@@ -1,0 +1,17 @@
+{
+  "$schema": "https://www.schemastore.org/package.json",
+  "name": "libvibe",
+  "version": "0.0.1",
+  "description": "A library to create extensions for the Vibe Music Player",
+  "scripts": {
+    "types": "sh ./scripts/types.sh"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.12.1",
+  "dependencies": {
+    "gnim": "^1.6.3",
+    "typescript": "^5.9.2"
+  }
+}
