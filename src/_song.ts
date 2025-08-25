@@ -1,30 +1,37 @@
+import Gio from "gi://Gio?version=2.0";
 import GObject, { getter, ParamSpec, register } from "gnim/gobject";
-import Artist from "./_artist";
 import Album from "./_album";
+import Artist from "./_artist";
 
 
+/** store song informations */
 @register({ GTypeName: "VibeSong" })
 export default class Song extends GObject.Object {
+
+    public static ArrayParamSpec = (name: string, flags: GObject.ParamFlags) =>
+        GObject.ParamSpec.jsobject(name, null, null, flags) as ParamSpec<Array<Song>>;
 
     public static ParamSpec = (name: string, flags: GObject.ParamFlags) => 
         GObject.ParamSpec.jsobject(name, null, null, flags) as ParamSpec<Song>;
 
-    readonly #name?: string;
-    readonly #artist?: Array<Artist>;
-    readonly #album?: Album;
-    readonly #url?: string;
-
     /** the unique identifier of this song, usually defined 
-    * by the plugin on song import.
-    * @method Vibe.generateSongID() to generate an ID
+    * by the plugin on load.
+    * @method Vibe.generateSongID() to generate an ID for this object
     */
-    public id: any;
+    readonly id: any;
+
+    readonly #name: string|null;
+    readonly #artist: Array<Artist>|null;
+    readonly #album: Album| null = null;
+    readonly #url: string|null = null;
+    readonly #file: Gio.File|null;
+
 
     /** the song name. can be null */
     @getter(String) 
     get name() { return this.#name!; }
 
-    /** the authors of the song, can be null */
+    /** the authors of this song, can be null */
     @getter(Artist.ArrayParamSpec) 
     get artist() { return this.#artist!; }
 
@@ -36,28 +43,28 @@ export default class Song extends GObject.Object {
     @getter(String)
     get url() { return this.#url!; }
 
+    /** the song's file path or GFile, can be null */
+    @getter(Gio.File)
+    get file() { return this.#file!; }
 
     constructor(properties: {
         name?: string;
         id?: any;
         artist?: Array<Artist>;
+        file: Gio.File|string;
         url?: string;
         album?: Album;
     }) {
         super();
 
         this.id = properties.id;
+        this.#file = (typeof properties.file === "string" ?
+            Gio.File.new_for_path(properties.file)
+        : properties.file) ?? null;
 
-        if(properties.url !== undefined)
-            this.#url = properties.url;
-
-        if(properties.name !== undefined)
-            this.#name = properties.name;
-
-        if(properties.album !== undefined) 
-            this.#album = properties.album;
-
-        if(properties.artist !== undefined)
-            this.#artist = properties.artist;
+        this.#url = properties.url ?? null;
+        this.#name = properties.name ?? null;
+        this.#album = properties.album ?? null;
+        this.#artist = properties.artist ?? null;
     }
 }
