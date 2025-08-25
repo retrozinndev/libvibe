@@ -2,6 +2,7 @@ import Gio from "gi://Gio?version=2.0";
 import GObject, { getter, ParamSpec, register } from "gnim/gobject";
 import Album from "./_album";
 import Artist from "./_artist";
+import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
 
 
 /** store song informations */
@@ -25,6 +26,7 @@ export default class Song extends GObject.Object {
     readonly #album: Album| null = null;
     readonly #url: string|null = null;
     readonly #file: Gio.File|null;
+    readonly #image: GdkPixbuf.Pixbuf|null = null;
 
 
     /** the song name. can be null */
@@ -47,12 +49,19 @@ export default class Song extends GObject.Object {
     @getter(Gio.File)
     get file() { return this.#file!; }
 
+    /** the song's individual image. usually, you don't need to define this,
+    * as it's expected that only the album has an image; but you can also
+    * use this if needed. can be null */
+    @getter(GdkPixbuf.Pixbuf)
+    get image() { return this.#image!; }
+
     constructor(properties: {
         name?: string;
         id?: any;
         artist?: Array<Artist>;
         file: Gio.File|string;
         url?: string;
+        image?: GdkPixbuf.Pixbuf;
         album?: Album;
     }) {
         super();
@@ -64,6 +73,7 @@ export default class Song extends GObject.Object {
 
         this.#url = properties.url ?? null;
         this.#name = properties.name ?? null;
+        this.#image = properties.image ?? null;
         this.#album = properties.album ?? null;
         this.#artist = properties.artist ?? null;
     }

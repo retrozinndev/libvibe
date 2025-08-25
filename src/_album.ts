@@ -1,6 +1,8 @@
 import GObject, { getter, ParamSpec, register } from "gnim/gobject";
 import Artist from "./_artist";
 import Song from "./_song";
+import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
+
 
 /** store album information */
 @register({ GTypeName: "VibeAlbum" })
@@ -18,6 +20,7 @@ export default class Album extends GObject.Object {
     readonly #title: string|null = null;
     readonly #description: string|null = null;
     readonly #url: string|null = null;
+    readonly #image: GdkPixbuf.Pixbuf|null = null;
     readonly #songs: Array<Song>;
     readonly #single: boolean = false;
 
@@ -44,11 +47,15 @@ export default class Album extends GObject.Object {
     @getter(Boolean)
     get single() { return this.#single; }
 
+    /** the album's image, in pixbuf. can be null */
+    @getter(GdkPixbuf.Pixbuf)
+    get image() { return this.#image!; }
 
     constructor(properties: {
         artist: Array<Artist>;
         songs: Array<Song>;
         id?: any;
+        image?: GdkPixbuf.Pixbuf;
         title?: string;
         description?: string;
         url?: string;
@@ -59,6 +66,7 @@ export default class Album extends GObject.Object {
         this.#title = properties.title ?? null;
         this.#artist = properties.artist ?? null;
         this.#description = properties.description ?? null;
+        this.#image = properties.image ?? null;
         this.#url = properties.url ?? null;
         this.#songs = properties.songs ?? null;
         this.#single = properties.single ?? this.#songs.length === 1;

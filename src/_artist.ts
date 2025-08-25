@@ -1,3 +1,4 @@
+import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
 import GObject, { getter, ParamSpec, register } from "gnim/gobject";
 
 
@@ -15,9 +16,10 @@ export default class Artist extends GObject.Object {
     readonly id: any;
 
     readonly #name: string;
-    readonly #url: string|null = null;
-    readonly #description: string|null = null;
     readonly #displayName: string|null = null;
+    readonly #description: string|null = null;
+    readonly #image: GdkPixbuf.Pixbuf|null = null;
+    readonly #url: string|null = null;
 
     /** the artist's name.
     * if display name is provideable, use this property for the user name
@@ -40,9 +42,14 @@ export default class Artist extends GObject.Object {
     @getter(String)
     get url() { return this.#url!; }
 
+    /** the artist's picture, in pixbuf. can be null */
+    @getter(GdkPixbuf.Pixbuf)
+    get image() { return this.#image!; }
+
     constructor(properties: {
         name: string;
         displayName?: string;
+        image?: GdkPixbuf.Pixbuf;
         url?: string;
         description?: string;
     }) {
@@ -51,5 +58,6 @@ export default class Artist extends GObject.Object {
         this.#name = properties.name;
         this.#displayName = properties.displayName ?? null;
         this.#description = properties.description ?? null;
+        this.#image = properties.image ?? null;
     }
 }

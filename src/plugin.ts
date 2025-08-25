@@ -25,6 +25,7 @@ export default class Plugin extends GObject.Object {
     readonly #implementsSearch: boolean = false;
     readonly #implementsSections: boolean = false;
     readonly #version: string = "unknown";
+    readonly #url?: string;
 
     /** the plugin name */
     @getter(String) 
@@ -46,6 +47,10 @@ export default class Plugin extends GObject.Object {
     @getter(Boolean)
     get implementsSections() { return this.#implementsSections; }
 
+    /** the plugin's website, can be null */
+    @getter(String)
+    get url() { return this.#url!; }
+
     /** the plugin's status, you can set this to the available 
     * values through completion anytime. default: "none" */
     @property(String as unknown as ParamSpec<keyof PluginStatus>) // fake-type (lol) because it's all a string in the end
@@ -56,12 +61,14 @@ export default class Plugin extends GObject.Object {
         name: string;
         description?: string;
         version?: string;
+        url?: string;
         implementsSearch?: boolean;
         implementsSections?: boolean;
     }) {
         super();
 
         this.#name = properties.name;
+        this.#url = properties.url;
 
         if(properties.description !== undefined)
             this.description = properties.description;
