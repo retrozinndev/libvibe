@@ -1,7 +1,6 @@
 import Gio from "gi://Gio?version=2.0";
 import GObject, { getter, ParamSpec, register } from "gnim/gobject";
-import Album from "./_album";
-import Artist from "./_artist";
+import { Album, Artist } from "../index";
 import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
 
 

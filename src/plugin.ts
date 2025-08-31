@@ -1,7 +1,5 @@
 import GObject, { getter, ParamSpec, property, register } from "gnim/gobject";
-import Album from "./_album";
-import Artist from "./_artist";
-import Song from "./_song";
+import { Album, Artist, Song } from "../index";
 import { Section } from "./vibe";
 
 

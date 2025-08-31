@@ -1,6 +1,5 @@
 import GObject, { getter, ParamSpec, register } from "gnim/gobject";
-import Artist from "./_artist";
-import Song from "./_song";
+import { Artist, Song } from "../index";
 import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
 
 
