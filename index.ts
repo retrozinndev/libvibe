@@ -2,13 +2,19 @@ import Plugin from "./src/plugin";
 import Album from "./src/_album";
 import Song from "./src/_song";
 import Artist from "./src/_artist";
-import Vibe from "./src/vibe";
+import * as VibeNamespace from "./src/vibe";
 
+
+const { isLabelButton, isIconButton, PlayerState } = VibeNamespace;
+const Vibe = VibeNamespace.default;
 
 export {
     Plugin,
     Album,
     Song,
     Artist,
-    Vibe as VibeAPI
-}
+    isIconButton,
+    isLabelButton,
+    PlayerState,
+    Vibe
+};

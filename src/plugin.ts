@@ -11,19 +11,41 @@ export type PluginStatus = {
     "none": string;
 };
 
+export type Implementations = Partial<{
+    /** true if plugin implements the search feature */
+    search: boolean;
+    /** true if plugin implements the sections feature */
+    sections: boolean;
+}>;
+
 /** create plugins and add functions to them */
 @register({ GTypeName: "VibePlugin" })
 export default class Plugin extends GObject.Object {
 
+    declare $signals: GObject.Object.SignalSignatures & {
+        /** emitted when the plugin has finished loading */
+        "loaded": () => void;
+        /** emitted when the plugin has finished importing(first-load/update only) */
+        "imported": () => void;
+    };
     /** the plugin's unique identifier, defined by the application 
     * on plugin import */
     public id: any;
 
     readonly #name: string;
-    readonly #implementsSearch: boolean = false;
-    readonly #implementsSections: boolean = false;
     readonly #version: string = "unknown";
     readonly #url?: string;
+
+    #implements: Implementations = {};
+    #songs: Array<Song> = [];
+    
+
+    /** array containing all the songs in the plugin.
+      * if the plugin functions like online music players, 
+      * you don't need to provide data to the array.
+      */
+    @getter(Array<Song>)
+    get songs() { return this.#songs; }
 
     /** the plugin name */
     @getter(String) 
@@ -37,31 +59,27 @@ export default class Plugin extends GObject.Object {
     @getter(String)
     get version() { return this.#version; }
 
-    /** true if plugin implements the search feature */
-    @getter(Boolean)
-    get implementsSearch() { return this.#implementsSearch; }
-
-    /** true if plugin implements the sections feature */
-    @getter(Boolean)
-    get implementsSections() { return this.#implementsSections; }
-
     /** the plugin's website, can be null */
     @getter(String)
     get url() { return this.#url!; }
+
+    /** an object containing which functions are implemented in 
+      * this plugin
+      */
+    @getter(Object as unknown as ParamSpec<Implementations>)
+    get implements() { return this.#implements; }
 
     /** the plugin's status, you can set this to the available 
     * values through completion anytime. default: "none" */
     @property(String as unknown as ParamSpec<keyof PluginStatus>) // fake-type (lol) because it's all a string in the end
     status: keyof PluginStatus = "none";
 
-
     constructor(properties: {
         name: string;
         description?: string;
         version?: string;
         url?: string;
-        implementsSearch?: boolean;
-        implementsSections?: boolean;
+        implements?: Implementations
     }) {
         super();
 
@@ -74,11 +92,13 @@ export default class Plugin extends GObject.Object {
         if(properties.version !== undefined)
             this.#version = properties.version;
 
-        if(properties.implementsSearch !== undefined)
-            this.#implementsSearch = properties.implementsSearch;
+        if(properties.implements !== undefined)
+            this.#implements = Object.freeze({ ...properties.implements });
+    }
 
-        if(properties.implementsSections !== undefined)
-            this.#implementsSections = properties.implementsSections;
+    protected addSong(song: Song): void {
+        this.#songs.push(song);
+        this.notify("songs");
     }
 
     /** the search function implemented by the plugin.
@@ -101,5 +121,21 @@ export default class Plugin extends GObject.Object {
     * */
     getSections(_length?: number): Array<Section>|null {
         return null;
+    }
+
+    public emit<Signal extends keyof typeof this.$signals>(
+        signal: Signal, 
+        ...args: Parameters<(typeof this.$signals)[Signal]>
+    ): void {
+        super.emit(signal, ...args);
+    }
+
+    public connect<Signal extends keyof typeof this.$signals>(
+        signal: Signal, 
+        callback: (self: typeof this, ...args: Parameters<(typeof this.$signals)[Signal]>) => ReturnType<
+            (typeof this.$signals)[Signal]
+        >
+    ): number {
+        return super.connect(signal, callback);
     }
 }
