@@ -1,7 +1,8 @@
 import GObject, { getter, ParamSpec, register } from "gnim/gobject";
-import { Plugin, Song } from "../index";
 import Gio from "gi://Gio?version=2.0";
 import GLib from "gi://GLib?version=2.0";
+import Plugin from "./plugin";
+import Song from "./song";
 
 
 export type IconButton = {
