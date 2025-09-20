@@ -53,7 +53,7 @@ export default class Vibe extends GObject.Object {
     #state: PlayerState = PlayerState.NONE;
 
     /** currently playing song, can be null if there's none */
-    @getter(Song.ParamSpec as unknown as ParamSpec<Song|null>)
+    @getter(Song as unknown as ParamSpec<Song|null>)
     get song() { return this.#song; }
 
     @getter(Number as unknown as ParamSpec<PlayerState>) // just for completion purposes

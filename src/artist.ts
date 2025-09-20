@@ -1,16 +1,12 @@
 import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
-import GObject, { getter, ParamSpec, register } from "gnim/gobject";
+import GObject, { getter, GType, ParamSpec, register } from "gnim/gobject";
 
 
 /** store artist informations */
 @register({ GTypeName: "VibeArtist" })
 export default class Artist extends GObject.Object {
 
-    public static ArrayParamSpec = (name: string, flags: GObject.ParamFlags) =>
-        GObject.ParamSpec.jsobject(name, null, null, flags) as ParamSpec<Array<Artist>>;
-
-    public static ParamSpec = (name: string, flags: GObject.ParamFlags) => 
-        GObject.ParamSpec.jsobject(name, null, null, flags) as ParamSpec<Artist>;
+    $gtype = GObject.type_from_name("VibeArtist") as GType<Artist>;
 
     /** the unique identifier for this artist in this plugin */
     readonly id: any;
@@ -29,22 +25,22 @@ export default class Artist extends GObject.Object {
     get name() { return this.#name; };
 
     /** the artist's display name, can be null */
-    @getter(String)
-    get displayName() { return this.#displayName!; }
+    @getter(String as unknown as ParamSpec<string|null>)
+    get displayName() { return this.#displayName; }
 
     /** the artist's description, can be null */
-    @getter(String)
-    get description() { return this.#description!; }
+    @getter(String as unknown as ParamSpec<string|null>)
+    get description() { return this.#description; }
 
     /** the artist's url, can be null.
     * you can set this as the artist's profile page or their website
     * */
-    @getter(String)
-    get url() { return this.#url!; }
+    @getter(String as unknown as ParamSpec<string|null>)
+    get url() { return this.#url; }
 
     /** the artist's picture, in pixbuf. can be null */
-    @getter(GdkPixbuf.Pixbuf)
-    get image() { return this.#image!; }
+    @getter(GdkPixbuf.Pixbuf as unknown as ParamSpec<GdkPixbuf.Pixbuf|null>)
+    get image() { return this.#image; }
 
     constructor(properties: {
         name: string;

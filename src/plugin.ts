@@ -1,6 +1,8 @@
 import GObject, { getter, ParamSpec, property, register } from "gnim/gobject";
-import { Album, Artist, Song } from "../index";
 import { Section } from "./vibe";
+import Album from "./album";
+import Artist from "./artist";
+import Song from "./song";
 
 
 export type PluginStatus = {
@@ -137,5 +139,12 @@ export default class Plugin extends GObject.Object {
         >
     ): number {
         return super.connect(signal, callback);
+    }
+
+    /** check if a feature is implemented for this plugin.
+      * @returns true if feature is implemented by the plugin
+      */
+    isImplemented<Feature extends keyof Implementations>(feature: Feature): boolean {
+        return Boolean(this.#implements[feature]);
     }
 }
