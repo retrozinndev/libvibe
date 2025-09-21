@@ -1,8 +1,9 @@
-import GObject, { getter, ParamSpec, property, register } from "gnim/gobject";
-import { Section } from "./vibe";
+import GObject, { getter, GType, ParamSpec, property, register } from "gnim/gobject";
 import Album from "./album";
 import Artist from "./artist";
 import Song from "./song";
+import SongList from "./songlist";
+import { Section } from "./vibe";
 
 
 export type PluginStatus = {
@@ -24,55 +25,69 @@ export type Implementations = Partial<{
 @register({ GTypeName: "VibePlugin" })
 export default class Plugin extends GObject.Object {
 
+    $gtype = GObject.type_from_name("VibePlugin") as GType<Plugin>;
+
     declare $signals: GObject.Object.SignalSignatures & {
         /** emitted when the plugin has finished loading */
         "loaded": () => void;
         /** emitted when the plugin has finished importing(first-load/update only) */
         "imported": () => void;
+        "notify::description": (description: string) => void;
+        "notify::status": (status: PluginStatus) => void;
     };
     /** the plugin's unique identifier, defined by the application 
-    * on plugin import */
+    * on plugin import 
+    * @default undefined */
     public id: any;
 
     readonly #name: string;
     readonly #version: string = "unknown";
-    readonly #url?: string;
+    readonly #url: string|null = null;
 
     #implements: Implementations = {};
-    #songs: Array<Song> = [];
+    #songlist: SongList = new SongList();
     
 
-    /** array containing all the songs in the plugin.
-      * if the plugin functions like online music players, 
-      * you don't need to provide data to the array.
+    /** SongList containing all the songs imported by the plugin.
+      * if the plugin functions like online music players(network streaming), 
+      * you don't need to add them to the list.
+      * You can add/remove songs by using this field.
+      * @readonly
       */
-    @getter(Array<Song>)
-    get songs() { return this.#songs; }
+    // this is a type-workaround: @getter doesn't want my custom gobjects to work for some reason :broken_heart:
+    @getter(SongList as unknown as ParamSpec<SongList>) 
+    get songlist() { return this.#songlist; }
 
-    /** the plugin name */
+    /** the plugin name 
+    * @readonly */
     @getter(String) 
     get name() { return this.#name; }
 
-    /** the plugin's description */
+    /** the plugin's description
+    * @default "A cool Plugin" */
     @property(String) 
     description: string = "A cool Plugin";
 
-    /** the plugin's version in a string format, default: "unknown" */
+    /** the plugin's version in a string format 
+    * @default: "unknown" */
     @getter(String)
     get version() { return this.#version; }
 
-    /** the plugin's website, can be null */
-    @getter(String)
-    get url() { return this.#url!; }
+    /** the plugin's website, can be null 
+    * @readonly */
+    @getter(String as unknown as ParamSpec<string|null>)
+    get url() { return this.#url; }
 
     /** an object containing which functions are implemented in 
       * this plugin
+      * @readonly
       */
     @getter(Object as unknown as ParamSpec<Implementations>)
     get implements() { return this.#implements; }
 
     /** the plugin's status, you can set this to the available 
-    * values through completion anytime. default: "none" */
+      * values through completion anytime. 
+      * @default "none" */
     @property(String as unknown as ParamSpec<keyof PluginStatus>) // fake-type (lol) because it's all a string in the end
     status: keyof PluginStatus = "none";
 
@@ -81,12 +96,14 @@ export default class Plugin extends GObject.Object {
         description?: string;
         version?: string;
         url?: string;
-        implements?: Implementations
+        implements?: Implementations;
     }) {
         super();
 
         this.#name = properties.name;
-        this.#url = properties.url;
+
+        if(properties.url !== undefined)
+            this.#url = properties.url;
 
         if(properties.description !== undefined)
             this.description = properties.description;
@@ -96,11 +113,6 @@ export default class Plugin extends GObject.Object {
 
         if(properties.implements !== undefined)
             this.#implements = Object.freeze({ ...properties.implements });
-    }
-
-    protected addSong(song: Song): void {
-        this.#songs.push(song);
-        this.notify("songs");
     }
 
     /** the search function implemented by the plugin.

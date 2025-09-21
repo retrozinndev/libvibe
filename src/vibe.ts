@@ -1,4 +1,4 @@
-import GObject, { getter, ParamSpec, register } from "gnim/gobject";
+import GObject, { getter, GType, ParamSpec, register } from "gnim/gobject";
 import Gio from "gi://Gio?version=2.0";
 import GLib from "gi://GLib?version=2.0";
 import Song from "./song";
@@ -45,6 +45,8 @@ export const isLabelButton = (obj: object): boolean =>
 @register({ GTypeName: "VibeAPI" })
 export default class Vibe extends GObject.Object {
     private static instance: Vibe;
+
+    $gtype = GObject.type_from_name("VibeAPI") as GType<Vibe>;
 
     #encoder = new TextEncoder();
     #lastId: number = -1;
