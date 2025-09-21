@@ -52,6 +52,7 @@ export default class Vibe extends GObject.Object {
     #client: Gio.SocketClient;
     #address: Gio.UnixSocketAddress;
     #state: PlayerState = PlayerState.NONE;
+    #socketFile = Gio.File.new_for_path(`${Vibe.runtimeDir}/socket.sock`);
 
     public static readonly runtimeDir = Gio.File.new_for_path(`${GLib.get_user_runtime_dir()}/vibe`);
     public static readonly cacheDir = Gio.File.new_for_path(`${GLib.get_user_cache_dir()}/vibe`);
@@ -83,12 +84,7 @@ export default class Vibe extends GObject.Object {
     constructor(socketAdress?: Gio.UnixSocketAddress) {
         super();
 
-        const exists = GLib.file_test(
-            `${Vibe.runtimeDir.get_path()!}/socket.sock`, 
-            GLib.FileTest.EXISTS
-        );
-
-        if(!exists) 
+        if(!this.#socketFile.query_exists(null)) 
             throw new Error(`Vibe Socket: Couldn't connect to socket!`);
 
         this.#client = Gio.SocketClient.new();
