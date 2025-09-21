@@ -73,7 +73,8 @@ export default class Vibe extends GObject.Object {
         return this.instance;
     }
 
-    constructor() {
+    /** @param socketAdress the vibe unix socket address */
+    constructor(socketAdress?: Gio.UnixSocketAddress) {
         super();
 
         const exists = GLib.file_test(
@@ -85,7 +86,8 @@ export default class Vibe extends GObject.Object {
             throw new Error(`Vibe Socket: Couldn't connect to socket!`);
 
         this.#service = Gio.SocketService.new();
-        this.#service.add_address(Gio.UnixSocketAddress.new(
+        this.#service.add_address(
+            socketAdress ?? Gio.UnixSocketAddress.new(
                 `${this.#runtimeDir.get_path()!}/socket.sock`
             ),
             Gio.SocketType.STREAM,
