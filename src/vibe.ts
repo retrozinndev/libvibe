@@ -49,8 +49,8 @@ export default class Vibe extends GObject.Object {
     #encoder = new TextEncoder();
     #lastId: number = -1;
     #song: Song|null = null;
-    #client: Gio.SocketClient;
-    #address: Gio.UnixSocketAddress;
+    #client?: Gio.SocketClient;
+    #address?: Gio.UnixSocketAddress;
     #state: PlayerState = PlayerState.NONE;
     #socketFile = Gio.File.new_for_path(`${Vibe.runtimeDir}/socket.sock`);
     #enableSocket: boolean = true;
@@ -98,6 +98,8 @@ export default class Vibe extends GObject.Object {
             });
         }
 
+        if(!this.#enableSocket) return;
+
         if(!this.#socketFile.query_exists(null)) 
             throw new Error(`Vibe Socket: Couldn't connect to socket!`);
 
@@ -114,8 +116,8 @@ export default class Vibe extends GObject.Object {
         if(!this.#enableSocket)
             throw new Error(`Vibe Socket: Communicating via socket is disabled by the application`);
         
-        this.#client.connect_async(this.#address, null, (_, res) => {
-            const conn = this.#client.connect_finish(res);
+        this.#client!.connect_async(this.#address!, null, (_, res) => {
+            const conn = this.#client!.connect_finish(res);
                 
             conn.outputStream.write_bytes(
                 this.#encoder.encode(`${command}>>${JSON.stringify(data)}`),
