@@ -1,5 +1,5 @@
 import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
-import GObject, { getter, GType, ParamSpec, register } from "gnim/gobject";
+import { getter, ParamSpec, register } from "gnim/gobject";
 import Artist from "./artist";
 import Song from "./song";
 import SongList from "./songlist";
@@ -8,9 +8,6 @@ import SongList from "./songlist";
 /** store album information */
 @register({ GTypeName: "VibeAlbum" })
 export default class Album extends SongList {
-
-    $gtype = GObject.type_from_name("VibeAlbum") as GType<Album>;
-
     /** the object's unique identifier for the plugin */
     readonly id: any;
 

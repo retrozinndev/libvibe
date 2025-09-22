@@ -1,13 +1,11 @@
-import GObject, { getter, GType, ParamSpec, register } from "gnim/gobject";
+import GObject, { getter, gtype, register } from "gnim/gobject";
 import Song from "./song";
 
 
 /** base class for song lists(albums and playlists) */
 @register({ GTypeName: "VibeSongList" })
 export default class SongList extends GObject.Object {
-    
-    $gtype = GObject.type_from_name("VibeSongList") as GType<SongList>;
-
+    /** @protected array containing all songs in this list */
     protected _songs: Array<Song> = [];
 
     /** @protected the title for this song list */
@@ -22,11 +20,11 @@ export default class SongList extends GObject.Object {
     get songs() { return this._songs; }
 
     /** title for this song list, can be null */
-    @getter(String as unknown as ParamSpec<string|null>)
+    @getter(gtype<string|null>(String))
     get title() { return this._title; }
 
     /** description for this song list, can be null */
-    @getter(String as unknown as ParamSpec<string|null>)
+    @getter(gtype<string|null>(String))
     get description() { return this._description; }
 
     constructor(properties?: {

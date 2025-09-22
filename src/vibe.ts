@@ -1,4 +1,4 @@
-import GObject, { getter, GType, ParamSpec, register } from "gnim/gobject";
+import GObject, { getter, gtype, register } from "gnim/gobject";
 import Gio from "gi://Gio?version=2.0";
 import GLib from "gi://GLib?version=2.0";
 import Song from "./song";
@@ -46,8 +46,6 @@ export const isLabelButton = (obj: object): boolean =>
 export default class Vibe extends GObject.Object {
     private static instance: Vibe;
 
-    $gtype = GObject.type_from_name("VibeAPI") as GType<Vibe>;
-
     #encoder = new TextEncoder();
     #lastId: number = -1;
     #song: Song|null = null;
@@ -63,13 +61,13 @@ export default class Vibe extends GObject.Object {
     public static readonly pluginsCacheDir = Gio.File.new_for_path(`${this.cacheDir}/plugins`);
 
     /** currently playing song, can be null if there's none */
-    @getter(Song as unknown as ParamSpec<Song|null>)
+    @getter(gtype<Song|null>(Song))
     get song() { return this.#song; }
 
-    @getter(Number as unknown as ParamSpec<PlayerState>) // just for completion purposes
+    @getter(gtype<PlayerState>(Number))
     get state() { return this.#state; }
 
-    /** generate an unique identifier for this instance */
+    /** generate an unique identifier for an object(song, playlist, artist, album...) */
     public generateID(): number {
         this.#lastId++;
         return this.#lastId;

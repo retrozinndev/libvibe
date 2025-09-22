@@ -7,11 +7,10 @@ import SongList from "./songlist";
 /** user-managed song list (handled by the app) */
 @register({ GTypeName: "VibePlaylist" })
 export default class Playlist extends SongList {
-
     readonly id: any;
 
-    @property(GdkPixbuf.Pixbuf as unknown as ParamSpec<GdkPixbuf.Pixbuf|undefined>) 
-    image?: GdkPixbuf.Pixbuf;
+    @property(GdkPixbuf.Pixbuf as unknown as ParamSpec<GdkPixbuf.Pixbuf|null>) 
+    image: GdkPixbuf.Pixbuf|null = null;
 
     constructor(properties: {
         title: string;

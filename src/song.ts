@@ -1,5 +1,5 @@
 import Gio from "gi://Gio?version=2.0";
-import GObject, { getter, ParamSpec, register } from "gnim/gobject";
+import GObject, { getter, gtype, register } from "gnim/gobject";
 import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
 import Artist from "./artist";
 import Album from "./album";
@@ -11,42 +11,42 @@ export default class Song extends GObject.Object {
 
     /** the unique identifier of this song, usually defined 
     * by the plugin on load.
-    * @method Vibe.generateSongID() to generate an ID for this object
+    * @method Vibe.generateID() to generate an ID for this object
     */
     readonly id: any;
 
-    readonly #name: string|null;
-    readonly #artist: Array<Artist>|null;
+    readonly #name: string|null = null;
+    readonly #artist: Array<Artist>|null = null;
     readonly #album: Album|null = null;
     readonly #url: string|null = null;
-    readonly #file: Gio.File|null;
+    readonly #file: Gio.File|null = null;
     readonly #image: GdkPixbuf.Pixbuf|null = null;
 
 
     /** the song name. can be null */
-    @getter(String) 
-    get name() { return this.#name!; }
+    @getter(gtype<string|null>(String)) 
+    get name() { return this.#name; }
 
     /** the authors of this song, can be null */
-    @getter(Array<Artist>) 
-    get artist() { return this.#artist!; }
+    @getter(gtype<Array<Artist>|null>(Array)) 
+    get artist() { return this.#artist; }
 
     /** the album object where this song belongs, can be null */
-    @getter(Album as unknown as ParamSpec<Album|null>)
+    @getter(gtype<Album|null>(Album))
     get album() { return this.#album; }
 
     /** the song's url, can be null */
-    @getter(String)
-    get url() { return this.#url!; }
+    @getter(gtype<string|null>(String))
+    get url() { return this.#url; }
 
     /** the song's file path or GFile, can be null */
-    @getter(Gio.File)
-    get file() { return this.#file!; }
+    @getter(gtype<Gio.File|null>(Gio.File))
+    get file() { return this.#file; }
 
     /** the song's individual image. usually, you don't need to define this,
     * as it's expected that only the album has an image; but you can also
     * use this if needed. can be null */
-    @getter(GdkPixbuf.Pixbuf as unknown as ParamSpec<GdkPixbuf.Pixbuf|null>)
+    @getter(gtype<GdkPixbuf.Pixbuf|null>(GdkPixbuf.Pixbuf))
     get image() { return this.#image; }
 
     constructor(properties: {
@@ -65,10 +65,16 @@ export default class Song extends GObject.Object {
             Gio.File.new_for_path(properties.file)
         : properties.file) ?? null;
 
-        this.#url = properties.url ?? null;
-        this.#name = properties.name ?? null;
-        this.#image = properties.image ?? null;
-        this.#album = properties.album ?? null;
-        this.#artist = properties.artist ?? null;
+        if(properties.url !== undefined)
+            this.#url = properties.url;
+
+        if(properties.name !== undefined)
+            this.#name = properties.name;
+
+        if(properties.image !== undefined)
+            this.#image = properties.image;
+
+        if(properties.artist !== undefined)
+            this.#artist = properties.artist;
     }
 }

@@ -1,4 +1,4 @@
-import GObject, { getter, GType, ParamSpec, property, register } from "gnim/gobject";
+import GObject, { getter, gtype, property, register } from "gnim/gobject";
 import Album from "./album";
 import Artist from "./artist";
 import Song from "./song";
@@ -15,30 +15,33 @@ export type PluginStatus = {
 };
 
 export type Implementations = Partial<{
-    /** true if plugin implements the search feature */
+    /** whether the plugin implements the search feature or not */
     search: boolean;
-    /** true if plugin implements the sections feature */
+    /** wheter this plugin implements the sections feature or not */
     sections: boolean;
+    /** wheter this plugin supports creating playlists or not */
+    playlist: boolean;
 }>;
+
+export type PluginSignalSignatures = GObject.Object.SignalSignatures & {
+    /** emitted when the plugin has finished loading */
+    "loaded": () => void;
+    /** emitted when the plugin has finished importing(first-load/update only) */
+    "imported": () => void;
+    "notify::description": (description: string) => void;
+    "notify::status": (status: PluginStatus) => void;
+};
+ 
 
 /** create plugins and add functions to them */
 @register({ GTypeName: "VibePlugin" })
 export default class Plugin extends GObject.Object {
+    declare $signals: PluginSignalSignatures;
 
-    $gtype = GObject.type_from_name("VibePlugin") as GType<Plugin>;
-
-    declare $signals: GObject.Object.SignalSignatures & {
-        /** emitted when the plugin has finished loading */
-        "loaded": () => void;
-        /** emitted when the plugin has finished importing(first-load/update only) */
-        "imported": () => void;
-        "notify::description": (description: string) => void;
-        "notify::status": (status: PluginStatus) => void;
-    };
     /** the plugin's unique identifier, defined by the application 
-    * on plugin import 
-    * @default undefined */
-    public id: any;
+      * on plugin import 
+      * @default undefined */
+    public readonly id: any;
 
     readonly #name: string;
     readonly #version: string = "unknown";
@@ -54,8 +57,7 @@ export default class Plugin extends GObject.Object {
       * You can add/remove songs by using this field.
       * @readonly
       */
-    // this is a type-workaround: @getter doesn't want my custom gobjects to work for some reason :broken_heart:
-    @getter(SongList as unknown as ParamSpec<SongList>) 
+    @getter(SongList) 
     get songlist() { return this.#songlist; }
 
     /** the plugin name 
@@ -75,20 +77,20 @@ export default class Plugin extends GObject.Object {
 
     /** the plugin's website, can be null 
     * @readonly */
-    @getter(String as unknown as ParamSpec<string|null>)
+    @getter(gtype<string|null>(String))
     get url() { return this.#url; }
 
     /** an object containing which functions are implemented in 
       * this plugin
       * @readonly
       */
-    @getter(Object as unknown as ParamSpec<Implementations>)
+    @getter(gtype<Implementations>(Object))
     get implements() { return this.#implements; }
 
     /** the plugin's status, you can set this to the available 
       * values through completion anytime. 
       * @default "none" */
-    @property(String as unknown as ParamSpec<keyof PluginStatus>) // fake-type (lol) because it's all a string in the end
+    @property(gtype<keyof PluginStatus>(String)) // fake-type (lol) because it's all a string in the end
     status: keyof PluginStatus = "none";
 
     constructor(properties: {

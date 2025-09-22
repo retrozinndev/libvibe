@@ -1,13 +1,10 @@
 import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
-import GObject, { getter, GType, ParamSpec, register } from "gnim/gobject";
+import GObject, { getter, ParamSpec, register } from "gnim/gobject";
 
 
 /** store artist informations */
 @register({ GTypeName: "VibeArtist" })
 export default class Artist extends GObject.Object {
-
-    $gtype = GObject.type_from_name("VibeArtist") as GType<Artist>;
-
     /** the unique identifier for this artist in this plugin */
     readonly id: any;
 
