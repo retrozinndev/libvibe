@@ -99,12 +99,11 @@ export default class Vibe extends GObject.Object {
         super();
 
         if(props) {
-            Object.keys(props).forEach(k => {
-                if(props[k as keyof typeof props] !== undefined)
-                    this[`#${k}` as keyof typeof this] = props[
-                        k as keyof typeof props
-                    ] as this[keyof typeof this];
-            });
+            if(props.enableSocket !== undefined)
+                this.#enableSocket = props.enableSocket;
+
+            if(props.socketAddress !== undefined)
+                this.#socketAddress = props.socketAddress;
         }
 
         if(!this.#enableSocket) return;
