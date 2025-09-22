@@ -82,6 +82,15 @@ export default class Vibe extends GObject.Object {
         return this.instance;
     }
 
+    public static setDefault(inst: Vibe): void {
+        if(!this.instance) {
+            this.instance = inst;
+            return;
+        }
+
+        throw new Error("Vibe: Can't set default instance if it was previously set! (readonly)");
+    }
+
     /** @param socketAdress the vibe unix socket address */
     constructor(props?: {
         enableSocket?: boolean;
