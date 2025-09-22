@@ -53,6 +53,8 @@ export default class Vibe extends GObject.Object {
     #address: Gio.UnixSocketAddress;
     #state: PlayerState = PlayerState.NONE;
     #socketFile = Gio.File.new_for_path(`${Vibe.runtimeDir}/socket.sock`);
+    #enableSocket: boolean = true;
+    #socketAddress?: Gio.UnixSocketAddress;
 
     public static readonly runtimeDir = Gio.File.new_for_path(`${GLib.get_user_runtime_dir()}/vibe`);
     public static readonly cacheDir = Gio.File.new_for_path(`${GLib.get_user_cache_dir()}/vibe`);
@@ -81,14 +83,26 @@ export default class Vibe extends GObject.Object {
     }
 
     /** @param socketAdress the vibe unix socket address */
-    constructor(socketAdress?: Gio.UnixSocketAddress) {
+    constructor(props?: {
+        enableSocket?: boolean;
+        socketAddress?: Gio.UnixSocketAddress;
+    }) {
         super();
+
+        if(props) {
+            Object.keys(props).forEach(k => {
+                if(props[k as keyof typeof props] !== undefined)
+                    this[`#${k}` as keyof typeof this] = props[
+                        k as keyof typeof props
+                    ] as this[keyof typeof this];
+            });
+        }
 
         if(!this.#socketFile.query_exists(null)) 
             throw new Error(`Vibe Socket: Couldn't connect to socket!`);
 
         this.#client = Gio.SocketClient.new();
-        this.#address = socketAdress ?? Gio.UnixSocketAddress.new(
+        this.#address = this.#socketAddress ?? Gio.UnixSocketAddress.new(
             `${Vibe.runtimeDir.peek_path()!}/socket.sock`
         );
     }
@@ -97,6 +111,8 @@ export default class Vibe extends GObject.Object {
     * @param command the command you want to use 
     * @param data the data you want to pass to the application (can be arguments for the command) */
     public sendCommand(command: "play"|"pause"|"next"|"previous", ...data: Array<any>): void {
+        if(!this.#enableSocket)
+            throw new Error(`Vibe Socket: Communicating via socket is disabled by the application`);
         
         this.#client.connect_async(this.#address, null, (_, res) => {
             const conn = this.#client.connect_finish(res);
