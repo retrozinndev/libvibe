@@ -129,13 +129,16 @@ export default class Plugin extends GObject.Object {
     * attractive title and maybe a description; with song/album 
     * suggestions.
     * 
-    * @param _length the number of sections to generate, usually provided
+    * @param length the number of sections to generate, usually provided
     * by the application. can be undefined
+    *
+    * @param offset the offset to load the next sections. usually it's the 
+    * index of the last loaded section.
     *
     * @returns an array containing all the sections, or null if not
     * implemented
     * */
-    getSections(_length?: number): Array<Section>|null {
+    getSections(length?: number, offset?: number): Array<Section>|null {
         return null;
     }
 
