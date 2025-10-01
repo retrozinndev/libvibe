@@ -5,11 +5,13 @@ import Song from "./song";
 
 
 export type IconButton = {
+    id: any;
     iconName: string;
     onClicked?: () => void;
 };
 
 export type LabelButton = {
+    id: any;
     label: string;
     onClicked?: () => void;
 };
