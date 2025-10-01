@@ -2,6 +2,8 @@ import GObject, { getter, gtype, register } from "gnim/gobject";
 import Gio from "gi://Gio?version=2.0";
 import GLib from "gi://GLib?version=2.0";
 import Song from "./song";
+import SongList from "./songlist";
+import Artist from "./artist";
 
 
 export type IconButton = {
@@ -20,6 +22,7 @@ export type Section = {
     title: string;
     description?: string;
     type?: "listrow"|"row";
+    content?: Array<Song|SongList|Artist>;
     headerButtons?: Array<IconButton | LabelButton>;
     endButton?: IconButton | LabelButton;
 };
@@ -37,10 +40,10 @@ export enum PlayerState {
     STOPPED = 3
 }
 
-export const isIconButton = (obj: object): boolean =>
+export const isIconButton = (obj: object): obj is IconButton =>
     Boolean(Object.hasOwn(obj, "iconName") && Object.hasOwn(obj, "onClicked"));
 
-export const isLabelButton = (obj: object): boolean => 
+export const isLabelButton = (obj: object): obj is LabelButton => 
     Boolean(Object.hasOwn(obj, "label") && Object.hasOwn(obj, "onClicked"));
 
 /** Communicate with the music player */
