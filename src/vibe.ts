@@ -51,15 +51,9 @@ export const isLabelButton = (obj: object): obj is LabelButton =>
 export default class Vibe extends GObject.Object {
     private static instance: Vibe;
 
-    #encoder = new TextEncoder();
     #lastId: number = -1;
     #song: Song|null = null;
-    #client?: Gio.SocketClient;
-    #address?: Gio.UnixSocketAddress;
     #state: PlayerState = PlayerState.NONE;
-    #socketFile = Gio.File.new_for_path(`${Vibe.runtimeDir}/socket.sock`);
-    #enableSocket: boolean = true;
-    #socketAddress?: Gio.UnixSocketAddress;
 
     public static readonly runtimeDir = Gio.File.new_for_path(`${GLib.get_user_runtime_dir()}/vibe`);
     public static readonly cacheDir = Gio.File.new_for_path(`${GLib.get_user_cache_dir()}/vibe`);
@@ -96,48 +90,7 @@ export default class Vibe extends GObject.Object {
         throw new Error("Vibe: Can't set default instance if it was previously set! (readonly)");
     }
 
-    /** @param socketAdress the vibe unix socket address */
-    constructor(props?: {
-        enableSocket?: boolean;
-        socketAddress?: Gio.UnixSocketAddress;
-    }) {
+    constructor() {
         super();
-
-        if(props) {
-            if(props.enableSocket !== undefined)
-                this.#enableSocket = props.enableSocket;
-
-            if(props.socketAddress !== undefined)
-                this.#socketAddress = props.socketAddress;
-        }
-
-        if(!this.#enableSocket) return;
-
-        if(!this.#socketFile.query_exists(null)) 
-            throw new Error(`Vibe Socket: Couldn't connect to socket!`);
-
-        this.#client = Gio.SocketClient.new();
-        this.#address = this.#socketAddress ?? Gio.UnixSocketAddress.new(
-            `${Vibe.runtimeDir.peek_path()!}/socket.sock`
-        );
-    }
-
-    /** send commands to the vibe application through the unix socket 
-    * @param command the command you want to use 
-    * @param data the data you want to pass to the application (can be arguments for the command) */
-    public sendCommand(command: "play"|"pause"|"next"|"previous", ...data: Array<any>): void {
-        if(!this.#enableSocket)
-            throw new Error(`Vibe Socket: Communicating via socket is disabled by the application`);
-        
-        this.#client!.connect_async(this.#address!, null, (_, res) => {
-            const conn = this.#client!.connect_finish(res);
-                
-            conn.outputStream.write_bytes(
-                this.#encoder.encode(`${command}>>${JSON.stringify(data)}`),
-                null
-            );
-
-            return true;
-        });
     }
 }

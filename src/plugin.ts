@@ -14,6 +14,17 @@ export type PluginStatus = {
     "none": string;
 };
 
+export type Update = {
+    /** the new updated version number.
+      * @example 1.2.1 (previous was 1.2.0) */
+    newVersion: string;
+    /** the link where the GET request should be made to get the updated plugin */
+    downloadUrl?: string;
+    /** the link for the user to download the new plugin version.
+      * (use this if you don't want to implement the plugin update directly) */
+    dowloadLink?: string;
+};
+
 export type Implementations = Partial<{
     /** whether the plugin implements the search feature or not */
     search: boolean;
@@ -21,6 +32,8 @@ export type Implementations = Partial<{
     sections: boolean;
     /** wheter this plugin supports creating playlists or not */
     playlist: boolean;
+    /** whether the plugin implements an update system */
+    updates: boolean;
 }>;
 
 export type PluginSignalSignatures = GObject.Object.SignalSignatures & {
@@ -139,6 +152,13 @@ export default class Plugin extends GObject.Object {
     * implemented
     * */
     getSections(length?: number, offset?: number): Array<Section>|null {
+        return null;
+    }
+
+    /** function that checks for updates for the plugin(if implemented).
+      * this is called by the application when the plugin initializes/the user checks for updates.
+      * @returns an Update object if an update was found, or null if none */
+    getUpdates(): Update|null {
         return null;
     }
 
