@@ -3,7 +3,17 @@ import GObject, { getter, gtype, register } from "gnim/gobject";
 import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
 import Artist from "./artist";
 import Album from "./album";
+import Gst from "gi://Gst?version=1.0";
 
+
+export namespace Song {
+    export interface SignalSignatures extends GObject.Object.SignalSignatures {
+
+        "notify::stream": (stream: Gst.Stream) => void;
+        /** emitted when the previous song is about to finish, so the next one can be prepared for a faster load time */
+        "prepare": () => void;
+    }
+}
 
 /* store song data */
 @register({ GTypeName: "VibeSong" })
@@ -22,6 +32,7 @@ export default class Song extends GObject.Object {
     readonly #file: Gio.File|null = null;
     readonly #image: GdkPixbuf.Pixbuf|null = null;
 
+    #stream: Gst.Stream|null = null;
 
     /** the song name. can be null */
     @getter(gtype<string|null>(String)) 
@@ -49,21 +60,34 @@ export default class Song extends GObject.Object {
     @getter(gtype<GdkPixbuf.Pixbuf|null>(GdkPixbuf.Pixbuf))
     get image() { return this.#image; }
 
+    /** stream for the app to play. you can use this if the plugin streams songs from the internet instead of downloading them */
+    @getter(gtype<Gst.Stream|null>(Gst.Stream))
+    get stream() { return this.#stream; }
+
     constructor(properties: {
         name?: string;
         id?: any;
         artist?: Array<Artist>;
-        file: Gio.File|string;
+        /** play a file instead of a stream */
+        file?: Gio.File|string;
+        /** a stream to play instead of a file */
+        stream?: Gst.Stream;
         url?: string;
+        /** song's own image. usually you don't need to define this, as vibe will automatically get the image from the song's album if available. */
         image?: GdkPixbuf.Pixbuf;
         album?: Album;
     }) {
         super();
 
         this.id = properties.id;
-        this.#file = (typeof properties.file === "string" ?
-            Gio.File.new_for_path(properties.file)
-        : properties.file) ?? null;
+
+        if(properties.file !== undefined)
+            this.#file = (typeof properties.file === "string" ?
+                Gio.File.new_for_path(properties.file)
+            : properties.file);
+
+        if(properties.stream !== undefined)
+            this.#stream = properties.stream;
 
         if(properties.url !== undefined)
             this.#url = properties.url;
