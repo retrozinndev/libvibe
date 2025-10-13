@@ -17,7 +17,7 @@ export interface MediaSignalSignatures extends GObject.Object.SignalSignatures {
 }
 
 /** interface implemented by the vibe app to control media from each plugin */
-export interface Media extends GObject.Object {
+export default interface Media extends GObject.Object {
     $signals: MediaSignalSignatures;
     /** currently-playing song */
     get song(): Song|null;

@@ -5,6 +5,7 @@ import Artist from "./src/artist";
 import Playlist from "./src/playlist";
 import Queue from "./src/queue";
 import SongList from "./src/songlist";
+import Media from "./src/media";
 import Vibe, {
     isIconButton,
     isLabelButton,
@@ -26,6 +27,7 @@ export {
     Playlist,
     Queue,
     SongList,
+    Media,
     Vibe,
     Section,
     IconButton,
