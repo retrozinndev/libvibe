@@ -134,7 +134,7 @@ export default class Plugin extends GObject.Object {
      * @param _search the current search string
      * @returns an Array containing the search results or null
      */
-    search(_search: string): Array<Array<Section>|Array<Album|Artist|Song>>|null {
+    search(_search: string): Promise<Array<Array<Section>|Array<Album|Artist|Song>>|null>|null {
         return null;
     }
 
@@ -151,14 +151,14 @@ export default class Plugin extends GObject.Object {
     * @returns an array containing all the sections, or null if not
     * implemented
     * */
-    getSections(length?: number, offset?: number): Array<Section>|null {
+    getSections(length?: number, offset?: number): Promise<Array<Section>|null>|null {
         return null;
     }
 
     /** function that checks for updates for the plugin(if implemented).
       * this is called by the application when the plugin initializes/the user checks for updates.
       * @returns an Update object if an update was found, or null if none */
-    getUpdates(): Update|null {
+    getUpdates(): Promise<Update|null>|null {
         return null;
     }
 
