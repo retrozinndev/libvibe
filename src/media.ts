@@ -1,6 +1,7 @@
 import GObject from "gnim/gobject";
 import Song from "./song";
 import Queue from "./queue";
+import SongList from "./songlist";
 
 
 export interface MediaSignalSignatures extends GObject.Object.SignalSignatures {
@@ -27,10 +28,10 @@ export default interface Media extends GObject.Object {
     * @param song the song to be played
     * @param pos song position to jump to */
     playSong(song: Song, pos: number): void;
-    /** play a queue of songs 
-    * @param queue the queue to be played
-    * @param posNum the queue position to start playing(zero-based) */
-    playQueue(queue: Queue, posNum: number): void;
+    /** play a list of songs
+    * @param list the song list to be played
+    * @param posNum the song position in the list to start playing(zero-based) */
+    playList(queue: SongList, posNum: number): void;
 
     /** resume media */
     resume(): void;
