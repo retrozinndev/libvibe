@@ -3,7 +3,7 @@ import Album from "./album";
 import Artist from "./artist";
 import Song from "./song";
 import SongList from "./songlist";
-import { Section } from "./vibe";
+import Vibe, { Section } from "./vibe";
 
 
 export type PluginStatus = {
@@ -115,6 +115,7 @@ export default class Plugin extends GObject.Object {
     }) {
         super();
 
+        this.id = Vibe.getDefault().generateID();
         this.#name = properties.name;
 
         if(properties.url !== undefined)

@@ -4,11 +4,11 @@ import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
 import Artist from "./artist";
 import Album from "./album";
 import Gst from "gi://Gst?version=1.0";
+import Vibe from "./vibe";
 
 
 export namespace Song {
     export interface SignalSignatures extends GObject.Object.SignalSignatures {
-
         "notify::stream": (stream: Gst.Stream) => void;
         /** emitted when the previous song is about to finish, so the next one can be prepared for a faster load time */
         "prepare": () => void;
@@ -66,7 +66,6 @@ export default class Song extends GObject.Object {
 
     constructor(properties: {
         name?: string;
-        id?: any;
         artist?: Array<Artist>;
         /** play a file instead of a stream */
         file?: Gio.File|string;
@@ -79,7 +78,7 @@ export default class Song extends GObject.Object {
     }) {
         super();
 
-        this.id = properties.id;
+        this.id = Vibe.getDefault().generateID();
 
         if(properties.file !== undefined)
             this.#file = (typeof properties.file === "string" ?

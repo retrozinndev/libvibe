@@ -1,5 +1,6 @@
 import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
 import GObject, { getter, ParamSpec, register } from "gnim/gobject";
+import Vibe from "./vibe";
 
 
 /** store artist informations */
@@ -47,6 +48,8 @@ export default class Artist extends GObject.Object {
         description?: string;
     }) {
         super();
+
+        this.id = Vibe.getDefault().generateID();
         
         this.#name = properties.name;
         this.#displayName = properties.displayName ?? null;

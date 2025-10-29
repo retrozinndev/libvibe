@@ -1,11 +1,14 @@
 import GObject, { getter, gtype, property, register } from "gnim/gobject";
 import Song from "./song";
 import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
+import Vibe from "./vibe";
 
 
 /** base class for song lists(albums and playlists) */
 @register({ GTypeName: "VibeSongList" })
 export default class SongList extends GObject.Object {
+    readonly id: any;
+
     /** @protected array containing all songs in this list */
     protected _songs: Array<Song> = [];
 
@@ -39,6 +42,8 @@ export default class SongList extends GObject.Object {
         description?: string;
     }) {
         super();
+
+        this.id = Vibe.getDefault().generateID();
 
         if(properties === undefined)
             return;

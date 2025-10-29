@@ -46,7 +46,7 @@ export const isIconButton = (obj: object): obj is IconButton =>
 export const isLabelButton = (obj: object): obj is LabelButton => 
     Boolean(Object.hasOwn(obj, "label") && Object.hasOwn(obj, "onClicked"));
 
-/** Communicate with the music player */
+/** Communicate with the music player and do more stuff */
 @register({ GTypeName: "VibeAPI" })
 export default class Vibe extends GObject.Object {
     private static instance: Vibe;

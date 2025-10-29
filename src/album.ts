@@ -8,12 +8,8 @@ import SongList from "./songlist";
 /** store album information */
 @register({ GTypeName: "VibeAlbum" })
 export default class Album extends SongList {
-    /** the object's unique identifier for the plugin */
-    readonly id: any;
-
     readonly #artist: Array<Artist>|null = null;
     readonly #url: string|null = null;
-    readonly #image: GdkPixbuf.Pixbuf|null = null;
     readonly #songs: Array<Song>;
     readonly #single: boolean = false;
 
@@ -33,14 +29,9 @@ export default class Album extends SongList {
     @getter(Boolean)
     get single() { return this.#single; }
 
-    /** the album's image, in pixbuf. can be null */
-    @getter(GdkPixbuf.Pixbuf as unknown as ParamSpec<GdkPixbuf.Pixbuf|null>)
-    get image() { return this.#image; }
-
     constructor(properties: {
         artist: Array<Artist>;
         songs: Array<Song>;
-        id?: any;
         image?: GdkPixbuf.Pixbuf;
         title?: string;
         description?: string;
@@ -53,7 +44,7 @@ export default class Album extends SongList {
         this._description = properties.description ?? null;
 
         this.#artist = properties.artist ?? null;
-        this.#image = properties.image ?? null;
+        this.image = properties.image ?? null;
         this.#url = properties.url ?? null;
         this.#songs = properties.songs ?? null;
         this.#single = properties.single ?? this.#songs.length === 1;
