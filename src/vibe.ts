@@ -7,13 +7,13 @@ import Artist from "./artist";
 
 
 export type IconButton = {
-    id: any;
+    id?: any;
     iconName: string;
     onClicked?: () => void;
 };
 
 export type LabelButton = {
-    id: any;
+    id?: any;
     label: string;
     onClicked?: () => void;
 };
