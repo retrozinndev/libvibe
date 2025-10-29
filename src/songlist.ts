@@ -1,5 +1,6 @@
-import GObject, { getter, gtype, register } from "gnim/gobject";
+import GObject, { getter, gtype, property, register } from "gnim/gobject";
 import Song from "./song";
+import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
 
 
 /** base class for song lists(albums and playlists) */
@@ -27,9 +28,14 @@ export default class SongList extends GObject.Object {
     @getter(gtype<string|null>(String))
     get description() { return this._description; }
 
+    @property(gtype<GdkPixbuf.Pixbuf|null>(GdkPixbuf.Pixbuf))
+    image: GdkPixbuf.Pixbuf|null = null;
+
+
     constructor(properties?: {
         songs?: Array<Song>;
         title?: string;
+        image?: GdkPixbuf.Pixbuf;
         description?: string;
     }) {
         super();
@@ -45,18 +51,24 @@ export default class SongList extends GObject.Object {
 
         if(properties.description !== undefined)
             this._description = properties.description;
+
+        if(properties.image !== undefined)
+            this.image = properties.image;
     }
 
     /** pop the last song from this song list */
     pop(): void {
-        
+        this._songs.pop();
+        this.notify("songs");
     }
 
+    /** add a song to the song list */
     add(song: Song): void {
         this._songs.push(song);
         this.notify("songs");
     }
 
+    /** loop through the song list */
     forEach(predicate: (song: Song, index: number) => void): void {
         this._songs.forEach((song, i) => predicate(song, i));
     }
