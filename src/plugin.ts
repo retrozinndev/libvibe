@@ -152,7 +152,7 @@ export default class Plugin extends GObject.Object {
     * @returns an array containing all the sections, or null if not
     * implemented
     * */
-    getSections(length?: number, offset?: number): Promise<Array<Section>|null>|null {
+    getSections(length?: number, offset?: number): Promise<Array<Section>|null>|Array<Section>|null {
         return null;
     }
 
