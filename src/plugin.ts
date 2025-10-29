@@ -1,5 +1,4 @@
 import GObject, { getter, gtype, property, register } from "gnim/gobject";
-import Album from "./album";
 import Artist from "./artist";
 import Song from "./song";
 import SongList from "./songlist";
@@ -135,7 +134,7 @@ export default class Plugin extends GObject.Object {
      * @param _search the current search string
      * @returns an Array containing the search results or null
      */
-    search(_search: string): Promise<Array<Array<Section>|Array<Album|Artist|Song>>|null>|null {
+    search(search: string): Promise<Array<Song|Artist|SongList|Section>|null>|Array<Song|Artist|SongList|Section>|null {
         return null;
     }
 
@@ -151,7 +150,7 @@ export default class Plugin extends GObject.Object {
     *
     * @returns an array containing all the sections, or null if not
     * implemented
-    * */
+    */
     getSections(length?: number, offset?: number): Promise<Array<Section>|null>|Array<Section>|null {
         return null;
     }
