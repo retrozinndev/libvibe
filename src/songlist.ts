@@ -49,7 +49,9 @@ export default class SongList extends GObject.Object {
             return;
 
         if(properties.songs !== undefined)
-            this._songs = properties.songs;
+            properties.songs.forEach(song =>
+                this.add(song)
+            );
 
         if(properties.title !== undefined)
             this._title = properties.title;

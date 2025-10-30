@@ -23,6 +23,8 @@ export default class Playlist extends SongList {
             this._description = properties.description;
 
         if(properties.songs !== undefined)
-            this._songs = properties.songs;
+            properties.songs.forEach(song =>
+                this.add(song)
+            );
     }
 }

@@ -10,8 +10,6 @@ export default class Queue extends SongList {
         });
 
         if(songs !== undefined)
-            songs.reverse().forEach(s => 
-                this.add(s)
-            );
+            songs.forEach(s => this.add(s));
     }
 }

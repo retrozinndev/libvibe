@@ -22,15 +22,15 @@ import Vibe, {
 
 export {
     // classes and interfaces
-    Plugin,
+    Vibe,
+    SongList,
     Album,
     Song,
     Artist,
     Playlist,
     Queue,
-    SongList,
     Media,
-    Vibe,
+    Plugin,
 
     // methods
     isIconButton,
