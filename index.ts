@@ -5,7 +5,11 @@ import Artist from "./src/artist";
 import Playlist from "./src/playlist";
 import Queue from "./src/queue";
 import SongList from "./src/songlist";
-import Media, { MediaSignalSignatures } from "./src/media";
+import Media, {
+    MediaSignalSignatures,
+    LoopMode,
+    ShuffleMode
+} from "./src/media";
 import Vibe, {
     isIconButton,
     isLabelButton,
@@ -17,22 +21,29 @@ import Vibe, {
 
 
 export {
+    // classes and interfaces
     Plugin,
     Album,
     Song,
     Artist,
-    isIconButton,
-    isLabelButton,
-    PlayerState,
     Playlist,
     Queue,
     SongList,
     Media,
     Vibe,
 
+    // methods
+    isIconButton,
+    isLabelButton,
+
+    // enums
+    LoopMode,
+    ShuffleMode,
+
     // types
     Section,
     IconButton,
     LabelButton,
-    MediaSignalSignatures
+    MediaSignalSignatures,
+    PlayerState
 };
