@@ -17,12 +17,35 @@ export interface MediaSignalSignatures extends GObject.Object.SignalSignatures {
     "notify::queue": (queue: Queue|null) => void;
 }
 
+export enum LoopMode {
+    /** no loop */
+    NONE = 0,
+    /** loop through song list(playlist, album, queue...) */
+    LIST = 1,
+    /** only loop the currently-playing song */
+    SONG = 2
+}
+
+export enum ShuffleMode {
+    /** no shuffle @default */
+    NONE = 0,
+    /** shuffle the order of the songlist(playlist, album, queue...) */
+    SHUFFLE = 1,
+    /** (not yet supported, will fallback to SHUFFLE) smart shuffle the 
+    * songlist(album, playlist, queue...) */
+    SMART_SHUFFLE = 2
+}
+
+
 /** interface implemented by the vibe app to control media from each plugin */
 export default interface Media extends GObject.Object {
     /** currently-playing song */
     get song(): Song|null;
     /** current queue */
     get queue(): Queue|null;
+    /** loop mode: none(no loop), list(playlist, album, queue...) or song */
+    loop: LoopMode;
+    shuffle: ShuffleMode;
 
     /** play a specific song 
     * @param song the song to be played
