@@ -1,10 +1,10 @@
 import Plugin from "./src/plugin";
-import Album from "./src/album";
 import Song from "./src/song";
+import SongList from "./src/songlist";
+import Album from "./src/album";
 import Artist from "./src/artist";
 import Playlist from "./src/playlist";
 import Queue from "./src/queue";
-import SongList from "./src/songlist";
 import Media, {
     MediaSignalSignatures,
     LoopMode,
