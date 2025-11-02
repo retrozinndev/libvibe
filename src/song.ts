@@ -5,6 +5,7 @@ import Artist from "./artist";
 import Album from "./album";
 import Gst from "gi://Gst?version=1.0";
 import Vibe from "./vibe";
+import Plugin from "./plugin";
 
 
 export namespace Song {
@@ -71,6 +72,8 @@ export default class Song extends GObject.Object {
         file?: Gio.File|string;
         /** a stream to play instead of a file */
         stream?: Gst.Stream;
+        id?: any;
+        plugin?: Plugin;
         url?: string;
         /** song's own image. usually you don't need to define this, as vibe will automatically get the image from the song's album if available. */
         image?: GdkPixbuf.Pixbuf;
@@ -78,12 +81,20 @@ export default class Song extends GObject.Object {
     }) {
         super();
 
-        this.id = Vibe.getDefault().generateID();
+        this.id = properties.id ?? Vibe.getDefault().generateID();
 
         if(properties.file !== undefined)
             this.#file = (typeof properties.file === "string" ?
                 Gio.File.new_for_path(properties.file)
             : properties.file);
+
+        
+        if(properties.plugin !== undefined)
+            Vibe.getDefault().emit(
+                "song-added",
+                properties.plugin,
+                this
+            );
 
         if(properties.stream !== undefined)
             this.#stream = properties.stream;

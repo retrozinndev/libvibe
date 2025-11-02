@@ -43,7 +43,7 @@ export type PluginSignalSignatures = GObject.Object.SignalSignatures & {
     "notify::description": (description: string) => void;
     "notify::status": (status: PluginStatus) => void;
 };
- 
+
 
 /** create plugins and add functions to them */
 @register({ GTypeName: "VibePlugin" })
@@ -56,6 +56,7 @@ export default class Plugin extends GObject.Object {
     public readonly id: any;
 
     readonly #name: string;
+    readonly #prettyName: string;
     readonly #version: string = "unknown";
     readonly #url: string|null = null;
 
@@ -72,10 +73,16 @@ export default class Plugin extends GObject.Object {
     @getter(SongList) 
     get songlist() { return this.#songlist; }
 
-    /** the plugin name 
+    /** the plugin's unique name. e.g.: vibe-plugin-music
     * @readonly */
     @getter(String) 
     get name() { return this.#name; }
+
+    /** pretty name for the plugin. e.g.: 
+      * name: vibe-plugin-music, prettyName: Music 
+      * defaults to the name of the plugin if not set */
+    @getter(String)
+    get prettyName() { return this.#prettyName; }
 
     /** the plugin's description
     * @default "A cool Plugin" */
@@ -83,7 +90,7 @@ export default class Plugin extends GObject.Object {
     description: string = "A cool Plugin";
 
     /** the plugin's version in a string format 
-    * @default: "unknown" */
+    * @default "unknown" */
     @getter(String)
     get version() { return this.#version; }
 
@@ -107,6 +114,7 @@ export default class Plugin extends GObject.Object {
 
     constructor(properties: {
         name: string;
+        prettyName?: string;
         description?: string;
         version?: string;
         url?: string;
@@ -116,6 +124,7 @@ export default class Plugin extends GObject.Object {
 
         this.id = Vibe.getDefault().generateID();
         this.#name = properties.name;
+        this.#prettyName = properties.prettyName ?? properties.name;
 
         if(properties.url !== undefined)
             this.#url = properties.url;

@@ -3,6 +3,8 @@ import { getter, gtype, register } from "gnim/gobject";
 import Artist from "./artist";
 import Song from "./song";
 import SongList from "./songlist";
+import Plugin from "./plugin";
+import Vibe from "./vibe";
 
 
 /** store album information */
@@ -29,23 +31,35 @@ export default class Album extends SongList {
         songs: Array<Song>;
         image?: GdkPixbuf.Pixbuf;
         title?: string;
+        id?: any;
+        plugin?: Plugin;
         description?: string;
         url?: string;
         single?: boolean;
     }) {
-        super();
+        super({
+            title: properties.title,
+            image: properties.image,
+            description: properties.description,
+            plugin: properties.plugin,
+            songs: properties.songs,
+            id: properties.id
+        });
 
-        this._title = properties.title ?? null;
-        this._description = properties.description ?? null;
+        if(properties.artist !== undefined)
+            this.#artist = properties.artist;
 
-        this.#artist = properties.artist ?? null;
-        this.image = properties.image ?? null;
-        this.#url = properties.url ?? null;
-        if(properties.songs !== undefined)
-            properties.songs.forEach(song =>
-                this.add(song)
+        if(properties.url !== undefined)
+            this.#url = properties.url;
+
+        if(properties.single !== undefined)
+            this.#single = properties.single;
+
+        if(properties.plugin)
+            Vibe.getDefault().emit(
+                "album-added", 
+                properties.plugin,
+                this
             );
-
-        this.#single = properties.single ?? this._songs.length === 1;
     }
 }

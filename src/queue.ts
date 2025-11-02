@@ -3,13 +3,12 @@ import SongList from "./songlist";
 
 
 export default class Queue extends SongList {
-    constructor(songs?: Array<Song>) {
+    constructor(songs?: Array<Song>, id?: any) {
         super({
             title: "Queue",
+            id: id,
+            songs: songs,
             description: "Your song queue"
         });
-
-        if(songs !== undefined)
-            songs.forEach(s => this.add(s));
     }
 }

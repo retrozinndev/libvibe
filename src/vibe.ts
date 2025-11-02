@@ -7,6 +7,7 @@ import Artist from "./artist";
 import Album from "./album";
 import Plugin from "./plugin";
 import Playlist from "./playlist";
+import Media from "./media";
 
 
 export type IconButton = {
@@ -66,6 +67,7 @@ export default class Vibe extends GObject.Object {
         "auth-ended": (plugin: Plugin) => void;
     };
 
+    #media!: Media;
     #songs: Array<{
         plugin: Plugin, 
         song: Song
@@ -87,6 +89,10 @@ export default class Vibe extends GObject.Object {
         artist: Artist
     }> = [];
     #plugins: Array<Plugin> = [];
+
+
+    @getter(gtype<Media>(GObject.Object))
+    get media() { return this.#media; }
 
     @getter(Array)
     get songs() { return this.#songs; }
@@ -206,7 +212,18 @@ export default class Vibe extends GObject.Object {
             return;
         }
 
-        throw new Error("Vibe: Can't set default instance if it was previously set! (it's readonly)");
+        throw new Error("Vibe: Can't set default instance if it was previously set! (readonly)");
+    }
+
+    
+    public setMedia(inst: Media): void {
+        if(!this.#media) {
+            this.#media = inst;
+            this.notify("media");
+            return;
+        }
+
+        throw new Error("Vibe: Can't set Media implementation if it was previously set! (readonly)");
     }
 
     constructor() {

@@ -1,6 +1,7 @@
 import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
-import GObject, { getter, ParamSpec, register } from "gnim/gobject";
+import GObject, { getter, gtype, property, register } from "gnim/gobject";
 import Vibe from "./vibe";
+import Plugin from "./plugin";
 
 
 /** store artist informations */
@@ -12,7 +13,6 @@ export default class Artist extends GObject.Object {
     readonly #name: string;
     readonly #displayName: string|null = null;
     readonly #description: string|null = null;
-    readonly #image: GdkPixbuf.Pixbuf|null = null;
     readonly #url: string|null = null;
 
     /** the artist's name.
@@ -23,37 +23,51 @@ export default class Artist extends GObject.Object {
     get name() { return this.#name; };
 
     /** the artist's display name, can be null */
-    @getter(String as unknown as ParamSpec<string|null>)
+    @getter(gtype<string|null>(String))
     get displayName() { return this.#displayName; }
 
     /** the artist's description, can be null */
-    @getter(String as unknown as ParamSpec<string|null>)
+    @getter(gtype<string|null>(String))
     get description() { return this.#description; }
 
     /** the artist's url, can be null.
     * you can set this as the artist's profile page or their website
     * */
-    @getter(String as unknown as ParamSpec<string|null>)
+    @getter(gtype<string|null>(String))
     get url() { return this.#url; }
 
     /** the artist's picture, in pixbuf. can be null */
-    @getter(GdkPixbuf.Pixbuf as unknown as ParamSpec<GdkPixbuf.Pixbuf|null>)
-    get image() { return this.#image; }
+    @property(gtype<GdkPixbuf.Pixbuf|null>(GdkPixbuf.Pixbuf))
+    image: GdkPixbuf.Pixbuf|null = null;
 
     constructor(properties: {
         name: string;
         displayName?: string;
         image?: GdkPixbuf.Pixbuf;
+        plugin?: Plugin;
+        id?: any;
         url?: string;
         description?: string;
     }) {
         super();
 
-        this.id = Vibe.getDefault().generateID();
-        
+        this.id = properties.id ?? Vibe.getDefault().generateID();
         this.#name = properties.name;
-        this.#displayName = properties.displayName ?? null;
-        this.#description = properties.description ?? null;
-        this.#image = properties.image ?? null;
+
+        if(properties.displayName !== undefined)
+            this.#displayName = properties.displayName;
+
+        if(properties.description !== undefined)
+            this.#description = properties.description;
+
+        if(properties.image !== undefined)
+            this.image = properties.image;
+
+        if(properties.plugin)
+            Vibe.getDefault().emit(
+                "artist-added",
+                properties.plugin,
+                this
+            );
     }
 }

@@ -1,4 +1,9 @@
-import Plugin from "./src/plugin";
+import Plugin, {
+    Update,
+    PluginStatus,
+    Implementations,
+    PluginSignalSignatures
+} from "./src/plugin";
 import Song from "./src/song";
 import SongList from "./src/songlist";
 import Album from "./src/album";
@@ -22,6 +27,10 @@ import Vibe, {
 
 export {
     Plugin,
+    Update,
+    PluginStatus,
+    Implementations,
+    PluginSignalSignatures,
     Album,
     Song,
     Artist,

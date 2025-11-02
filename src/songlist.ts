@@ -2,6 +2,7 @@ import GObject, { getter, gtype, property, register } from "gnim/gobject";
 import Song from "./song";
 import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
 import Vibe from "./vibe";
+import Plugin from "./plugin";
 
 
 /** base class for song lists(albums and playlists) */
@@ -38,12 +39,14 @@ export default class SongList extends GObject.Object {
     constructor(properties?: {
         songs?: Array<Song>;
         title?: string;
+        plugin?: Plugin;
+        id?: any;
         image?: GdkPixbuf.Pixbuf;
         description?: string;
     }) {
         super();
 
-        this.id = Vibe.getDefault().generateID();
+        this.id = properties?.id ?? Vibe.getDefault().generateID();
 
         if(properties === undefined)
             return;
@@ -51,6 +54,13 @@ export default class SongList extends GObject.Object {
         if(properties.songs !== undefined)
             properties.songs.forEach(song =>
                 this.add(song)
+            );
+
+        if(properties.plugin !== undefined)
+            Vibe.getDefault().emit(
+                "songlist-added",
+                properties.plugin,
+                this
             );
 
         if(properties.title !== undefined)
@@ -110,4 +120,9 @@ export default class SongList extends GObject.Object {
             }
         }
     }
+
+
+    // to make _title, _description or _songs read-write, just implement
+    // methods like set_title, set_description or set_songs, gnim will
+    // automatically use them to update a property value
 }
