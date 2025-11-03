@@ -1,6 +1,5 @@
 import GObject from "gnim/gobject";
-import Song from "./song";
-import SongList from "./songlist";
+import { Song, SongList } from "../objects";
 
 
 export interface MediaSignalSignatures extends GObject.Object.SignalSignatures {
@@ -37,7 +36,7 @@ export enum ShuffleMode {
 
 
 /** interface implemented by the vibe app to control media from each plugin */
-interface Media extends GObject.Object {
+export interface Media extends GObject.Object {
     /** currently-playing song */
     get song(): Song|null;
     /** current queue */
@@ -64,5 +63,3 @@ interface Media extends GObject.Object {
     /** go back to previous item in queue(if any) */
     previous(): void;
 }
-
-export default Media;

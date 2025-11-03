@@ -1,11 +1,10 @@
 import Gio from "gi://Gio?version=2.0";
 import GObject, { getter, gtype, register } from "gnim/gobject";
 import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
-import Artist from "./artist";
-import Album from "./album";
 import Gst from "gi://Gst?version=1.0";
-import Vibe from "./vibe";
-import Plugin from "./plugin";
+import { Artist, Album } from ".";
+import { Plugin } from "../plugin";
+import { Vibe } from "..";
 
 
 export namespace Song {
@@ -18,7 +17,7 @@ export namespace Song {
 
 /* store song data */
 @register({ GTypeName: "VibeSong" })
-class Song extends GObject.Object {
+export class Song extends GObject.Object {
 
     /** the unique identifier of this song, usually defined 
     * by the plugin on load.
@@ -112,5 +111,3 @@ class Song extends GObject.Object {
             this.#artist = properties.artist;
     }
 }
-
-export default Song;

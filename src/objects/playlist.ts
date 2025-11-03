@@ -1,14 +1,13 @@
 import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
-import Song from "./song";
-import SongList from "./songlist";
-import Plugin from "./plugin";
-import Vibe from "./vibe";
 import { gtype, property, register } from "gnim/gobject";
+import { Vibe } from "..";
+import { Song, SongList } from ".";
+import { Plugin } from "../plugin";
 
 
 /** user-managed song list (handled by the app) */
 @register({ GTypeName: "VibePlaylist" })
-class Playlist extends SongList {
+export class Playlist extends SongList {
 
     @property(gtype<GdkPixbuf.Pixbuf|null>(GdkPixbuf.Pixbuf)) 
     image: GdkPixbuf.Pixbuf|null = null;
@@ -37,5 +36,3 @@ class Playlist extends SongList {
             );
     }
 }
-
-export default Playlist;

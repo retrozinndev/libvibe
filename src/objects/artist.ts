@@ -1,12 +1,12 @@
 import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
 import GObject, { getter, gtype, property, register } from "gnim/gobject";
-import Vibe from "./vibe";
-import Plugin from "./plugin";
+import { Vibe } from "..";
+import { Plugin } from "../plugin";
 
 
 /** store artist informations */
 @register({ GTypeName: "VibeArtist" })
-class Artist extends GObject.Object {
+export class Artist extends GObject.Object {
     /** the unique identifier for this artist in this plugin */
     readonly id: any;
 
@@ -71,5 +71,3 @@ class Artist extends GObject.Object {
             );
     }
 }
-
-export default Artist;

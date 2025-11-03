@@ -1,8 +1,6 @@
 import GObject, { getter, gtype, property, register } from "gnim/gobject";
-import Artist from "./artist";
-import Song from "./song";
-import SongList from "./songlist";
-import Vibe, { Section } from "./vibe";
+import { Vibe, Section } from "..";
+import { Song, Artist, SongList } from "../objects";
 
 
 export type PluginStatus = {
@@ -47,7 +45,7 @@ export type PluginSignalSignatures = GObject.Object.SignalSignatures & {
 
 /** create plugins and add functions to them */
 @register({ GTypeName: "VibePlugin" })
-class Plugin extends GObject.Object {
+export class Plugin extends GObject.Object {
     declare $signals: PluginSignalSignatures;
 
     /** the plugin's unique identifier, defined by the application 
@@ -194,5 +192,3 @@ class Plugin extends GObject.Object {
         return Boolean(this.#implements[feature]);
     }
 }
-
-export default Plugin;

@@ -1,13 +1,9 @@
 import GObject, { getter, gtype, register, signal } from "gnim/gobject";
 import Gio from "gi://Gio?version=2.0";
 import GLib from "gi://GLib?version=2.0";
-import Song from "./song";
-import SongList from "./songlist";
-import Artist from "./artist";
-import Album from "./album";
-import Plugin from "./plugin";
-import Playlist from "./playlist";
-import Media from "./media";
+import { SongList, Song, Artist, Album, Playlist } from "./objects";
+import { Media } from "./interfaces/media";
+import { Plugin } from "./plugin";
 
 
 export type IconButton = {
@@ -52,7 +48,7 @@ export const isLabelButton = (obj: object): obj is LabelButton =>
 
 /** Communicate with the music player and do more stuff */
 @register({ GTypeName: "VibeAPI" })
-class Vibe extends GObject.Object {
+export class Vibe extends GObject.Object {
     private static instance: Vibe;
 
     declare $signals: GObject.Object.SignalSignatures & {
@@ -251,5 +247,3 @@ class Vibe extends GObject.Object {
         super.notify(prop as string);
     }
 }
-
-export default Vibe;

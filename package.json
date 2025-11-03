@@ -11,15 +11,11 @@
   "license": "ISC",
   "packageManager": "pnpm@10.12.1",
   "exports": {
-      ".": "./src/vibe.ts",
-      "./album": "./src/album.ts",
-      "./song": "./src/song.ts",
-      "./songlist": "./src/songlist.ts",
-      "./playlist": "./src/playlist.ts",
-      "./media": "./src/media.ts",
-      "./artist": "./src/artist.ts",
-      "./plugin": "./src/plugin.ts",
-      "./auth": "./src/auth.ts"
+      ".": "./src/index.ts",
+      "./objects": "./src/objects/index.ts",
+      "./utils": "./src/utils/index.ts",
+      "./plugin": "./src/plugin/index.ts",
+      "./interfaces": "./src/interfaces"
   },
   "files": ["src"],
   "peerDependencies": {

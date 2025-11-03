@@ -1,15 +1,13 @@
 import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
 import { getter, gtype, register } from "gnim/gobject";
-import Artist from "./artist";
-import Song from "./song";
-import SongList from "./songlist";
-import Plugin from "./plugin";
-import Vibe from "./vibe";
+import { Vibe } from "..";
+import { Plugin } from "../plugin";
+import { Song, Artist, SongList } from ".";
 
 
 /** store album information */
 @register({ GTypeName: "VibeAlbum" })
-class Album extends SongList {
+export class Album extends SongList {
     readonly #artist: Array<Artist> = [];
     readonly #url: string|null = null;
     readonly #single: boolean = false;
@@ -63,5 +61,3 @@ class Album extends SongList {
             );
     }
 }
-
-export default Album;

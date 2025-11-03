@@ -1,13 +1,13 @@
 import GObject, { getter, gtype, property, register } from "gnim/gobject";
-import Song from "./song";
 import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
-import Vibe from "./vibe";
-import Plugin from "./plugin";
+import { Vibe } from "..";
+import { Song } from "./song";
+import { Plugin } from "../plugin";
 
 
 /** base class for song lists(albums and playlists) */
 @register({ GTypeName: "VibeSongList" })
-class SongList extends GObject.Object {
+export class SongList extends GObject.Object {
     readonly id: any;
 
     /** @protected array containing all songs in this list */
@@ -126,5 +126,3 @@ class SongList extends GObject.Object {
     // methods like set_title, set_description or set_songs, gnim will
     // automatically use them to update a property value
 }
-
-export default SongList;
