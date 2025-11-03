@@ -1,7 +1,7 @@
 import WebKit2 from "gi://WebKit2?version=4.1";
 
 
-export namespace Auth {
+namespace Auth {
     export type Entry = {
         /** template text for the entry, it's visible by the user. Examples: "E-mail", "Password" */
         text?: string;
@@ -44,3 +44,5 @@ export namespace Auth {
         throw new Error("Function not implemented");
     }
 }
+
+export default Auth;

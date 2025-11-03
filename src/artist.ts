@@ -6,7 +6,7 @@ import Plugin from "./plugin";
 
 /** store artist informations */
 @register({ GTypeName: "VibeArtist" })
-export default class Artist extends GObject.Object {
+class Artist extends GObject.Object {
     /** the unique identifier for this artist in this plugin */
     readonly id: any;
 
@@ -71,3 +71,5 @@ export default class Artist extends GObject.Object {
             );
     }
 }
+
+export default Artist;

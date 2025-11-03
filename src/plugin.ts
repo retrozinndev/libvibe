@@ -47,7 +47,7 @@ export type PluginSignalSignatures = GObject.Object.SignalSignatures & {
 
 /** create plugins and add functions to them */
 @register({ GTypeName: "VibePlugin" })
-export default class Plugin extends GObject.Object {
+class Plugin extends GObject.Object {
     declare $signals: PluginSignalSignatures;
 
     /** the plugin's unique identifier, defined by the application 
@@ -194,3 +194,5 @@ export default class Plugin extends GObject.Object {
         return Boolean(this.#implements[feature]);
     }
 }
+
+export default Plugin;

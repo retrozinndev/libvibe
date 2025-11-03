@@ -8,7 +8,7 @@ import { gtype, property, register } from "gnim/gobject";
 
 /** user-managed song list (handled by the app) */
 @register({ GTypeName: "VibePlaylist" })
-export default class Playlist extends SongList {
+class Playlist extends SongList {
 
     @property(gtype<GdkPixbuf.Pixbuf|null>(GdkPixbuf.Pixbuf)) 
     image: GdkPixbuf.Pixbuf|null = null;
@@ -37,3 +37,5 @@ export default class Playlist extends SongList {
             );
     }
 }
+
+export default Playlist;

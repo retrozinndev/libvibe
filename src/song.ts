@@ -18,7 +18,7 @@ export namespace Song {
 
 /* store song data */
 @register({ GTypeName: "VibeSong" })
-export default class Song extends GObject.Object {
+class Song extends GObject.Object {
 
     /** the unique identifier of this song, usually defined 
     * by the plugin on load.
@@ -112,3 +112,5 @@ export default class Song extends GObject.Object {
             this.#artist = properties.artist;
     }
 }
+
+export default Song;

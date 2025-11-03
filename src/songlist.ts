@@ -7,7 +7,7 @@ import Plugin from "./plugin";
 
 /** base class for song lists(albums and playlists) */
 @register({ GTypeName: "VibeSongList" })
-export default class SongList extends GObject.Object {
+class SongList extends GObject.Object {
     readonly id: any;
 
     /** @protected array containing all songs in this list */
@@ -126,3 +126,5 @@ export default class SongList extends GObject.Object {
     // methods like set_title, set_description or set_songs, gnim will
     // automatically use them to update a property value
 }
+
+export default SongList;

@@ -52,7 +52,7 @@ export const isLabelButton = (obj: object): obj is LabelButton =>
 
 /** Communicate with the music player and do more stuff */
 @register({ GTypeName: "VibeAPI" })
-export default class Vibe extends GObject.Object {
+class Vibe extends GObject.Object {
     private static instance: Vibe;
 
     declare $signals: GObject.Object.SignalSignatures & {
@@ -251,3 +251,5 @@ export default class Vibe extends GObject.Object {
         super.notify(prop as string);
     }
 }
+
+export default Vibe;

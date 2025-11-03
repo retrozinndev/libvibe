@@ -37,7 +37,7 @@ export enum ShuffleMode {
 
 
 /** interface implemented by the vibe app to control media from each plugin */
-export default interface Media extends GObject.Object {
+interface Media extends GObject.Object {
     /** currently-playing song */
     get song(): Song|null;
     /** current queue */
@@ -64,3 +64,5 @@ export default interface Media extends GObject.Object {
     /** go back to previous item in queue(if any) */
     previous(): void;
 }
+
+export default Media;

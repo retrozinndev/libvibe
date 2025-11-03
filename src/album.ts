@@ -9,7 +9,7 @@ import Vibe from "./vibe";
 
 /** store album information */
 @register({ GTypeName: "VibeAlbum" })
-export default class Album extends SongList {
+class Album extends SongList {
     readonly #artist: Array<Artist> = [];
     readonly #url: string|null = null;
     readonly #single: boolean = false;
@@ -63,3 +63,5 @@ export default class Album extends SongList {
             );
     }
 }
+
+export default Album;
