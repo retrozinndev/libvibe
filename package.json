@@ -15,7 +15,7 @@
       "./objects": "./src/objects/index.ts",
       "./utils": "./src/utils/index.ts",
       "./plugin": "./src/plugin/index.ts",
-      "./interfaces": "./src/interfaces"
+      "./interfaces": "./src/interfaces/index.ts"
   },
   "files": ["src"],
   "peerDependencies": {
