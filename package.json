@@ -10,7 +10,19 @@
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.12.1",
-  "dependencies": {
+  "exports": {
+      ".": "./src/vibe.ts",
+      "./album": "./src/album.ts",
+      "./song": "./src/song.ts",
+      "./songlist": "./src/songlist.ts",
+      "./playlist": "./src/playlist.ts",
+      "./media": "./src/media.ts",
+      "./artist": "./src/artist.ts",
+      "./plugin": "./src/plugin.ts",
+      "./auth": "./src/auth.ts"
+  },
+  "files": ["src"],
+  "peerDependencies": {
     "gnim": "^1.8.0",
     "typescript": "^5.9.2"
   }

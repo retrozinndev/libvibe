@@ -1,6 +1,5 @@
 import GObject from "gnim/gobject";
 import Song from "./song";
-import Queue from "./queue";
 import SongList from "./songlist";
 
 
@@ -14,7 +13,7 @@ export interface MediaSignalSignatures extends GObject.Object.SignalSignatures {
     /** rewinded to previous song. song can be null if there's no previous song to go to */
     "previous": (song: Song|null) => void;
     "notify::song": (song: Song|null) => void;
-    "notify::queue": (queue: Queue|null) => void;
+    "notify::queue": (queue: SongList|null) => void;
 }
 
 export enum LoopMode {
@@ -42,7 +41,7 @@ export default interface Media extends GObject.Object {
     /** currently-playing song */
     get song(): Song|null;
     /** current queue */
-    get queue(): Queue|null;
+    get queue(): SongList|null;
     /** loop mode: none(no loop), list(playlist, album, queue...) or song */
     loop: LoopMode;
     shuffle: ShuffleMode;
