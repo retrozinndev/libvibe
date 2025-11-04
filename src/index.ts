@@ -179,8 +179,8 @@ export class Vibe extends GObject.Object {
     public static readonly runtimeDir = Gio.File.new_for_path(`${GLib.get_user_runtime_dir()}/vibe`);
     public static readonly cacheDir = Gio.File.new_for_path(`${GLib.get_user_cache_dir()}/vibe`);
     public static readonly dataDir = Gio.File.new_for_path(`${GLib.get_user_data_dir()}/vibe`);
-    public static readonly pluginsDir = Gio.File.new_for_path(`${this.dataDir}/plugins`);
-    public static readonly pluginsCacheDir = Gio.File.new_for_path(`${this.cacheDir}/plugins`);
+    public static readonly pluginsDir = Gio.File.new_for_path(`${this.dataDir.peek_path()!}/plugins`);
+    public static readonly pluginsCacheDir = Gio.File.new_for_path(`${this.cacheDir.peek_path()!}/plugins`);
 
     /** currently playing song, can be null if there's none */
     @getter(gtype<Song|null>(Song))
