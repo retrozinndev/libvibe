@@ -26,7 +26,7 @@ export type Implementations = Partial<{
     /** whether the plugin implements the search feature or not */
     search: boolean;
     /** wheter this plugin implements the sections feature or not */
-    sections: boolean;
+    recommendations: boolean;
     /** wheter this plugin supports creating playlists or not */
     playlist: boolean;
     /** whether the plugin implements an update system */
@@ -145,9 +145,9 @@ export class Plugin extends GObject.Object {
         return null;
     }
 
-    /** the plugin's section generator. sections are widgets with an
-    * attractive title and maybe a description; with song/album 
-    * suggestions.
+    /** the plugin's recommendedation sections generator. sections are widgets 
+    * with an attractive title and maybe a description; with song/album 
+    * suggestions for the user to listen to.
     * 
     * @param length the number of sections to generate, usually provided
     * by the application. can be undefined
@@ -158,7 +158,7 @@ export class Plugin extends GObject.Object {
     * @returns an array containing all the sections, or null if not
     * implemented
     */
-    getSections(length?: number, offset?: number): Promise<Array<Section>|null>|Array<Section>|null {
+    getRecommendations(length?: number, offset?: number): Promise<Array<Section>|null>|Array<Section>|null {
         return null;
     }
 
