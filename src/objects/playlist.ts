@@ -1,7 +1,8 @@
 import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
 import { gtype, property, register } from "gnim/gobject";
 import { Vibe } from "..";
-import { Song, SongList } from ".";
+import { Song } from "./song";
+import { SongList } from "./songlist";
 import { Plugin } from "../plugin";
 
 

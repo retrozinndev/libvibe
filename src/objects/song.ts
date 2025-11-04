@@ -2,7 +2,8 @@ import Gio from "gi://Gio?version=2.0";
 import GObject, { getter, gtype, register } from "gnim/gobject";
 import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
 import Gst from "gi://Gst?version=1.0";
-import { Artist, Album } from ".";
+import { Artist } from "./artist";
+import { Album } from "./album";
 import { Plugin } from "../plugin";
 import { Vibe } from "..";
 
