@@ -31,6 +31,8 @@ export type Implementations = Partial<{
     playlist: boolean;
     /** whether the plugin implements an update system */
     updates: boolean;
+    /** whether the plugin implements a library system(saved playlists/songs/albums...) */
+    library: boolean;
 }>;
 
 export type PluginSignalSignatures = GObject.Object.SignalSignatures & {
@@ -166,6 +168,17 @@ export class Plugin extends GObject.Object {
       * this is called by the application when the plugin initializes/the user checks for updates.
       * @returns an Update object if an update was found, or null if none */
     getUpdates(): Promise<Update|null>|null {
+        return null;
+    }
+
+    /** function that gets the plugin's song library.
+      * usually, the plugin should provide/return the user's saved
+      * playlists, albums, songs, artists and other user-liked content.
+      * 
+      * @param length how much content to get from the offset point
+      * @param offset index from where to start retrieving content
+      */
+    getLibrary(length?: number, offset?: number): Promise<Array<SongList|Song|Artist>|null>|Array<SongList|Song|Artist>|null {
         return null;
     }
 
