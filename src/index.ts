@@ -52,7 +52,7 @@ export class Vibe extends GObject.Object {
     private static instance: Vibe;
 
     declare $signals: GObject.Object.SignalSignatures & {
-        "initalized": () => void;
+        "initialized": () => void;
         "song-added": (plugin: Plugin, song: Song) => void;
         "album-added": (plugin: Plugin, album: Album) => void;
         "songlist-added": (plugin: Plugin, list: SongList) => void;
