@@ -5,7 +5,6 @@ import { SongList, Song, Artist, Album, Playlist } from "./objects";
 import { Media } from "./interfaces/media";
 import { Plugin } from "./plugin";
 import { Pages } from "./interfaces/pages";
-import { Page } from "./interfaces/page";
 
 
 export type IconButton = {
@@ -251,9 +250,12 @@ export class Vibe extends GObject.Object {
         super();
     }
 
-    connect<Signal extends keyof typeof this.$signals>(
-        signal: Signal,
-        callback: (typeof this.$signals)[Signal]
+    connect<
+        S extends keyof typeof this.$signals,
+        C extends (typeof this.$signals)[S]
+    >(
+        signal: S,
+        callback: (self: typeof this, ...args: Parameters<C>) => ReturnType<C>
     ): number {
         return super.connect(signal, callback);
     }

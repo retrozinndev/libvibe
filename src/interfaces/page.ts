@@ -1,13 +1,14 @@
 import Gtk from "gi://Gtk?version=4.0";
 import { IconButton, LabelButton, Section } from "..";
-import { Album, Artist, Playlist, Song, SongList } from "../objects";
+import { Album, Artist, Playlist, Song } from "../objects";
 
 
 export enum PageModal {
-    ARTIST = 0,
+    CUSTOM = 0,
     SONG = 1,
     ALBUM = 2,
-    PLAYLIST = 3
+    PLAYLIST = 3,
+    ARTIST = 4
 }
 
 export type PageContentType<M extends PageModal> = M extends PageModal.SONG ?
@@ -18,7 +19,7 @@ export type PageContentType<M extends PageModal> = M extends PageModal.SONG ?
     Album
 : M extends PageModal.PLAYLIST ?
     Playlist
-: SongList;
+: undefined;
 
 export type PageProps<
     M extends PageModal,
@@ -27,20 +28,21 @@ export type PageProps<
     modal: M;
     title: string;
     sections?: Array<Section>;
-    content: T,
+    content: T extends undefined ? undefined : T,
     buttons?: Array<IconButton & LabelButton>;
 };
 
 export interface Page<
     M extends PageModal = PageModal.SONG,
-    T extends PageContentType<M>|unknown = unknown,
+    T extends PageContentType<M>|undefined = undefined,
 > extends Gtk.StackPage {
-    get modal(): M;
     title: string;
     sections: Array<Section>;
-    content: T;
-
+    content?: T;
     buttons: Array<IconButton & LabelButton>;
+    
+    get modal(): M extends PageModal ? M : undefined;
+
 
     constructor(props: PageProps<M, T>): void;
 }

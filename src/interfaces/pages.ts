@@ -32,9 +32,12 @@ export interface Pages extends Gtk.Stack {
     /** go back to the previous stack's page */
     back(): void;
 
-    connect<S extends keyof PagesSignalSignatures>(
+    connect<
+        S extends keyof PagesSignalSignatures,
+        C extends PagesSignalSignatures[S]
+    >(
         signal: S,
-        callback: PagesSignalSignatures[S]
+        callback: (self: Pages, ...params: Parameters<C>) => ReturnType<C>
     ): number;
 
     emit<S extends keyof PagesSignalSignatures>(

@@ -189,11 +189,12 @@ export class Plugin extends GObject.Object {
         super.emit(signal, ...args);
     }
 
-    public connect<Signal extends keyof typeof this.$signals>(
-        signal: Signal, 
-        callback: (self: typeof this, ...args: Parameters<(typeof this.$signals)[Signal]>) => ReturnType<
-            (typeof this.$signals)[Signal]
-        >
+    public connect<
+        S extends keyof typeof this.$signals,
+        C extends (typeof this.$signals)[S]
+    >(
+        signal: S, 
+        callback: (self: typeof this, ...args: Parameters<C>) => ReturnType<C>
     ): number {
         return super.connect(signal, callback);
     }
