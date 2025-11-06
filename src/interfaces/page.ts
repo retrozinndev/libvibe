@@ -10,7 +10,7 @@ export enum PageModal {
     PLAYLIST = 3
 }
 
-type ContentType<M extends PageModal> = M extends PageModal.SONG ?
+export type PageContentType<M extends PageModal> = M extends PageModal.SONG ?
     Song
 : M extends PageModal.ARTIST ? 
     Artist
@@ -22,7 +22,7 @@ type ContentType<M extends PageModal> = M extends PageModal.SONG ?
 
 export type PageProps<
     M extends PageModal,
-    T extends ContentType<M>|unknown
+    T extends PageContentType<M>|unknown
 > = {
     modal: M;
     title: string;
@@ -33,7 +33,7 @@ export type PageProps<
 
 export interface Page<
     M extends PageModal = PageModal.SONG,
-    T extends ContentType<M>|unknown = unknown,
+    T extends PageContentType<M>|unknown = unknown,
 > extends Gtk.StackPage {
     get modal(): Page<M>;
     title: string;
