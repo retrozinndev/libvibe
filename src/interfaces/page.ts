@@ -1,6 +1,6 @@
 import Gtk from "gi://Gtk?version=4.0";
 import { IconButton, LabelButton, Section } from "..";
-import { Artist, Song, SongList } from "../objects";
+import { Album, Artist, Playlist, Song, SongList } from "../objects";
 
 
 export enum PageModal {
@@ -10,13 +10,30 @@ export enum PageModal {
     PLAYLIST = 3
 }
 
+type ContentType<M extends PageModal> = M extends PageModal.SONG ?
+    Song
+: M extends PageModal.ARTIST ? 
+    Artist
+: M extends PageModal.ALBUM ?
+    Album
+: M extends PageModal.PLAYLIST ?
+    Playlist
+: SongList;
+
+export type PageProps<
+    M extends PageModal,
+    T extends ContentType<M>|unknown
+> = {
+    modal: M;
+    title: string;
+    sections?: Array<Section>;
+    content: T,
+    buttons?: Array<IconButton & LabelButton>;
+};
+
 export interface Page<
     M extends PageModal = PageModal.SONG,
-    T extends (M extends PageModal.SONG ?
-        Song
-    : M extends PageModal.ARTIST ? 
-        Artist
-    : SongList)|unknown = unknown,
+    T extends ContentType<M>|unknown = unknown,
 > extends Gtk.StackPage {
     get modal(): Page<M>;
     title: string;
@@ -25,11 +42,5 @@ export interface Page<
 
     buttons: Array<IconButton & LabelButton>;
 
-    constructor(props: {
-        modal: M;
-        title: string;
-        sections?: Array<Section>;
-        content: T,
-        buttons?: Array<IconButton & LabelButton>;
-    }): void;
+    constructor(props: PageProps<M, T>): void;
 }
