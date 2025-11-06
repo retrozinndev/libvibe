@@ -42,7 +42,4 @@ export interface Page<
     buttons: Array<IconButton & LabelButton>;
     
     get modal(): M;
-
-
-    constructor(props: PageProps<M, T>): void;
 }
