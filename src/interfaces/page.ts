@@ -1,4 +1,4 @@
-import Gtk from "gi://Gtk?version=4.0";
+import Adw from "gi://Adw?version=1";
 import { IconButton, LabelButton, Section } from "..";
 import { Album, Artist, Playlist, Song } from "../objects";
 
@@ -35,13 +35,13 @@ export type PageProps<
 export interface Page<
     M extends PageModal = PageModal.SONG,
     T extends PageContentType<M>|undefined = undefined,
-> extends Gtk.StackPage {
+> extends Adw.Bin {
     title: string;
     sections: Array<Section>;
     content?: T;
     buttons: Array<IconButton & LabelButton>;
     
-    get modal(): M extends PageModal ? M : undefined;
+    get modal(): M;
 
 
     constructor(props: PageProps<M, T>): void;
