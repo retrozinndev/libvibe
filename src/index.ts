@@ -4,6 +4,8 @@ import GLib from "gi://GLib?version=2.0";
 import { SongList, Song, Artist, Album, Playlist } from "./objects";
 import { Media } from "./interfaces/media";
 import { Plugin } from "./plugin";
+import { Pages } from "./interfaces/pages";
+import { Page } from "./interfaces/page";
 
 
 export type IconButton = {
@@ -52,17 +54,27 @@ export class Vibe extends GObject.Object {
     private static instance: Vibe;
 
     declare $signals: GObject.Object.SignalSignatures & {
+        /** the app and api just finished initializing/starting */
         "initialized": () => void;
+        /** a new song object was generated */
         "song-added": (plugin: Plugin, song: Song) => void;
+        /** a new album was generated */
         "album-added": (plugin: Plugin, album: Album) => void;
+        /** a new song list was generated. it's also triggered by albums and playlists */
         "songlist-added": (plugin: Plugin, list: SongList) => void;
+        /** new artist object instance was generated */
         "artist-added": (plugin: Plugin, artist: Artist) => void;
+        /** a new plugin got installed by the user */
         "plugin-added": (plugin: Plugin) => void;
+        /** a playlist was created */
         "playlist-added": (plugin: Plugin, playlist: Playlist) => void;
+        /** authentication for a plugin has started */
         "auth-started": (plugin: Plugin) => void;
+        /** authentication for a plugin has ended */
         "auth-ended": (plugin: Plugin) => void;
     };
 
+    #pages!: Pages;
     #media!: Media;
     #songs: Array<{
         plugin: Plugin, 
@@ -86,6 +98,11 @@ export class Vibe extends GObject.Object {
     }> = [];
     #plugins: Array<Plugin> = [];
 
+
+    /** control on adding new pages and going back to the previous
+    * app's stack page */
+    @getter(gtype<Pages>(GObject.Object))
+    get pages() { return this.#pages; }
 
     @getter(gtype<Media>(GObject.Object))
     get media() { return this.#media; }
@@ -211,6 +228,14 @@ export class Vibe extends GObject.Object {
         throw new Error("Vibe: Can't set default instance if it was previously set! (readonly)");
     }
 
+    public setPages(pages: Pages): void {
+        if(!this.#pages) {
+            this.#pages = pages;
+            return;
+        }
+
+        throw new Error("Vibe: Can't set pages implementation if it was previously set! (readonly)");
+    }
     
     public setMedia(inst: Media): void {
         if(!this.#media) {
