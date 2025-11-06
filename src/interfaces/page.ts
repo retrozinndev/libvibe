@@ -35,7 +35,7 @@ export interface Page<
     M extends PageModal = PageModal.SONG,
     T extends PageContentType<M>|unknown = unknown,
 > extends Gtk.StackPage {
-    get modal(): Page<M>;
+    get modal(): M;
     title: string;
     sections: Array<Section>;
     content: T;
