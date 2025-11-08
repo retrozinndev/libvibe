@@ -27,6 +27,7 @@ export type PageProps<
 > = {
     modal: M;
     title: string;
+    id?: any;
     sections?: Array<Section>;
     content: T extends undefined ? undefined : T,
     buttons?: Array<IconButton & LabelButton>;
@@ -36,6 +37,7 @@ export interface Page<
     M extends PageModal = PageModal.SONG,
     T extends PageContentType<M>|undefined = undefined,
 > extends Adw.Bin {
+    readonly id: any;
     title: string;
     sections: Array<Section>;
     content?: T;
