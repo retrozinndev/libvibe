@@ -19,18 +19,25 @@ export type PageContentType<M extends PageModal> = M extends PageModal.SONG ?
     Album
 : M extends PageModal.PLAYLIST ?
     Playlist
-: undefined;
+: unknown;
 
-export type PageProps<
-    M extends PageModal,
-    T extends PageContentType<M>|unknown
-> = {
+type Props<M extends PageModal> = {
     modal: M;
     title: string;
     id?: any;
     sections?: Array<Section>;
-    content: T extends undefined ? undefined : T,
     buttons?: Array<IconButton & LabelButton>;
+};
+
+export type PageProps<
+    M extends PageModal,
+    T extends PageContentType<M>
+> = T extends unknown ? 
+    Props<M> & Partial<{
+        content: T
+    }>
+: Props<M> & {
+    content: T
 };
 
 export interface Page<
