@@ -38,7 +38,7 @@ export type PageProps<
 
 export interface Page<
     M extends PageModal = PageModal.CUSTOM,
-    T extends PageContentType<M>|undefined = undefined,
+    T extends PageContentType<M> = PageContentType<M>,
 > extends Adw.Bin {
     readonly id: any;
     title: string;
