@@ -17,7 +17,10 @@ export interface Pages extends Gtk.Stack {
     
     // properties
     /** current app's stack page */
-    page: Page;
+    get page(): Page;
+
+    /** page history available to go back to (includes current one) */
+    get history(): Array<Page>;
 
     
     // signals
