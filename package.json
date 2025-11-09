@@ -19,7 +19,6 @@
   },
   "files": ["src"],
   "peerDependencies": {
-    "gnim": "^1.8.0",
-    "typescript": "^5.9.2"
+    "gnim": "^1.8.2"
   }
 }
