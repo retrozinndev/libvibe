@@ -32,13 +32,9 @@ type Props<M extends PageModal> = {
 export type PageProps<
     M extends PageModal,
     T extends PageContentType<M>
-> = T extends unknown ? 
-    Props<M> & Partial<{
-        content: T
-    }>
-: Props<M> & {
-    content: T
-};
+> = M extends PageModal.CUSTOM ? 
+    Props<M> & { content?: T }
+: Props<M> & { content: T };
 
 export interface Page<
     M extends PageModal = PageModal.CUSTOM,
