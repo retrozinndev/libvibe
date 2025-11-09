@@ -34,7 +34,7 @@ export type PageProps<
 };
 
 export interface Page<
-    M extends PageModal = PageModal.SONG,
+    M extends PageModal = PageModal.CUSTOM,
     T extends PageContentType<M>|undefined = undefined,
 > extends Adw.Bin {
     readonly id: any;

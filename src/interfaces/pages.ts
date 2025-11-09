@@ -21,8 +21,8 @@ export interface Pages extends Gtk.Stack {
 
     
     // signals
-    pageAdded(page: Page): void;
-    pageRemoved(removedPage: Page): void;
+    added(page: Page): void;
+    removed(removedPage: Page): void;
 
 
     // methods
