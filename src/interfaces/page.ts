@@ -29,21 +29,17 @@ type Props<M extends PageModal> = {
     buttons?: Array<IconButton & LabelButton>;
 };
 
-export type PageProps<
-    M extends PageModal,
-    T extends PageContentType<M>
-> = M extends PageModal.CUSTOM ? 
-    Props<M> & { content?: T }
-: Props<M> & { content: T };
+export type PageProps<M extends PageModal> = M extends PageModal.CUSTOM ? 
+    Props<M> & { content?: PageContentType<M> }
+: Props<M> & { content: PageContentType<M> };
 
 export interface Page<
-    M extends PageModal = PageModal.CUSTOM,
-    T extends PageContentType<M> = PageContentType<M>,
+    M extends PageModal = PageModal.CUSTOM
 > extends Adw.Bin {
     readonly id: any;
     title: string;
     sections: Array<Section>;
-    content?: T;
+    content?: PageContentType<M>;
     buttons: Array<IconButton & LabelButton>;
     
     get modal(): M;
