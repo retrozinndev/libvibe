@@ -1,4 +1,5 @@
 import Adw from "gi://Adw?version=1";
+import Gtk from "gi://Gtk?version=4.0";
 import { IconButton, LabelButton, Section } from "..";
 import { Album, Artist, Playlist, Song } from "../objects";
 
@@ -43,4 +44,6 @@ export interface Page<
     buttons: Array<IconButton & LabelButton>;
     
     get modal(): M;
+
+    get_content_widget(): Gtk.Box;
 }
