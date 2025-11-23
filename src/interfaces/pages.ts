@@ -8,6 +8,8 @@ export interface PagesSignalSignatures extends Gtk.Stack.SignalSignatures {
     "added": (page: Page) => void;
     /** a page got removed when the user hit the back button */
     "removed": (removedPage: Page) => void;
+    "notify::current-page": () => void;
+    "notify::history": () => void;
 }
 
 export interface Pages extends Gtk.Stack {
@@ -17,7 +19,7 @@ export interface Pages extends Gtk.Stack {
     
     // properties
     /** current app's stack page */
-    get page(): Page;
+    get currentPage(): Page;
 
     /** page history available to go back to (includes current one) */
     get history(): Array<Page>;
