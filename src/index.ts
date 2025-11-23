@@ -128,7 +128,7 @@ export class Vibe extends GObject.Object {
     @signal()
     initialized() {}
 
-    @signal(Song)
+    @signal(Plugin, Song)
     songAdded(plugin: Plugin, song: Song) {
         this.#songs.push({
             plugin: plugin,
@@ -138,7 +138,7 @@ export class Vibe extends GObject.Object {
         this.notify("songs");
     }
 
-    @signal(Album)
+    @signal(Plugin, Album)
     albumAdded(plugin: Plugin, album: Album) {
         this.#albums.push({
             plugin: plugin,
@@ -148,7 +148,7 @@ export class Vibe extends GObject.Object {
         this.notify("albums");
     }
 
-    @signal(SongList)
+    @signal(Plugin, SongList)
     songlistAdded(plugin: Plugin, list: SongList) {
         this.#songlists.push({
             plugin: plugin,
@@ -158,7 +158,7 @@ export class Vibe extends GObject.Object {
         this.notify("songlists");
     }
     
-    @signal(Artist)
+    @signal(Plugin, Artist)
     artistAdded(plugin: Plugin, artist: Artist) {
         this.#artists.push({
             plugin: plugin,
@@ -174,7 +174,7 @@ export class Vibe extends GObject.Object {
         this.notify("plugins");
     }
 
-    @signal(Playlist)
+    @signal(Plugin, Playlist)
     playlistAdded(plugin: Plugin, list: Playlist) {
         this.#playlists.push({
             plugin: plugin,
