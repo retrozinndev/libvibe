@@ -6,6 +6,7 @@ import { Media } from "./interfaces/media";
 import { Plugin } from "./plugin";
 import { Pages } from "./interfaces/pages";
 import { Page, PageModal, PageProps } from "./interfaces";
+import { createRoot, getScope } from "gnim";
 
 
 export type IconButton = {
@@ -238,8 +239,17 @@ export class Vibe extends GObject.Object {
 
     /** add a new page to the stack. plugins can use this to open details for artists, 
       * songs, playlists, albums and even custom pages */
-    public addPage<M extends PageModal>(page: PageProps<M>): void {
-        this.#pages.addPage(new this.#pageConstructor(page));
+    public addPage<M extends PageModal>(props: PageProps<M>): void {
+        createRoot(() => {
+            const page = new this.#pageConstructor(props),
+                scope = getScope();
+
+            const id = page.connect("destroy", () => {
+                page.disconnect(id);
+                scope.dispose();
+            });
+            this.#pages.addPage(page);
+        });
     }
 
     public setPages(pages: Pages, pageConstructor: PageConstructor): void {
