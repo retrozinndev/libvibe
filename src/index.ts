@@ -5,6 +5,7 @@ import { SongList, Song, Artist, Album, Playlist } from "./objects";
 import { Media } from "./interfaces/media";
 import { Plugin } from "./plugin";
 import { Pages } from "./interfaces/pages";
+import { Page, PageModal, PageProps } from "./interfaces";
 
 
 export type IconButton = {
@@ -41,6 +42,8 @@ export enum PlayerState {
     STOPPED = 3
 }
 
+type PageConstructor = new <M extends PageModal>(props: PageProps<M>) => Page;
+
 export const isIconButton = (obj: object): obj is IconButton =>
     Boolean(Object.hasOwn(obj, "iconName") && Object.hasOwn(obj, "onClicked"));
 
@@ -74,6 +77,7 @@ export class Vibe extends GObject.Object {
     };
 
     #pages!: Pages;
+    #pageConstructor!: PageConstructor;
     #media!: Media;
     #songs: Array<{
         plugin: Plugin, 
@@ -205,6 +209,11 @@ export class Vibe extends GObject.Object {
     @getter(gtype<PlayerState>(Number))
     get state() { return this.#state; }
 
+    
+    constructor() {
+        super();
+    }
+
     /** generate an unique identifier for an object(song, playlist, artist, album...) */
     public generateID(): number {
         this.#lastId++;
@@ -227,9 +236,16 @@ export class Vibe extends GObject.Object {
         throw new Error("Vibe: Can't set default instance if it was previously set! (readonly)");
     }
 
-    public setPages(pages: Pages): void {
+    /** add a new page to the stack. plugins can use this to open details for artists, 
+      * songs, playlists, albums and even custom pages */
+    public addPage<M extends PageModal>(page: PageProps<M>): void {
+        this.#pages.addPage(new this.#pageConstructor(page));
+    }
+
+    public setPages(pages: Pages, pageConstructor: PageConstructor): void {
         if(!this.#pages) {
             this.#pages = pages;
+            this.#pageConstructor = pageConstructor;
             return;
         }
 
@@ -244,10 +260,6 @@ export class Vibe extends GObject.Object {
         }
 
         throw new Error("Vibe: Can't set Media implementation if it was previously set! (readonly)");
-    }
-
-    constructor() {
-        super();
     }
 
     connect<

@@ -22,7 +22,7 @@ export type PageContentType<M extends PageModal> = M extends PageModal.SONG ?
     Playlist
 : unknown;
 
-type Props<M extends PageModal> = {
+export type Props<M extends PageModal> = {
     modal: M;
     title: string;
     id?: any;
