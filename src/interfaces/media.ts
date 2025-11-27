@@ -34,6 +34,17 @@ export enum ShuffleMode {
     SMART_SHUFFLE = 2
 }
 
+export enum PlaybackStatus {
+    /** the player is stopped, no media is playing */
+    STOPPED = 0,
+    /** the song is playing */
+    PLAYING = 1,
+    /** the song is paused */
+    PAUSED = 2,
+    /** indicates wheter the song is still preparing to play, currently not implemented */
+    LOADING = 3
+}
+
 
 /** interface implemented by the vibe app to control media from each plugin */
 export interface Media extends GObject.Object {
@@ -41,6 +52,8 @@ export interface Media extends GObject.Object {
     get song(): Song|null;
     /** current queue */
     get queue(): SongList|null;
+    /** get the player status(playing, paused, stopped...) */
+    get status(): PlaybackStatus;
     /** loop mode: none(no loop), list(playlist, album, queue...) or song */
     loop: LoopMode;
     shuffle: ShuffleMode;
