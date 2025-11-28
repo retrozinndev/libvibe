@@ -160,7 +160,7 @@ export class SongList extends GObject.Object {
       * as the last element from the list.
       *
       * @returns the song that got "replaced" with the provided song */
-    reoder(song: Song|number, newPos: number): void {
+    reorder(song: Song|number, newPos: number): void {
         const i = typeof song !== "number" ?
             this._songs.findIndex((s) => s.id === (song as Song).id)
         : song;
