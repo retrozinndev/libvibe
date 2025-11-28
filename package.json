@@ -6,9 +6,13 @@
   "scripts": {
     "types": "sh ./scripts/types.sh"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["library", "music-player", "music", "plugins", "extensions"],
+  "author": {
+      "name": "João Dias",
+      "url": "https://retrozinndev.github.io",
+      "email": "joaovodias@gmail.com"
+  },
+  "license": "BSD-3-Clause",
   "packageManager": "pnpm@10.12.1",
   "exports": {
       ".": "./src/index.ts",
