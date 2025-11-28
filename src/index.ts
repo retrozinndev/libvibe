@@ -287,6 +287,12 @@ Please create one providing all the necessary properties")
         this.#toastOverlay.add_toast(toast);
     }
 
+    vfunc_dispose(): void {
+        this.#connections.forEach((ids, gobj) => Array.isArray(ids) ?
+            ids.forEach(id => gobj.disconnect(id))
+        : gobj.disconnect(ids));
+    }
+
     connect<
         S extends keyof typeof this.$signals,
         C extends (typeof this.$signals)[S]
