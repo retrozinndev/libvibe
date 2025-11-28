@@ -197,7 +197,13 @@ export class SongList extends GObject.Object {
         this.emit("reordered", song, replaced);
     }
 
-    connect<S extends keyof typeof this.$signals>(signal: S, callback: (typeof this.$signals)[S]): number {
+    connect<
+        S extends keyof typeof this.$signals,
+        C extends (typeof this.$signals)[S]
+    >(
+        signal: S, 
+        callback: (self: typeof this, ...params: Parameters<C>) => ReturnType<C>
+    ): number {
         return super.connect(signal, callback);
     }
 

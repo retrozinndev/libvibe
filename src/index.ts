@@ -7,6 +7,7 @@ import { Plugin } from "./plugin";
 import { Pages } from "./interfaces/pages";
 import { Page, PageModal, PageProps } from "./interfaces";
 import { createRoot, getScope } from "gnim";
+import Adw from "gi://Adw?version=1";
 
 
 export type IconButton = {
@@ -77,9 +78,14 @@ export class Vibe extends GObject.Object {
         "auth-ended": (plugin: Plugin) => void;
     };
 
-    #pages!: Pages;
-    #pageConstructor!: PageConstructor;
-    #media!: Media;
+    #pages: Pages;
+    #pageConstructor: PageConstructor;
+    #media: Media;
+    #toastOverlay: Adw.ToastOverlay;
+    #lastId: number = -1;
+    #connections: Map<GObject.Object, Array<number>|number> = new Map();
+
+    #plugins: Array<Plugin> = [];
     #songs: Array<{
         plugin: Plugin, 
         song: Song
@@ -100,7 +106,6 @@ export class Vibe extends GObject.Object {
         plugin: Plugin,
         artist: Artist
     }> = [];
-    #plugins: Array<Plugin> = [];
 
 
     /** control on adding new pages and going back to the previous
@@ -193,26 +198,25 @@ export class Vibe extends GObject.Object {
     @signal(Plugin)
     authEnded(_: Plugin) {}
 
-    #lastId: number = -1;
-    #song: Song|null = null;
-    #state: PlayerState = PlayerState.NONE;
-
     public static readonly runtimeDir = Gio.File.new_for_path(`${GLib.get_user_runtime_dir()}/vibe`);
     public static readonly cacheDir = Gio.File.new_for_path(`${GLib.get_user_cache_dir()}/vibe`);
     public static readonly dataDir = Gio.File.new_for_path(`${GLib.get_user_data_dir()}/vibe`);
     public static readonly pluginsDir = Gio.File.new_for_path(`${this.dataDir.peek_path()!}/plugins`);
     public static readonly pluginsCacheDir = Gio.File.new_for_path(`${this.cacheDir.peek_path()!}/plugins`);
-
-    /** currently playing song, can be null if there's none */
-    @getter(gtype<Song|null>(Song))
-    get song() { return this.#song; }
-
-    @getter(gtype<PlayerState>(Number))
-    get state() { return this.#state; }
-
     
-    constructor() {
+
+    constructor(
+        media: Media, 
+        pages: Pages, 
+        pageConstructor: new (props: object) => Page,
+        toastOverlay: Adw.ToastOverlay
+    ) {
         super();
+
+        this.#media = media;
+        this.#pages = pages;
+        this.#pageConstructor = pageConstructor;
+        this.#toastOverlay = toastOverlay;
     }
 
     /** generate an unique identifier for an object(song, playlist, artist, album...) */
@@ -223,7 +227,8 @@ export class Vibe extends GObject.Object {
 
     public static getDefault(): Vibe {
         if(!this.instance)
-            this.instance = new Vibe();
+            throw new Error("No instance of VibeAPI(Vibe) was created yet. \
+Please create one providing all the necessary properties")
 
         return this.instance;
     }
@@ -252,24 +257,34 @@ export class Vibe extends GObject.Object {
         });
     }
 
-    public setPages(pages: Pages, pageConstructor: PageConstructor): void {
-        if(!this.#pages) {
-            this.#pages = pages;
-            this.#pageConstructor = pageConstructor;
-            return;
+    /** send a small toast notification to the UI. 
+      * 
+      * @param text string containing what you want to notify the user
+      * @param priority the priority of the notification. can be "high" or "normal"
+      * @param button action button to go with the notification. you can leave this empty if you want none
+      *
+      * @example notify the user that there's no internet connection */
+    public toastNotify(text: string, priority?: "high"|"normal", button?: LabelButton): void {
+        const toast = new Adw.Toast({
+            title: text,
+            priority: priority === "high" ? 
+                Adw.ToastPriority.HIGH
+            : Adw.ToastPriority.NORMAL
+        });
+
+        if(button !== undefined) {
+            const action = new Gio.SimpleAction({
+                name: button.id ?? "toast.clicked",
+                enabled: true
+            });
+            this.#connections.set(action, 
+                action.connect("activate", () => button.onClicked?.())
+            );
+
+            toast.set_button_label(button.label);
         }
 
-        throw new Error("Vibe: Can't set pages implementation if it was previously set! (readonly)");
-    }
-    
-    public setMedia(inst: Media): void {
-        if(!this.#media) {
-            this.#media = inst;
-            this.notify("media");
-            return;
-        }
-
-        throw new Error("Vibe: Can't set Media implementation if it was previously set! (readonly)");
+        this.#toastOverlay.add_toast(toast);
     }
 
     connect<
