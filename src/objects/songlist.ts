@@ -1,7 +1,7 @@
-import GObject, { getter, gtype, property, register, signal } from "gnim/gobject";
 import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
-import { Vibe } from "..";
+import GObject, { getter, gtype, property, register, signal } from "gnim/gobject";
 import { Song } from "./song";
+import { Vibe } from "..";
 import { Plugin } from "../plugin";
 
 
