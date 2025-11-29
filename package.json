@@ -23,6 +23,6 @@
   },
   "files": ["src"],
   "peerDependencies": {
-    "gnim": "^1.8.2"
+    "gnim": "^1.9.0"
   }
 }
