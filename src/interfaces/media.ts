@@ -54,9 +54,14 @@ export interface Media extends GObject.Object {
     get queue(): SongList|null;
     /** get the player status(playing, paused, stopped...) */
     get status(): PlaybackStatus;
+    /** current song's length in microseconds */
+    get length(): number;
     /** loop mode: none(no loop), list(playlist, album, queue...) or song */
     loop: LoopMode;
+    /** queue shuffle mode */
     shuffle: ShuffleMode;
+    /** current song position in microseconds. if nothing is playing, it's set to 0. */
+    position: number;
 
     /** play a specific song 
     * @param song the song to be played
