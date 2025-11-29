@@ -1,7 +1,7 @@
 import GObject, { getter, gtype, register, signal } from "gnim/gobject";
 import Gio from "gi://Gio?version=2.0";
 import GLib from "gi://GLib?version=2.0";
-import { SongList, Song, Artist, Album, Playlist } from "./objects";
+import { Artist, Song, SongList, Album, Playlist } from "./objects";
 import { Media } from "./interfaces/media";
 import { Plugin } from "./plugin";
 import { Pages } from "./interfaces/pages";
@@ -31,19 +31,6 @@ export type Section = {
     endButton?: IconButton | LabelButton;
 };
 
-
-/** states where the player can be */
-export enum PlayerState {
-    /** nothing */
-    NONE = 0,
-    /** there's a song playing */
-    PLAYING = 1,
-    /** the song is paused */
-    PAUSED = 2,
-    /** the player has stopped */
-    STOPPED = 3
-}
-
 type PageConstructor = new <M extends PageModal>(props: PageProps<M>) => Page;
 
 export const isIconButton = (obj: object): obj is IconButton =>
@@ -51,6 +38,7 @@ export const isIconButton = (obj: object): obj is IconButton =>
 
 export const isLabelButton = (obj: object): obj is LabelButton => 
     Boolean(Object.hasOwn(obj, "label") && Object.hasOwn(obj, "onClicked"));
+
 
 /** Communicate with the music player and do more stuff */
 @register({ GTypeName: "VibeAPI" })
@@ -76,6 +64,8 @@ export class Vibe extends GObject.Object {
         "auth-started": (plugin: Plugin) => void;
         /** authentication for a plugin has ended */
         "auth-ended": (plugin: Plugin) => void;
+        /** a new toast notification got sent to the UI */
+        "toast-notified": (text: string, priority: "high"|"normal", button?: LabelButton) => void;
     };
 
     #pages: Pages;
@@ -264,7 +254,7 @@ Please create one providing all the necessary properties")
       * @param button action button to go with the notification. you can leave this empty if you want none
       *
       * @example notify the user that there's no internet connection */
-    public toastNotify(text: string, priority?: "high"|"normal", button?: LabelButton): void {
+    public toastNotify(text: string, priority: "high"|"normal" = "normal", button?: LabelButton): void {
         const toast = new Adw.Toast({
             title: text,
             priority: priority === "high" ? 
@@ -284,6 +274,7 @@ Please create one providing all the necessary properties")
             toast.set_button_label(button.label);
         }
 
+        this.emit("toast-notified", text, priority, button);
         this.#toastOverlay.add_toast(toast);
     }
 
