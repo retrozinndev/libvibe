@@ -24,9 +24,9 @@ export class Song extends GObject.Object {
     @signal()
     prepare() {}
 
-    /** the song name. can be null */
+    /** the song title. can be null */
     @property(gtype<string|null>(String)) 
-    name: string|null = null;
+    title: string|null = null;
 
     /** the authors of this song, can be null */
     @property(gtype<Array<Artist>|null>(Array)) 
@@ -56,7 +56,7 @@ export class Song extends GObject.Object {
     metadata: Meta.Data|null = null;
 
     constructor(properties: {
-        name?: string;
+        title?: string;
         artist?: Array<Artist>;
         source?: string|Gio.File|Gst.Stream;
         id?: any;
@@ -84,8 +84,8 @@ export class Song extends GObject.Object {
         if(properties.url !== undefined)
             this.url = properties.url;
 
-        if(properties.name !== undefined)
-            this.name = properties.name;
+        if(properties.title !== undefined)
+            this.title = properties.title;
 
         if(properties.image !== undefined)
             this.image = properties.image;
