@@ -1,4 +1,5 @@
 import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
+import Gly from "gi://Gly?version=1";
 import GObject, { getter, gtype, property, register, signal } from "gnim/gobject";
 import { Song } from "./song";
 import { Vibe } from "..";
@@ -10,11 +11,7 @@ import { Plugin } from "../plugin";
 export class SongList extends GObject.Object {
     readonly id: any;
 
-    declare $signals: GObject.Object.SignalSignatures & {
-        "added": (song: Song) => void;
-        "removed": (song: Song) => void;
-        "reordered": (song: Song, replacedSong: Song|null) => void;
-    };
+    declare $signals: SongList.SignalSignatures;
 
     /** @protected array containing all songs in this list */
     protected _songs: Array<Song> = [];
@@ -38,8 +35,8 @@ export class SongList extends GObject.Object {
     @getter(gtype<string|null>(String))
     get description() { return this._description; }
 
-    @property(gtype<GdkPixbuf.Pixbuf|null>(GdkPixbuf.Pixbuf))
-    image: GdkPixbuf.Pixbuf|null = null;
+    @property(gtype<GdkPixbuf.Pixbuf|Gly.Image|null>(GObject.Object))
+    image: GdkPixbuf.Pixbuf|Gly.Image|null = null;
 
     @signal(Song)
     added(_: Song) {}
@@ -55,7 +52,7 @@ export class SongList extends GObject.Object {
         title?: string;
         plugin?: Plugin;
         id?: any;
-        image?: GdkPixbuf.Pixbuf;
+        image?: GdkPixbuf.Pixbuf|Gly.Image;
         description?: string;
     }) {
         super();
@@ -198,8 +195,8 @@ export class SongList extends GObject.Object {
     }
 
     connect<
-        S extends keyof typeof this.$signals,
-        C extends (typeof this.$signals)[S]
+        S extends keyof SongList.SignalSignatures,
+        C extends SongList.SignalSignatures[S]
     >(
         signal: S, 
         callback: (self: typeof this, ...params: Parameters<C>) => ReturnType<C>
@@ -207,9 +204,9 @@ export class SongList extends GObject.Object {
         return super.connect(signal, callback);
     }
 
-    emit<S extends keyof typeof this.$signals>(
+    emit<S extends keyof SongList.SignalSignatures>(
         signal: S, 
-        ...args: Parameters<(typeof this.$signals)[S]>
+        ...args: Parameters<SongList.SignalSignatures[S]>
     ): void {
         super.emit(signal, ...args);
     }
@@ -224,4 +221,12 @@ export class SongList extends GObject.Object {
     // to make _title, _description or _songs read-write, just implement
     // methods like set_title, set_description or set_songs, gnim will
     // automatically use them to update a property value
+}
+
+export namespace SongList {
+    export interface SignalSignatures extends GObject.Object.SignalSignatures {
+        "added": (song: Song) => void;
+        "removed": (song: Song) => void;
+        "reordered": (song: Song, replacedSong: Song|null) => void;
+    }
 }

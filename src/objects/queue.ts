@@ -5,6 +5,7 @@ import { Song } from "./song";
 
 @register({ GTypeName: "VibeQueue" })
 export class Queue extends SongList {
+    declare $signals: Queue.SignalSignatures;
     @signal()
     cleared() {}
 
@@ -22,5 +23,18 @@ export class Queue extends SongList {
         this._songs = [];
         this.notify("songs");
         this.emit("cleared");
+    }
+
+    emit<S extends keyof Queue.SignalSignatures>(
+        signal: S, 
+        ...args: Parameters<Queue.SignalSignatures[S]>
+    ): void {
+        super.emit(signal as never, ...args as never);
+    }
+}
+
+export namespace Queue {
+    export interface SignalSignatures extends SongList.SignalSignatures {
+        "cleared": () => void;
     }
 }

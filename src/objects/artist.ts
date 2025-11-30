@@ -7,6 +7,7 @@ import { Plugin } from "../plugin";
 /** store artist informations */
 @register({ GTypeName: "VibeArtist" })
 export class Artist extends GObject.Object {
+    declare $signals: Artist.SignalSignatures;
     /** the unique identifier for this artist in this plugin */
     readonly id: any;
 
@@ -69,5 +70,14 @@ export class Artist extends GObject.Object {
                 properties.plugin,
                 this
             );
+    }
+}
+
+export namespace Artist {
+    export interface SignalSignatures extends GObject.Object.SignalSignatures {
+        "notify::name": () => void;
+        "notify::display-name": () => void;
+        "notify::image": () => void;
+        "notify::url": () => void;
     }
 }

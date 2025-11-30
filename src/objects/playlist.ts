@@ -1,5 +1,5 @@
 import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
-import { gtype, property, register } from "gnim/gobject";
+import { register } from "gnim/gobject";
 import { Vibe } from "..";
 import { Song } from "./song";
 import { SongList } from "./songlist";
@@ -10,8 +10,7 @@ import { Plugin } from "../plugin";
 @register({ GTypeName: "VibePlaylist" })
 export class Playlist extends SongList {
 
-    @property(gtype<GdkPixbuf.Pixbuf|null>(GdkPixbuf.Pixbuf)) 
-    image: GdkPixbuf.Pixbuf|null = null;
+    declare $signals: Playlist.SignalSignatures;
 
     constructor(properties: {
         title: string;
@@ -36,4 +35,8 @@ export class Playlist extends SongList {
                 this
             );
     }
+}
+
+export namespace Playlist {
+    export interface SignalSignatures extends SongList.SignalSignatures {}
 }

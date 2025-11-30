@@ -1,4 +1,5 @@
 import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
+import Gly from "gi://Gly?version=1";
 import { getter, gtype, register } from "gnim/gobject";
 import { Vibe } from "..";
 import { Plugin } from "../plugin";
@@ -10,6 +11,8 @@ import { SongList } from "./songlist";
 /** store album information */
 @register({ GTypeName: "VibeAlbum" })
 export class Album extends SongList {
+    declare $signals: Album.SignalSignatures;
+
     readonly #artist: Array<Artist> = [];
     readonly #url: string|null = null;
     readonly #single: boolean = false;
@@ -29,7 +32,7 @@ export class Album extends SongList {
     constructor(properties: {
         artist: Array<Artist>;
         songs: Array<Song>;
-        image?: GdkPixbuf.Pixbuf;
+        image?: GdkPixbuf.Pixbuf|Gly.Image;
         title?: string;
         id?: any;
         plugin?: Plugin;
@@ -61,5 +64,16 @@ export class Album extends SongList {
                 properties.plugin,
                 this
             );
+    }
+}
+
+export namespace Album {
+    export interface SignalSignatures extends SongList.SignalSignatures {
+        "notify::artist": () => void;
+        "notify::image": () => void;
+        "notify::title": () => void;
+        "notify::url": () => void;
+        "notify::single": () => void;
+        "notify::description": () => void;
     }
 }
