@@ -1,6 +1,12 @@
 import Gio from "gi://Gio?version=2.0";
 import Gst from "gi://Gst?version=1.0";
 import GstPbutils from "gi://GstPbutils?version=1.0";
+import { Song } from "./song";
+import { Plugin } from "../plugin";
+import { Artist } from "./artist";
+import { Vibe } from "..";
+import Gly from "gi://Gly";
+import { Album } from "./album";
 
 
 // This is still heavily WIP
@@ -50,6 +56,148 @@ export abstract class Meta {
 
     public static async getMetaTagsAsync(file: string|Gio.File, separator: string = ','): Promise<Meta.Data> {
         return this.getMetaTags(file, separator);
+    }
+
+    /** applies metadata to `Song` objects. properties like `:title`, `:artist` and `:metadata` are set
+      * automatically by this function, if found in `data`.
+      *
+      * the `plugin` parameter is used to search for existing objects declared by the plugin. it
+      * avoids creating unnecessary new objects.
+      *
+      * @throws `Error` if the `pictureData` property of `data` is corrupted and couldn't be read
+      * 
+      * @param song the `Song` object to apply metadata 
+      * @param data the `Meta.Data` object containing the metadata
+      * @param plugin optional `Plugin` object that is calling this method
+      * @param options optional modifiers that enables specific method features */
+    public static applyTags(song: Song, data: Meta.Data, plugin?: Plugin, options: {
+        /** whether to apply any image/picture to the song using the metadata.
+          * @default true */
+        applyImage?: boolean;
+        /** whether to, if `applyImage` is true, use an asynchronous(non-blocking) way to load the image.
+          * @default true */
+        applyImageAsynchronously?: boolean;
+        /** whether to apply the same song picture/image to the artist.
+          * @default true */
+        applyImageToArtist?: boolean;
+    } = {}): void {
+        if(Object.keys(data).length < 1)
+            return;
+
+        options.applyImage ??= true;
+        options.applyImageAsynchronously ??= true;
+        options.applyImageToArtist ??= true;
+
+        song.metadata = data;
+
+        const encode = new TextEncoder().encode;
+
+        if(data.title !== undefined)
+            song.title = data.title;
+
+        if(data.explicit !== undefined)
+            song.explicit = data.explicit;
+
+        if(data.artists !== undefined && data.artists.length > 0) {
+            const artists: Array<Artist> = [];
+
+            for(const name of data.artists) {
+                if(plugin) {
+                    const foundArtistData = Vibe.getDefault().artists.find(d => 
+                        d.plugin === plugin && d.artist.name === name
+                    );
+
+                    if(foundArtistData) {
+                        artists.push(foundArtistData.artist);
+                        continue;
+                    }
+                }
+
+                artists.push(new Artist({
+                    name,
+                    plugin
+                }));
+            }
+
+            song.artist = artists;
+        }
+
+        // FIXME: use metadata :albumArtist for setting album artists instead of grabbing from song
+        if(data.albumName !== undefined) {
+            if(plugin) {
+                const foundAlbum = Vibe.getDefault().albums.find((d) => {
+                    if(d.plugin !== plugin)
+                        return;
+
+                    if(d.album.title !== data.albumName)
+                        return;
+
+                    const foundArtist = d.album.artist.find(a => {
+                        for(const artist of song.artist) 
+                            return artist.id === a.id;
+                    });
+
+                    return Boolean(foundArtist);
+                });
+
+                if(foundAlbum)
+                    song.album = foundAlbum.album;
+
+                // add song if not in the album already
+                if(!foundAlbum?.album.songs.find(s => s.id === song.id))
+                    foundAlbum?.album.add(song);
+            } else {
+                song.album = new Album({
+                    title: data.albumName,
+                    artist: song.artist,
+                    plugin
+                });
+
+                if(!song.album.songs.find(s => s.id === song.id))
+                    song.album.add(song);
+            }
+        }
+
+        // load song image/picture
+        try {
+            const obj = song.album ?? song;
+            if(data.pictureData !== undefined && options.applyImage && options.applyImageAsynchronously) {
+                const loader = Gly.Loader.new_for_bytes(encode(data.pictureData));
+                loader.load_async(null, (_, res) => {
+                    try {
+                        const image = loader.load_finish(res);
+                        obj.image = image;
+
+                        if(!options.applyImageToArtist)
+                            return;
+
+                        for(const artist of obj.artist) {
+                            if(artist.image)
+                                continue;
+
+                            artist.image = obj.image;
+                        }
+                    } catch(e) {
+                        console.error("An error occurred while asynchronously-loading image from song metadata", e);
+                        return;
+                    }
+                });
+            } else if(data.pictureData !== undefined && options.applyImage) {
+                const image = Gly.Loader.new_for_bytes(encode(data.pictureData)).load();
+                obj.image = image;
+
+                if(options.applyImageToArtist) {
+                    for(const artist of obj.artist) {
+                        if(artist.image)
+                            continue;
+
+                        artist.image = obj.image;
+                    }
+                }
+            }
+        } catch(e) {
+            console.error("Couldn't load image for artist while applying metadata tags", e);
+        }
     }
 
     /** convert a `GstTagList` to a `Meta.Data` object. 

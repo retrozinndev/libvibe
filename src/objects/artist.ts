@@ -2,6 +2,7 @@ import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
 import GObject, { getter, gtype, property, register } from "gnim/gobject";
 import { Vibe } from "..";
 import { Plugin } from "../plugin";
+import Gly from "gi://Gly?version=1";
 
 
 /** store artist informations */
@@ -38,13 +39,13 @@ export class Artist extends GObject.Object {
     get url() { return this.#url; }
 
     /** the artist's picture, in pixbuf. can be null */
-    @property(gtype<GdkPixbuf.Pixbuf|null>(GdkPixbuf.Pixbuf))
-    image: GdkPixbuf.Pixbuf|null = null;
+    @property(gtype<GdkPixbuf.Pixbuf|Gly.Image|null>(GObject.Object))
+    image: GdkPixbuf.Pixbuf|Gly.Image|null = null;
 
     constructor(properties: {
         name: string;
         displayName?: string;
-        image?: GdkPixbuf.Pixbuf;
+        image?: GdkPixbuf.Pixbuf|Gly.Image;
         plugin?: Plugin;
         id?: any;
         url?: string;

@@ -44,6 +44,11 @@ export class Song extends GObject.Object {
     @property(gtype<Gio.File|Gst.Stream|null>(GObject.Object))
     source: Gst.Stream|Gio.File|null = null;
 
+    /** if the song is explicit / has explicit content 
+      * @default false */
+    @property(Boolean)
+    explicit: boolean = false;
+
     /** the song's individual image. usually, you don't need to define this,
     * as it's expected that only the album has an image; but you can also
     * use this if needed. can be null */
@@ -77,6 +82,8 @@ export class Song extends GObject.Object {
                 Gio.File.new_for_path(properties.source)
             : properties.source);
 
+        if(properties.explicit !== undefined)
+            this.explicit = properties.explicit;
         
         if(properties.metadata !== undefined)
             this.metadata = properties.metadata;

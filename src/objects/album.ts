@@ -31,7 +31,7 @@ export class Album extends SongList {
 
     constructor(properties: {
         artist: Array<Artist>;
-        songs: Array<Song>;
+        songs?: Array<Song>;
         image?: GdkPixbuf.Pixbuf|Gly.Image;
         title?: string;
         id?: any;
