@@ -7,6 +7,7 @@ import { Plugin } from "../plugin";
 import { Artist } from "./artist";
 import { Vibe } from "..";
 import { Album } from "./album";
+import GLib from "gi://GLib?version=2.0";
 
 
 // This is still heavily WIP
@@ -166,7 +167,7 @@ export abstract class Meta {
         try {
             const obj = song.album ?? song;
             if(data.pictureData !== undefined && options.applyImage && options.applyImageAsynchronously) {
-                const loader = Gly.Loader.new_for_bytes(encode(data.pictureData));
+                const loader = Gly.Loader.new_for_bytes(GLib.base64_decode(data.pictureData));
                 loader.load_async(null, (_, res) => {
                     try {
                         const image = loader.load_finish(res);
@@ -187,7 +188,7 @@ export abstract class Meta {
                     }
                 });
             } else if(data.pictureData !== undefined && options.applyImage) {
-                const image = Gly.Loader.new_for_bytes(encode(data.pictureData)).load();
+                const image = Gly.Loader.new_for_bytes(GLib.base64_decode(data.pictureData)).load();
                 obj.image = image;
 
                 if(options.applyImageToArtist) {
@@ -214,13 +215,17 @@ export abstract class Meta {
         const data: Meta.Data = {};
 
         taglist.foreach((self, tag) => {
-            switch(tag.toLowerCase()) {
+            switch(tag.toLowerCase().replaceAll(' ', '')) {
                 case "title":
                     data.title = self.get_string(tag)[1];
                 break;
 
                 case "artist":
                     data.artists = self.get_string(tag)[1]?.split(separator).filter(s => s.trim() !== "");
+                break;
+
+                case "albumartist":
+                    data.albumArtists = self.get_string(tag)[1]?.split(separator).filter(s => s.trim() !== "");
                 break;
 
                 case "album":
@@ -282,6 +287,7 @@ export namespace Meta {
     export type Data = Partial<{
         title: string;
         albumName: string;
+        albumArtists: Array<string>;
         pictureData: string;
         discNumber: number;
         barcode: number;
