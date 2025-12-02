@@ -3,11 +3,9 @@ import GObject, { gtype, property, register, signal } from "gnim/gobject";
 import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
 import Gst from "gi://Gst?version=1.0";
 import Gly from "gi://Gly?version=2";
-import { Artist } from "./artist";
-import { Album } from "./album";
+import { Artist, Album, Meta } from ".";
 import { Plugin } from "../plugin";
 import { Vibe } from "..";
-import { Meta } from "./meta";
 
 
 /* store song data */
