@@ -2,7 +2,7 @@ import Gio from "gi://Gio?version=2.0";
 import GObject, { gtype, property, register, signal } from "gnim/gobject";
 import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
 import Gst from "gi://Gst?version=1.0";
-import Gly from "gi://Gly?version=1";
+import Gly from "gi://Gly";
 import { Artist } from "./artist";
 import { Album } from "./album";
 import { Plugin } from "../plugin";
