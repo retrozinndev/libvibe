@@ -38,13 +38,13 @@ export class SongList extends GObject.Object {
     @property(gtype<GdkPixbuf.Pixbuf|Gly.Image|null>(GObject.Object))
     image: GdkPixbuf.Pixbuf|Gly.Image|null = null;
 
-    @signal(Song)
+    @signal(GObject.Object)
     added(_: Song) {}
 
-    @signal(Song)
+    @signal(GObject.Object)
     removed(_: Song) {}
 
-    @signal(Song, gtype<Song|null>(Song))
+    @signal(GObject.Object, gtype<Song|null>(GObject.Object))
     reordered(_: Song, __: Song|null) {}
 
     constructor(properties?: {

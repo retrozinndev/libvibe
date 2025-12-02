@@ -61,18 +61,7 @@ export class Plugin extends GObject.Object {
     readonly #url: string|null = null;
 
     #implements: Implementations = {};
-    #songlist: SongList = new SongList();
     
-
-    /** SongList containing all the songs imported by the plugin.
-      * if the plugin functions like online music players(network streaming), 
-      * you don't need to add them to the list.
-      * You can add/remove songs by using this field.
-      * @readonly
-      */
-    @getter(SongList) 
-    get songlist() { return this.#songlist; }
-
     /** the plugin's unique name. e.g.: vibe-plugin-music
     * @readonly */
     @getter(String) 

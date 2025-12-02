@@ -128,7 +128,7 @@ export class Vibe extends GObject.Object {
     @signal()
     initialized() {}
 
-    @signal(Plugin, Song)
+    @signal(GObject.Object, GObject.Object)
     songAdded(plugin: Plugin, song: Song) {
         this.#songs.push({
             plugin: plugin,
@@ -138,7 +138,7 @@ export class Vibe extends GObject.Object {
         this.notify("songs");
     }
 
-    @signal(Plugin, Album)
+    @signal(GObject.Object, GObject.Object)
     albumAdded(plugin: Plugin, album: Album) {
         this.#albums.push({
             plugin: plugin,
@@ -148,7 +148,7 @@ export class Vibe extends GObject.Object {
         this.notify("albums");
     }
 
-    @signal(Plugin, SongList)
+    @signal(GObject.Object, GObject.Object)
     songlistAdded(plugin: Plugin, list: SongList) {
         this.#songlists.push({
             plugin: plugin,
@@ -158,7 +158,7 @@ export class Vibe extends GObject.Object {
         this.notify("songlists");
     }
     
-    @signal(Plugin, Artist)
+    @signal(GObject.Object, GObject.Object)
     artistAdded(plugin: Plugin, artist: Artist) {
         this.#artists.push({
             plugin: plugin,
@@ -168,13 +168,13 @@ export class Vibe extends GObject.Object {
         this.notify("artists");
     }
 
-    @signal(Plugin)
+    @signal(GObject.Object)
     pluginAdded(plugin: Plugin) {
         this.#plugins.push(plugin);
         this.notify("plugins");
     }
 
-    @signal(Plugin, Playlist)
+    @signal(GObject.Object, GObject.Object)
     playlistAdded(plugin: Plugin, list: Playlist) {
         this.#playlists.push({
             plugin: plugin,
@@ -182,10 +182,10 @@ export class Vibe extends GObject.Object {
         });
     }
 
-    @signal(Plugin)
+    @signal(GObject.Object)
     authStarted(_: Plugin) {}
 
-    @signal(Plugin)
+    @signal(GObject.Object)
     authEnded(_: Plugin) {}
 
     public static readonly runtimeDir = Gio.File.new_for_path(`${GLib.get_user_runtime_dir()}/vibe`);
