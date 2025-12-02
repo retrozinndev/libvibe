@@ -48,7 +48,7 @@ export abstract class Meta {
                 throw new Meta.MetaTimeoutError();
         }
 
-        const tags = info.get_tags();
+        const tags = info.get_audio_streams()[0]?.get_tags();
         if(!tags)
             return {}; // no tags
 
