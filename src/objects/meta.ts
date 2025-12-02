@@ -95,8 +95,6 @@ export abstract class Meta {
 
         song.metadata = data;
 
-        const encode = new TextEncoder().encode;
-
         if(data.title !== undefined)
             song.title = data.title;
 
@@ -215,67 +213,71 @@ export abstract class Meta {
         const data: Meta.Data = {};
 
         taglist.foreach((self, tag) => {
-            switch(tag.toLowerCase().replaceAll(' ', '')) {
-                case "title":
-                    data.title = self.get_string(tag)[1];
-                break;
+            try {
+                switch(tag.toLowerCase().replaceAll(' ', '')) {
+                    case "title":
+                        data.title = self.get_string(tag)[1];
+                    break;
 
-                case "artist":
-                    data.artists = self.get_string(tag)[1]?.split(separator).filter(s => s.trim() !== "");
-                break;
+                    case "artist":
+                        data.artists = self.get_string(tag)[1]?.split(separator).filter(s => s.trim() !== "");
+                    break;
 
-                case "albumartist":
-                    data.albumArtists = self.get_string(tag)[1]?.split(separator).filter(s => s.trim() !== "");
-                break;
+                    case "albumartist":
+                        data.albumArtists = self.get_string(tag)[1]?.split(separator).filter(s => s.trim() !== "");
+                    break;
 
-                case "album":
-                    data.albumName = self.get_string(tag)[1];
-                break;
+                    case "album":
+                        data.albumName = self.get_string(tag)[1];
+                    break;
 
-                case "image":
-                case "album-cover":
-                case "picture":
-                    data.pictureData = self.get_string(tag)[1];
-                break;
+                    case "image":
+                    case "album-cover":
+                    case "picture":
+                        data.pictureData = self.get_string(tag)[1];
+                    break;
 
-                case "discnumber":
-                    data.discNumber = self.get_int(tag)[1];
-                break;
+                    case "discnumber":
+                        data.discNumber = self.get_int(tag)[1];
+                    break;
 
-                case "tracknumber":
-                    data.trackNumber = self.get_int(tag)[1];
-                break;
+                    case "tracknumber":
+                        data.trackNumber = self.get_int(tag)[1];
+                    break;
 
-                case "tracktotal":
-                    data.trackTotal = self.get_int(tag)[1];
-                break;
+                    case "tracktotal":
+                        data.trackTotal = self.get_int(tag)[1];
+                    break;
 
-                case "barcode":
-                case "upc":
-                    data.barcode = self.get_int(tag)[1];
-                break;
+                    case "barcode":
+                    case "upc":
+                        data.barcode = self.get_int(tag)[1];
+                    break;
 
-                case "explicit":
-                    data.explicit = self.get_int(tag)[1] !== 0;
-                break;
+                    case "explicit":
+                        data.explicit = self.get_int(tag)[1] !== 0;
+                    break;
 
-                case "composer":
-                    data.composers = self.get_string(tag)[1]?.split(separator).filter(s => s.trim() !== "");
-                break;
+                    case "composer":
+                        data.composers = self.get_string(tag)[1]?.split(separator).filter(s => s.trim() !== "");
+                    break;
 
-                case "publisher":
-                    data.publisher = self.get_string(tag)[1];
-                break;
+                    case "publisher":
+                        data.publisher = self.get_string(tag)[1];
+                    break;
 
-                case "date":
-                    try {
-                        data.date = new Date(self.get_string(tag)[1]);
-                    } catch(_) {}
-                break;
+                    case "date":
+                        try {
+                            data.date = new Date(self.get_string(tag)[1]);
+                        } catch(_) {}
+                    break;
 
-                case "lyrics":
-                    data.lyrics = self.get_string(tag)[1];
-                break;
+                    case "lyrics":
+                        data.lyrics = self.get_string(tag)[1];
+                    break;
+                }
+            } catch(e) {
+                console.error(e);
             }
         });
 
