@@ -28,6 +28,9 @@ export abstract class Meta {
         if(!file.query_exists(null))
             throw new Meta.MetaReadError("File either doesn't exist or isn't accessible");
 
+        if(!Gst.is_initialized())
+            Gst.init([]);
+
         GstPbutils.pb_utils_init();
 
         const discoverer = GstPbutils.Discoverer.new(timeout);
