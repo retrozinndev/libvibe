@@ -1,7 +1,7 @@
 import GObject, { getter, gtype, register, signal } from "gnim/gobject";
 import Gio from "gi://Gio?version=2.0";
 import GLib from "gi://GLib?version=2.0";
-import { Artist, Song, SongList, Album, Playlist } from "./objects";
+import { SongList, Song, Artist, Album, Playlist } from "./objects";
 import { Media } from "./interfaces/media";
 import { Plugin } from "./plugin";
 import { Pages } from "./interfaces/pages";
