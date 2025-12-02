@@ -1,4 +1,5 @@
 import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
+import Gly from "gi://Gly?version=2";
 import { register } from "gnim/gobject";
 import { Vibe } from "..";
 import { Song } from "./song";
@@ -17,7 +18,7 @@ export class Playlist extends SongList {
         description?: string;
         id?: any;
         plugin?: Plugin;
-        image?: GdkPixbuf.Pixbuf;
+        image?: GdkPixbuf.Pixbuf|Gly.Image;
         songs?: Array<Song>;
     }) {
         super({

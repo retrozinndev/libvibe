@@ -1,11 +1,11 @@
 import Gio from "gi://Gio?version=2.0";
 import Gst from "gi://Gst?version=1.0";
+import Gly from "gi://Gly?version=2";
 import GstPbutils from "gi://GstPbutils?version=1.0";
 import { Song } from "./song";
 import { Plugin } from "../plugin";
 import { Artist } from "./artist";
 import { Vibe } from "..";
-import Gly from "gi://Gly";
 import { Album } from "./album";
 
 

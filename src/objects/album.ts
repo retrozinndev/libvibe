@@ -1,5 +1,5 @@
 import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
-import Gly from "gi://Gly";
+import Gly from "gi://Gly?version=2";
 import { getter, gtype, register } from "gnim/gobject";
 import { Vibe } from "..";
 import { Plugin } from "../plugin";
