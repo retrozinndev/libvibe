@@ -68,10 +68,11 @@ export class Vibe extends GObject.Object {
         "toast-notified": (text: string, priority: "high"|"normal", button?: LabelButton) => void;
     };
 
-    #pages: Pages;
-    #pageConstructor: PageConstructor;
-    #media: Media;
-    #toastOverlay: Adw.ToastOverlay;
+    #isDataSet: boolean = false;
+    #pages!: Pages;
+    #pageConstructor!: PageConstructor;
+    #media!: Media;
+    #toastOverlay!: Adw.ToastOverlay;
     #lastId: number = -1;
     #connections: Map<GObject.Object, Array<number>|number> = new Map();
 
@@ -195,18 +196,8 @@ export class Vibe extends GObject.Object {
     public static readonly pluginsCacheDir = Gio.File.new_for_path(`${this.cacheDir.peek_path()!}/plugins`);
     
 
-    constructor(
-        media: Media, 
-        pages: Pages, 
-        pageConstructor: new (props: object) => Page,
-        toastOverlay: Adw.ToastOverlay
-    ) {
+    constructor() {
         super();
-
-        this.#media = media;
-        this.#pages = pages;
-        this.#pageConstructor = pageConstructor;
-        this.#toastOverlay = toastOverlay;
     }
 
     /** generate an unique identifier for an object(song, playlist, artist, album...) */
@@ -274,8 +265,30 @@ Please create one providing all the necessary properties")
             toast.set_button_label(button.label);
         }
 
-        this.emit("toast-notified", text, priority, button);
         this.#toastOverlay.add_toast(toast);
+        this.emit("toast-notified", text, priority, button);
+    }
+
+    /** set data for the VibeAPI to work correctly.
+      * these data are instances of widgets and class implementations of interfaces for the API to work with. 
+      * you don't need to set this, as it's set automatically by the application. */
+    public setData(
+        media: Media, 
+        pages: Pages, 
+        pageConstructor: new (props: object) => Page,
+        toastOverlay: Adw.ToastOverlay
+    ): void {
+        if(this.#isDataSet) {
+            console.error("Data was already set, this call was skipped");
+            return;
+        }
+
+        this.#media = media;
+        this.#pages = pages;
+        this.#pageConstructor = pageConstructor;
+        this.#toastOverlay = toastOverlay;
+
+        this.#isDataSet = true;
     }
 
     vfunc_dispose(): void {
