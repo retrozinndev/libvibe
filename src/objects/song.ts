@@ -31,7 +31,7 @@ export class Song extends GObject.Object {
     artist: Array<Artist> = [];
 
     /** the album object where this song belongs, can be null */
-    @property(gtype<Album|null>(Album))
+    @property(gtype<GObject.Object|null>(Album))
     album: Album|null = null;
 
     /** the song url(sometimes the link to a streaming service), can be null */
