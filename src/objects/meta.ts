@@ -52,7 +52,9 @@ export abstract class Meta {
                 throw new Meta.MetaTimeoutError();
         }
 
-        const tags = info.get_audio_streams()[0]?.get_tags();
+        const tags = info.get_audio_streams().map(stream => stream.get_tags())
+            .filter(stream => stream != null);
+
         if(!tags)
             return {}; // no tags
 
@@ -209,10 +211,10 @@ export abstract class Meta {
       * @param separator an optional metadata separator. the default is a comma: ',' 
       *
       * @returns a `Meta.Data` object with the result of the convertion */
-    public static taglistToData(taglist: Gst.TagList, separator: string = ','): Meta.Data {
+    public static taglistToData(taglist: Array<Gst.TagList>, separator: string = ','): Meta.Data {
         const data: Meta.Data = {};
 
-        taglist.foreach((self, tag) => {
+        taglist.forEach(list => list.foreach((self, tag) => {
             try {
                 switch(tag.toLowerCase().replaceAll(' ', '')) {
                     case "title":
@@ -279,7 +281,7 @@ export abstract class Meta {
             } catch(e) {
                 console.error(e);
             }
-        });
+        }));
 
         return data;
     }
