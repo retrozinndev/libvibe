@@ -198,6 +198,9 @@ export class Vibe extends GObject.Object {
 
     constructor() {
         super();
+
+        if(!Vibe.instance)
+            Vibe.instance = this;
     }
 
     /** generate an unique identifier for an object(song, playlist, artist, album...) */
@@ -212,15 +215,6 @@ export class Vibe extends GObject.Object {
 Please create one providing all the necessary properties")
 
         return this.instance;
-    }
-
-    public static setDefault(inst: Vibe): void {
-        if(!this.instance) {
-            this.instance = inst;
-            return;
-        }
-
-        throw new Error("Vibe: Can't set default instance if it was previously set! (readonly)");
     }
 
     /** add a new page to the stack. plugins can use this to open details for artists, 
