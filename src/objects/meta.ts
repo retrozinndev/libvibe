@@ -17,9 +17,10 @@ export abstract class Meta {
     /** get metadata tags(GstTags) from a media file 
       * @param file the GFile/path of the media where to get the data from
       * @param separator optional metadata separator. by default it's a comma: ','
+      * @param timeout optionally specify a timeout for GstPbutilsDiscoverer to work with
       *
       * @returns a {@link Meta.Data} object, containing the meta tags from the file(can be empty if there's none) */
-    public static getMetaTags(file: string|Gio.File, separator: string = ','): Meta.Data {
+    public static getMetaTags(file: string|Gio.File, separator: string = ',', timeout: number = 2500): Meta.Data {
         file = typeof file === "string" ?
             Gio.File.new_for_path(file)
         : file;
@@ -29,7 +30,7 @@ export abstract class Meta {
 
         GstPbutils.pb_utils_init();
 
-        const discoverer = GstPbutils.Discoverer.new(-1);
+        const discoverer = GstPbutils.Discoverer.new(timeout);
         const info = discoverer.discover_uri(`file://${file.peek_path()}`);
         const result = info.get_result();
 
@@ -54,8 +55,8 @@ export abstract class Meta {
         return this.taglistToData(tags, separator);
     }
 
-    public static async getMetaTagsAsync(file: string|Gio.File, separator: string = ','): Promise<Meta.Data> {
-        return this.getMetaTags(file, separator);
+    public static async getMetaTagsAsync(file: string|Gio.File, separator: string = ',', timeout: number = 2500): Promise<Meta.Data> {
+        return this.getMetaTags(file, separator, timeout);
     }
 
     /** applies metadata to `Song` objects. properties like `:title`, `:artist` and `:metadata` are set

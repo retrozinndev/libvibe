@@ -212,7 +212,7 @@ export class Vibe extends GObject.Object {
     public static getDefault(): Vibe {
         if(!this.instance)
             throw new Error("No instance of VibeAPI(Vibe) was created yet. \
-Please create one providing all the necessary properties")
+Please create one providing all the necessary properties");
 
         return this.instance;
     }
