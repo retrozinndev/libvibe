@@ -15,6 +15,9 @@ import GLib from "gi://GLib?version=2.0";
 /** retrieve metadata from media files, and apply them to a vibe object */
 export abstract class Meta {
 
+    private static readonly decode = new TextDecoder().decode;
+    private static readonly encode = new TextEncoder().encode;
+
     /** get metadata tags(GstTags) from a media file 
       * @param file the GFile/path of the media where to get the data from
       * @param separator optional metadata separator. by default it's a comma: ','
@@ -166,8 +169,10 @@ export abstract class Meta {
         // load song image/picture
         try {
             const obj = song.album ?? song;
-            if(data.pictureData !== undefined && options.applyImage && options.applyImageAsynchronously) {
-                const loader = Gly.Loader.new_for_bytes(GLib.base64_decode(data.pictureData));
+            const picData = data.pictureData ? this.isBase64(data.pictureData) : undefined;
+
+            if(picData && options.applyImage && options.applyImageAsynchronously) {
+                const loader = Gly.Loader.new_for_bytes(this.encode(picData));
                 loader.load_async(null, (_, res) => {
                     try {
                         const image = loader.load_finish(res);
@@ -187,8 +192,8 @@ export abstract class Meta {
                         return;
                     }
                 });
-            } else if(data.pictureData !== undefined && options.applyImage) {
-                const image = Gly.Loader.new_for_bytes(GLib.base64_decode(data.pictureData)).load();
+            } else if(picData && options.applyImage) {
+                const image = Gly.Loader.new_for_bytes(this.encode(picData)).load();
                 obj.image = image;
 
                 if(options.applyImageToArtist) {
@@ -284,6 +289,15 @@ export abstract class Meta {
         }));
 
         return data;
+    }
+
+    private static isBase64(str: string): string|null {
+        try {
+            const data = GLib.base64_decode(str);
+            return this.decode(data);
+        } catch(_) {}
+
+        return null;
     }
 }
 
