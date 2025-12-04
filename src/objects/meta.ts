@@ -8,6 +8,7 @@ import { Artist } from "./artist";
 import { Vibe } from "..";
 import { Album } from "./album";
 import GLib from "gi://GLib?version=2.0";
+import GObject from "gnim/gobject";
 
 
 // This is still heavily WIP
@@ -57,6 +58,18 @@ export abstract class Meta {
 
         const tags = info.get_audio_streams().map(stream => stream.get_tags())
             .filter(stream => stream != null);
+
+        // debugging
+        tags.forEach(list => list.foreach((_, tag) => {
+            const gvalue = list.get_value_index(tag, 0);
+            
+            if(gvalue?.get_gtype() === GObject.TYPE_INT) {
+                console.log(`${tag}: ${list.get_int(tag)[1]}`);
+                return;
+            }
+
+            console.log(`${tag}: ${list.get_string(tag)[1]}`);
+        }));
 
         if(!tags)
             return {}; // no tags
@@ -169,7 +182,9 @@ export abstract class Meta {
         // load song image/picture
         try {
             const obj = song.album ?? song;
-            const picData = data.pictureData ? this.isBase64(data.pictureData) : undefined;
+            const picData = data.pictureData ? this.isBase64(
+                data.pictureData.replace(/\s|\n/g, "") // remove spaces and line-breaks
+            ) : undefined;
 
             if(picData && options.applyImage && options.applyImageAsynchronously) {
                 const loader = Gly.Loader.new_for_bytes(this.encode(picData));
