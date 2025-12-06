@@ -15,9 +15,6 @@ import GLib from "gi://GLib?version=2.0";
 /** retrieve metadata from media files, and apply them to a vibe object */
 export abstract class Meta {
 
-    private static readonly decode = new TextDecoder().decode;
-    private static readonly encode = new TextEncoder().encode;
-
     /** get metadata tags(GstTags) from a media file 
       * @param file the GFile/path of the media where to get the data from
       * @param separator optional metadata separator. by default it's a comma: ','
@@ -169,12 +166,9 @@ export abstract class Meta {
         // load song image/picture
         try {
             const obj = song.album ?? song;
-            const picData = data.pictureData ? this.isBase64(
-                data.pictureData.replace(/\s|\n/g, "") // remove spaces and line-breaks
-            ) : undefined;
 
-            if(picData && options.applyImage && options.applyImageAsynchronously) {
-                const loader = Gly.Loader.new_for_bytes(this.encode(picData));
+            if(data.pictureData && options.applyImage && options.applyImageAsynchronously) {
+                const loader = Gly.Loader.new_for_bytes(data.pictureData);
                 loader.load_async(null, (_, res) => {
                     try {
                         const image = loader.load_finish(res);
@@ -194,8 +188,8 @@ export abstract class Meta {
                         return;
                     }
                 });
-            } else if(picData && options.applyImage) {
-                const image = Gly.Loader.new_for_bytes(this.encode(picData)).load();
+            } else if(data.pictureData && options.applyImage) {
+                const image = Gly.Loader.new_for_bytes(data.pictureData).load();
                 obj.image = image;
 
                 if(options.applyImageToArtist) {
@@ -241,7 +235,11 @@ export abstract class Meta {
                     break;
 
                     case Gst.TAG_IMAGE:
-                        data.pictureData = self.get_string(tag)[1];
+                    case Gst.TAG_PREVIEW_IMAGE:
+                        const sample = self.get_sample(tag)[1];
+                        const info = sample.get_buffer()?.map(Gst.MapFlags.READ)[1];
+
+                        data.pictureData = info?.data;
                     break;
 
                     case Gst.TAG_ALBUM_VOLUME_NUMBER:
@@ -290,15 +288,6 @@ export abstract class Meta {
 
         return data;
     }
-
-    private static isBase64(str: string): string|null {
-        try {
-            const data = GLib.base64_decode(str);
-            return this.decode(data);
-        } catch(_) {}
-
-        return null;
-    }
 }
 
 export namespace Meta {   
@@ -306,7 +295,7 @@ export namespace Meta {
         title: string;
         albumName: string;
         albumArtists: Array<string>;
-        pictureData: string;
+        pictureData: Uint8Array|GLib.Bytes;
         discNumber: number;
         isrc: number;
         trackNumber: number;
