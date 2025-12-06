@@ -8,7 +8,6 @@ import { Artist } from "./artist";
 import { Vibe } from "..";
 import { Album } from "./album";
 import GLib from "gi://GLib?version=2.0";
-import GObject from "gnim/gobject";
 
 
 // This is still heavily WIP
@@ -58,18 +57,6 @@ export abstract class Meta {
 
         const tags = info.get_audio_streams().map(stream => stream.get_tags())
             .filter(stream => stream != null);
-
-        // debugging
-        tags.forEach(list => list.foreach((_, tag) => {
-            const gvalue = list.get_value_index(tag, 0);
-            
-            if(gvalue?.get_gtype() === GObject.TYPE_INT) {
-                console.log(`${tag}: ${list.get_int(tag)[1]}`);
-                return;
-            }
-
-            console.log(`${tag}: ${list.get_string(tag)[1]}`);
-        }));
 
         if(!tags)
             return {}; // no tags
@@ -236,65 +223,63 @@ export abstract class Meta {
 
         taglist.forEach(list => list.foreach((self, tag) => {
             try {
-                switch(tag.toLowerCase().replaceAll(' ', '')) {
-                    case "title":
+                switch(tag) {
+                    case Gst.TAG_TITLE:
                         data.title = self.get_string(tag)[1];
                     break;
 
-                    case "artist":
+                    case Gst.TAG_ARTIST:
                         data.artists = self.get_string(tag)[1]?.split(separator).filter(s => s.trim() !== "");
                     break;
 
-                    case "albumartist":
+                    case Gst.TAG_ALBUM_ARTIST:
                         data.albumArtists = self.get_string(tag)[1]?.split(separator).filter(s => s.trim() !== "");
                     break;
 
-                    case "album":
+                    case Gst.TAG_ALBUM:
                         data.albumName = self.get_string(tag)[1];
                     break;
 
-                    case "image":
-                    case "album-cover":
-                    case "picture":
+                    case Gst.TAG_IMAGE:
                         data.pictureData = self.get_string(tag)[1];
                     break;
 
-                    case "discnumber":
+                    case Gst.TAG_ALBUM_VOLUME_NUMBER:
                         data.discNumber = self.get_int(tag)[1];
                     break;
 
-                    case "tracknumber":
+                    case Gst.TAG_TRACK_NUMBER:
                         data.trackNumber = self.get_int(tag)[1];
                     break;
 
-                    case "tracktotal":
+                    case Gst.TAG_TRACK_COUNT:
                         data.trackTotal = self.get_int(tag)[1];
                     break;
 
-                    case "barcode":
-                    case "upc":
-                        data.barcode = self.get_int(tag)[1];
+                    case Gst.TAG_ISRC:
+                        data.isrc = self.get_int(tag)[1];
                     break;
 
-                    case "explicit":
-                        data.explicit = self.get_int(tag)[1] !== 0;
+                    case "common::lyrics-rating":
+                    case "common::rating":
+                        data.explicit = /explicit|advisory/.test(self.get_string(tag)[1]);
                     break;
 
-                    case "composer":
+                    case Gst.TAG_COMPOSER:
                         data.composers = self.get_string(tag)[1]?.split(separator).filter(s => s.trim() !== "");
                     break;
 
-                    case "publisher":
+                    case Gst.TAG_PUBLISHER:
                         data.publisher = self.get_string(tag)[1];
                     break;
 
-                    case "date":
+                    case Gst.TAG_DATE:
                         try {
                             data.date = new Date(self.get_string(tag)[1]);
                         } catch(_) {}
                     break;
 
-                    case "lyrics":
+                    case Gst.TAG_LYRICS:
                         data.lyrics = self.get_string(tag)[1];
                     break;
                 }
@@ -323,7 +308,7 @@ export namespace Meta {
         albumArtists: Array<string>;
         pictureData: string;
         discNumber: number;
-        barcode: number;
+        isrc: number;
         trackNumber: number;
         explicit: boolean;
         trackTotal: number;
