@@ -37,6 +37,8 @@ export abstract class Meta {
         const discoverer = GstPbutils.Discoverer.new(timeout);
         const info = discoverer.discover_uri(`file://${file.peek_path()}`);
         const result = info.get_result();
+        const streamTags = info.get_tags(), 
+            audioStreamTags = info.get_audio_streams().map(audStream => audStream.get_tags());
 
         switch(result) {
             case GstPbutils.DiscovererResult.ERROR:
@@ -52,13 +54,19 @@ export abstract class Meta {
                 throw new Meta.MetaTimeoutError();
         }
 
-        const tags = info.get_audio_streams().map(stream => stream.get_tags())
-            .filter(stream => stream != null);
+        const taglists: Array<Gst.TagList> = [];
 
-        if(!tags)
+        if(streamTags)
+            taglists.push(streamTags);
+
+        if(audioStreamTags)
+            taglists.push(...audioStreamTags.filter(tag => tag != null));
+
+
+        if(!taglists)
             return {}; // no tags
 
-        return this.taglistToData(tags, separator);
+        return this.taglistToData(taglists, separator);
     }
 
     public static async getMetaTagsAsync(file: string|Gio.File, separator: string = ',', timeout: number = 2500000000): Promise<Meta.Data> {
