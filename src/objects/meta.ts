@@ -265,24 +265,24 @@ export abstract class Meta {
                     break;
 
                     case Gst.TAG_ALBUM_VOLUME_NUMBER:
-                        data.discNumber = self.get_int(tag)[1];
+                        data.discNumber = Number.parseInt(self.get_string(tag)[1]);
                     break;
 
                     case Gst.TAG_TRACK_NUMBER:
-                        data.trackNumber = self.get_int(tag)[1];
+                        data.trackNumber = Number.parseInt(self.get_string(tag)[1]);
                     break;
 
                     case Gst.TAG_TRACK_COUNT:
-                        data.trackTotal = self.get_int(tag)[1];
+                        data.trackTotal = Number.parseInt(self.get_string(tag)[1]);
                     break;
 
                     case Gst.TAG_ISRC:
-                        data.isrc = self.get_int(tag)[1];
+                        data.isrc = Number.parseInt(self.get_string(tag)[1]);
                     break;
 
                     case "common::lyrics-rating":
                     case "common::rating":
-                        data.explicit = /explicit|advisory/.test(self.get_string(tag)[1]);
+                        data.explicit = /explicit|advisory|[1]|true/i.test(self.get_string(tag)[1]);
                     break;
 
                     case Gst.TAG_COMPOSER:
