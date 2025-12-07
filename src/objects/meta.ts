@@ -8,6 +8,7 @@ import { Artist } from "./artist";
 import { Vibe } from "..";
 import { Album } from "./album";
 import GLib from "gi://GLib?version=2.0";
+import GlyGtk4 from "gi://GlyGtk4?version=2";
 
 
 // This is still heavily WIP
@@ -178,9 +179,25 @@ export abstract class Meta {
             if(data.pictureData && options.applyImage && options.applyImageAsynchronously) {
                 const loader = Gly.Loader.new_for_bytes(data.pictureData);
                 loader.load_async(null, (_, res) => {
+                    let image!: Gly.Image;
+
                     try {
-                        const image = loader.load_finish(res);
-                        obj.image = image;
+                        image = loader.load_finish(res);
+                    } catch(e) {
+                        console.error("An error occurred while asynchronously-loading image from song metadata", e);
+                        return;
+                    }
+
+                    image.next_frame_async(null, (_, res) => {
+                        let frame!: Gly.Frame;
+                        try {
+                            frame = image.next_frame_finish(res);
+                        } catch(e) {
+                            console.error("Failed to get next frame from image", e);
+                            return;
+                        }
+
+                        obj.image = GlyGtk4.frame_get_texture(frame);
 
                         if(!options.applyImageToArtist)
                             return;
@@ -191,14 +208,11 @@ export abstract class Meta {
 
                             artist.image = obj.image;
                         }
-                    } catch(e) {
-                        console.error("An error occurred while asynchronously-loading image from song metadata", e);
-                        return;
-                    }
+                    });
                 });
             } else if(data.pictureData && options.applyImage) {
-                const image = Gly.Loader.new_for_bytes(data.pictureData).load();
-                obj.image = image;
+                const texture = GlyGtk4.frame_get_texture(Gly.Loader.new_for_bytes(data.pictureData).load().next_frame());
+                obj.image = texture;
 
                 if(options.applyImageToArtist) {
                     for(const artist of obj.artist) {

@@ -6,6 +6,7 @@ import { Song } from "./song";
 @register({ GTypeName: "VibeQueue" })
 export class Queue extends SongList {
     declare $signals: Queue.SignalSignatures;
+
     @signal()
     cleared() {}
 
