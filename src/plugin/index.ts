@@ -130,9 +130,9 @@ export class Plugin extends GObject.Object {
 
     /** the search function implemented by the plugin.
      * @param _search the current search string
-     * @returns an Array containing the search results or null
+     * @returns an Array containing sections with search results or null
      */
-    search(search: string): Promise<Array<Song|Artist|SongList|Section>|null>|Array<Song|Artist|SongList|Section>|null {
+    search(search: string): Promise<Array<Section>|null>|Array<Section>|null {
         return null;
     }
 
