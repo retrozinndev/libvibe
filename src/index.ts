@@ -10,6 +10,8 @@ import { createRoot, getScope } from "gnim";
 import Adw from "gi://Adw?version=1";
 
 
+type ToastPriority = "high"|"normal";
+
 export type IconButton = {
     id?: any;
     iconName: string;
@@ -65,7 +67,7 @@ export class Vibe extends GObject.Object {
         /** authentication for a plugin has ended */
         "auth-ended": (plugin: Plugin) => void;
         /** a new toast notification got sent to the UI */
-        "toast-notified": (text: string, priority: "high"|"normal", button?: LabelButton) => void;
+        "toast-notified": (text: string, priority: ToastPriority, button?: LabelButton) => void;
     };
 
     #isDataSet: boolean = false;
@@ -125,6 +127,8 @@ export class Vibe extends GObject.Object {
     @getter(Array)
     get plugins() { return this.#plugins; }
 
+    @signal(String, gtype<ToastPriority>(String), gtype<LabelButton|undefined>(Object))
+    toastNotified(_: string, __: ToastPriority, ___?: LabelButton) {}
 
     @signal()
     initialized() {}
@@ -239,7 +243,7 @@ Please create one providing all the necessary properties");
       * @param button action button to go with the notification. you can leave this empty if you want none
       *
       * @example notify the user that there's no internet connection */
-    public toastNotify(text: string, priority: "high"|"normal" = "normal", button?: LabelButton): void {
+    public toastNotify(text: string, priority: ToastPriority = "normal", button?: LabelButton): void {
         const toast = new Adw.Toast({
             title: text,
             priority: priority === "high" ? 
