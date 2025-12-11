@@ -148,6 +148,24 @@ export class SongList extends GObject.Object {
         return false;
     }
 
+    /** get a song from this list. if you use a song instance as
+      * the parameter, this method will check if it's included in the list,
+      * then, if found, it returns the item back.
+      * for more precision, it's recommended to use an index value.
+      * 
+      * @param item song instance or index to find in the list 
+      *
+      * @returns `item`, if found, or else, `undefined` */
+    get(item: Song|number): Song|undefined {
+        if(typeof item === "number") 
+            return this._songs[item];
+
+        if(this.has(item))
+            return item;
+
+        return undefined;
+    }
+
     /** update the position of a song with another 
       *
       * @param song the song to update the position(or its zero-based index)

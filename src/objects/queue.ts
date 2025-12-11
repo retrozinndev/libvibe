@@ -1,4 +1,4 @@
-import { register, signal } from "gnim/gobject";
+import { property, register, signal } from "gnim/gobject";
 import { SongList } from "./songlist";
 import { Song } from "./song";
 
@@ -10,12 +10,19 @@ export class Queue extends SongList {
     @signal()
     cleared() {}
 
-    constructor(songs?: SongList|Array<Song>) {
+    /** the current song index */
+    @property(Number)
+    currentSong: number = 0;
+
+    constructor(songs?: SongList|Array<Song>, current?: number) {
         super({
             title: "Queue",
             description: "Your song queue",
             songs: Array.isArray(songs) ? songs : songs?.songs
         });
+
+        if(this.songs.length > 0 && current !== undefined)
+            this.currentSong = 0;
     }
 
     /** clears the song queue, emits ::cleared. you can add more songs using the 
@@ -37,5 +44,6 @@ export class Queue extends SongList {
 export namespace Queue {
     export interface SignalSignatures extends SongList.SignalSignatures {
         "cleared": () => void;
+        "notify::current-song": () => void;
     }
 }
