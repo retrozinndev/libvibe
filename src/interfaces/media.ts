@@ -70,24 +70,22 @@ export interface Media extends GObject.Object {
     previous(): void;
 }
 
-export namespace Media {
-    export interface SignalSignatures extends GObject.Object.SignalSignatures {
-        /** the song has been paused */
-        "paused": (song: Song) => void;
-        /** the song has been resumed */
-        "resumed": (song: Song) => void;
-        /** jumped to next song. song can be null if there's no next song to jump to */
-        "gone-next": (song: Song, queuePosition: number) => void;
-        /** rewinded to previous song. song can be null if there's no previous song to go to */
-        "gone-previous": (song: Song, queuePosition: number) => void;
-        /** emitted when a song gets played(doesn't get emitted on ::next, ::previous nor ::resume) */
-        "playing": (song: Song) => void;
-        "notify::song": () => void;
-        "notify::queue": () => void;
-        "notify::status": () => void;
-        "notify::length": () => void;
-        "notify::loop": () => void;
-        "notify::shuffle": () => void;
-        "notify::position": () => void;
-    }
+export interface MediaSignalSignatures extends GObject.Object.SignalSignatures {
+    /** the song has been paused */
+    "paused": (song: Song) => void;
+    /** the song has been resumed */
+    "resumed": (song: Song) => void;
+    /** jumped to next song. song can be null if there's no next song to jump to */
+    "gone-next": (song: Song, queuePosition: number) => void;
+    /** rewinded to previous song. song can be null if there's no previous song to go to */
+    "gone-previous": (song: Song, queuePosition: number) => void;
+    /** emitted when a song gets played(doesn't get emitted on ::next, ::previous nor ::resume) */
+    "playing": (song: Song) => void;
+    "notify::song": () => void;
+    "notify::queue": () => void;
+    "notify::status": () => void;
+    "notify::length": () => void;
+    "notify::loop": () => void;
+    "notify::shuffle": () => void;
+    "notify::position": () => void;
 }
