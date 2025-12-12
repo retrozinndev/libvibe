@@ -75,7 +75,7 @@ export namespace Media {
         /** the song has been paused */
         "paused": (song: Song) => void;
         /** the song has been resumed */
-        "resume": (song: Song) => void;
+        "resumed": (song: Song) => void;
         /** jumped to next song. song can be null if there's no next song to jump to */
         "next": (song: Song, queuePosition: number) => void;
         /** rewinded to previous song. song can be null if there's no previous song to go to */
