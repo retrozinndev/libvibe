@@ -2,19 +2,6 @@ import GObject from "gnim/gobject";
 import { Song, SongList } from "../objects";
 
 
-export interface MediaSignalSignatures extends GObject.Object.SignalSignatures {
-    /** the song has been paused */
-    "paused": () => void;
-    /** the song has been resumed */
-    "resume": () => void;
-    /** jumped to next song. song can be null if there's no next song to jump to */
-    "next": (song: Song|null) => void;
-    /** rewinded to previous song. song can be null if there's no previous song to go to */
-    "previous": (song: Song|null) => void;
-    "notify::song": (song: Song|null) => void;
-    "notify::queue": (queue: SongList|null) => void;
-}
-
 export enum LoopMode {
     /** no loop */
     NONE = 0,
@@ -46,7 +33,8 @@ export enum PlaybackStatus {
 }
 
 
-/** interface implemented by the vibe app to control media from each plugin */
+/** interface implemented by the vibe app to control media from each plugin. 
+  * don't forget to implement the object's signals! */
 export interface Media extends GObject.Object {
     /** currently-playing song */
     get song(): Song|null;
@@ -80,4 +68,19 @@ export interface Media extends GObject.Object {
     next(): void;
     /** go back to previous item in queue(if any) */
     previous(): void;
+}
+
+export namespace Media {
+    export interface SignalSignatures extends GObject.Object.SignalSignatures {
+        /** the song has been paused */
+        "paused": () => void;
+        /** the song has been resumed */
+        "resume": () => void;
+        /** jumped to next song. song can be null if there's no next song to jump to */
+        "next": (song: Song|null) => void;
+        /** rewinded to previous song. song can be null if there's no previous song to go to */
+        "previous": (song: Song|null) => void;
+        "notify::song": (song: Song|null) => void;
+        "notify::queue": (queue: SongList|null) => void;
+    }
 }
