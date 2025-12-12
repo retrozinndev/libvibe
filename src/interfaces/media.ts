@@ -77,11 +77,11 @@ export namespace Media {
         /** the song has been resumed */
         "resumed": (song: Song) => void;
         /** jumped to next song. song can be null if there's no next song to jump to */
-        "next": (song: Song, queuePosition: number) => void;
+        "gone-next": (song: Song, queuePosition: number) => void;
         /** rewinded to previous song. song can be null if there's no previous song to go to */
-        "previous": (song: Song, queuePosition: number) => void;
+        "gone-previous": (song: Song, queuePosition: number) => void;
         /** emitted when a song gets played(doesn't get emitted on ::next, ::previous nor ::resume) */
-        "play": (song: Song) => void;
+        "playing": (song: Song) => void;
         "notify::song": () => void;
         "notify::queue": () => void;
         "notify::status": () => void;
