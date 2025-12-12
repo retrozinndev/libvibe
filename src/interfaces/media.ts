@@ -73,14 +73,21 @@ export interface Media extends GObject.Object {
 export namespace Media {
     export interface SignalSignatures extends GObject.Object.SignalSignatures {
         /** the song has been paused */
-        "paused": () => void;
+        "paused": (song: Song) => void;
         /** the song has been resumed */
-        "resume": () => void;
+        "resume": (song: Song) => void;
         /** jumped to next song. song can be null if there's no next song to jump to */
-        "next": (song: Song|null) => void;
+        "next": (song: Song, queuePosition: number) => void;
         /** rewinded to previous song. song can be null if there's no previous song to go to */
-        "previous": (song: Song|null) => void;
-        "notify::song": (song: Song|null) => void;
-        "notify::queue": (queue: SongList|null) => void;
+        "previous": (song: Song, queuePosition: number) => void;
+        /** emitted when a song gets played(doesn't get emitted on ::next, ::previous nor ::resume) */
+        "play": (song: Song) => void;
+        "notify::song": () => void;
+        "notify::queue": () => void;
+        "notify::status": () => void;
+        "notify::length": () => void;
+        "notify::loop": () => void;
+        "notify::shuffle": () => void;
+        "notify::position": () => void;
     }
 }
