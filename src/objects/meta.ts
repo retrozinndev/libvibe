@@ -22,7 +22,7 @@ export abstract class Meta {
       * @param timeout optionally specify a timeout for GstPbutilsDiscoverer to work with(nanoseconds)
       *
       * @returns a {@link Meta.Data} object, containing the meta tags from the file(can be empty if there's none) */
-    public static getMetaTags(file: string|Gio.File, separator: string = ',', timeout: number = 2500000000): Meta.Data {
+    public static getMetaTags(file: string|Gio.File, separator: string = ',', timeout: number = Gst.SECOND * 2.5): Meta.Data {
         file = typeof file === "string" ?
             Gio.File.new_for_path(file)
         : file;
@@ -70,7 +70,7 @@ export abstract class Meta {
         return this.taglistToData(taglists, separator);
     }
 
-    public static async getMetaTagsAsync(file: string|Gio.File, separator: string = ',', timeout: number = 2500000000): Promise<Meta.Data> {
+    public static async getMetaTagsAsync(file: string|Gio.File, separator: string = ',', timeout: number = Gst.SECOND * 2.5): Promise<Meta.Data> {
         return this.getMetaTags(file, separator, timeout);
     }
 
@@ -234,8 +234,12 @@ export abstract class Meta {
       * @param separator an optional metadata separator. the default is a comma: ',' 
       *
       * @returns a `Meta.Data` object with the result of the convertion */
-    public static taglistToData(taglist: Array<Gst.TagList>, separator: string = ','): Meta.Data {
+    public static taglistToData(taglist: Array<Gst.TagList>, separator: string = ',', options: {
+        enableLogs?: boolean;
+    } = {}): Meta.Data {
         const data: Meta.Data = {};
+
+        options.enableLogs ??= false;
 
         taglist.forEach(list => list.foreach((self, tag) => {
             try {
@@ -304,7 +308,8 @@ export abstract class Meta {
                     break;
                 }
             } catch(e) {
-                console.error(e);
+                if(options.enableLogs)
+                    console.error(e);
             }
         }));
 
