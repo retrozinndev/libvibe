@@ -22,7 +22,9 @@ export abstract class Meta {
       * @param timeout optionally specify a timeout for GstPbutilsDiscoverer to work with(nanoseconds)
       *
       * @returns a {@link Meta.Data} object, containing the meta tags from the file(can be empty if there's none) */
-    public static getMetaTags(file: string|Gio.File, separator: string = ',', timeout: number = Gst.SECOND * 2.5): Meta.Data {
+    public static getMetaTags(file: string|Gio.File, separator: string = ',', timeout: number = Gst.SECOND * 2.5, options: {
+        enableLogs?: boolean;
+    } = {}): Meta.Data {
         file = typeof file === "string" ?
             Gio.File.new_for_path(file)
         : file;
@@ -34,6 +36,8 @@ export abstract class Meta {
             Gst.init([]);
 
         GstPbutils.pb_utils_init();
+
+        options.enableLogs ??= false;
 
         const discoverer = GstPbutils.Discoverer.new(timeout);
         const info = discoverer.discover_uri(`file://${file.peek_path()}`);
@@ -67,7 +71,9 @@ export abstract class Meta {
         if(!taglists)
             return {}; // no tags
 
-        return this.taglistToData(taglists, separator);
+        return this.taglistToData(taglists, separator, {
+            enableLogs: options.enableLogs
+        });
     }
 
     public static async getMetaTagsAsync(file: string|Gio.File, separator: string = ',', timeout: number = Gst.SECOND * 2.5): Promise<Meta.Data> {
