@@ -2,48 +2,33 @@ import Adw from "gi://Adw?version=1";
 import Gtk from "gi://Gtk?version=4.0";
 import { IconButton, LabelButton, Section } from "..";
 import { Album, Artist, Playlist, Song } from "../objects";
+import { Accessor } from "gnim";
 
 
-export enum PageModal {
-    CUSTOM = 0,
-    SONG = 1,
-    ALBUM = 2,
-    PLAYLIST = 3,
-    ARTIST = 4
-}
+export type PageType = Artist|Song|Album|Playlist|undefined;
 
-export type PageContentType<M extends PageModal> = M extends PageModal.SONG ?
-    Song
-: M extends PageModal.ARTIST ? 
-    Artist
-: M extends PageModal.ALBUM ?
-    Album
-: M extends PageModal.PLAYLIST ?
-    Playlist
-: unknown;
-
-export type Props<M extends PageModal> = {
-    modal: M;
-    title: string;
+export type Props = {
+    title?: string|Accessor<string>;
     id?: any;
-    sections?: Array<Section>;
-    buttons?: Array<IconButton & LabelButton>;
 };
 
-export type PageProps<M extends PageModal> = M extends PageModal.CUSTOM ? 
-    Props<M> & { content?: PageContentType<M> }
-: Props<M> & { content: PageContentType<M> };
+export type PageProps<T extends PageType = undefined> = T extends NonNullable<PageType> ?
+    Props & {
+        content: NonNullable<T>;
+        sections?: Array<Section>|Accessor<Array<Section>>;
+        buttons?: Array<IconButton & LabelButton>|Accessor<Array<IconButton&LabelButton>>;
+    }
+: Props
 
 export interface Page<
-    M extends PageModal = PageModal.CUSTOM
+    T extends PageType = undefined
 > extends Adw.Bin {
     readonly id: any;
+    /** page title. @default "New page"(if no content is defined; else it's based on the content) */
     title: string;
     sections: Array<Section>;
-    content?: PageContentType<M>;
+    content: T;
     buttons: Array<IconButton & LabelButton>;
-    
-    get modal(): M;
 
     get_content_widget(): Gtk.Box;
 }

@@ -5,7 +5,7 @@ import { SongList, Song, Artist, Album, Playlist } from "./objects";
 import { Media } from "./interfaces/media";
 import { Plugin } from "./plugin";
 import { Pages } from "./interfaces/pages";
-import { Page, PageModal, PageProps } from "./interfaces";
+import { Page, PageType, PageProps } from "./interfaces";
 import { createRoot, getScope } from "gnim";
 import Adw from "gi://Adw?version=1";
 
@@ -33,7 +33,7 @@ export type Section = {
     endButton?: IconButton | LabelButton;
 };
 
-type PageConstructor = new <M extends PageModal>(props: PageProps<M>) => Page;
+type PageConstructor = new <T extends PageType>(props: PageProps<T>) => Page<T>;
 
 export const isIconButton = (obj: object): obj is IconButton =>
     Boolean(Object.hasOwn(obj, "iconName") && Object.hasOwn(obj, "onClicked"));
@@ -223,7 +223,7 @@ Please create one providing all the necessary properties");
 
     /** add a new page to the stack. plugins can use this to open details for artists, 
       * songs, playlists, albums and even custom pages */
-    public addPage<M extends PageModal>(props: PageProps<M>): void {
+    public addPage<T extends PageType>(props: PageProps<T>): void {
         createRoot(() => {
             const page = new this.#pageConstructor(props),
                 scope = getScope();
@@ -232,7 +232,7 @@ Please create one providing all the necessary properties");
                 page.disconnect(id);
                 scope.dispose();
             });
-            this.#pages.addPage(page);
+            this.#pages.add(page as Page);
         });
     }
 
@@ -273,7 +273,7 @@ Please create one providing all the necessary properties");
     public setData(
         media: Media, 
         pages: Pages, 
-        pageConstructor: new (props: object) => Page,
+        pageConstructor: new <T extends PageType>(props: PageProps<T>) => Page<T>,
         toastOverlay: Adw.ToastOverlay
     ): void {
         if(this.#isDataSet) {
