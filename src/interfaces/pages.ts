@@ -24,6 +24,9 @@ export interface Pages extends Gtk.Stack {
     /** page stack history (doesn't include current, old-to-newest order, pages get removed from history when they're single) */
     get history(): Array<Page>;
 
+    /** `true` if the user can go back to the previous page, or else `false` */
+    get canGoBack(): boolean;
+
 
     // methods
     /** add a new page to the stack */
@@ -32,6 +35,8 @@ export interface Pages extends Gtk.Stack {
     /** go back to the previous stack page */
     back(): void;
 
+
+    // re-declarations to ensure type safety
     connect<
         S extends keyof PagesSignalSignatures,
         C extends PagesSignalSignatures[S]
