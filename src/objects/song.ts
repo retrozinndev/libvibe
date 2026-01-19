@@ -8,9 +8,10 @@ import { Vibe } from "..";
 import Gdk from "gi://Gdk?version=4.0";
 
 
-/* store song data */
+/** store song data.
+  * `T` - the source type */
 @register({ GTypeName: "VibeSong" })
-export class Song extends GObject.Object {
+export class Song<T extends Object = Gio.File|Gst.Stream> extends GObject.Object {
 
     declare $signals: Song.SignalSignatures;
 
@@ -38,9 +39,9 @@ export class Song extends GObject.Object {
     @property(gtype<string|null>(String))
     url: string|null = null;
 
-    /** the song's source, can be a `GFile`(local), `GstStream`(tcp/udp streaming) or null */
-    @property(gtype<Gio.File|Gst.Stream|null>(GObject.Object))
-    source: Gst.Stream|Gio.File|null = null;
+    /** the song's source, can be a `GFile`(local), `GstStream`(tcp/udp streaming), null or any chosen type in construction */
+    @property(gtype<T|null>(GObject.TYPE_JSOBJECT))
+    source: T|null = null;
 
     /** if the song is explicit / has explicit content 
       * @default false */
@@ -61,7 +62,7 @@ export class Song extends GObject.Object {
     constructor(properties: {
         title?: string;
         artist?: Array<Artist>;
-        source?: string|Gio.File|Gst.Stream;
+        source?: T;
         id?: any;
         /** internally-used property to notify the api about a new song added for a plugin */
         plugin?: Plugin;
@@ -78,7 +79,7 @@ export class Song extends GObject.Object {
         if(properties.source !== undefined)
             this.source = (typeof properties.source === "string" ?
                 Gio.File.new_for_path(properties.source)
-            : properties.source);
+            : properties.source) as T;
 
         if(properties.explicit !== undefined)
             this.explicit = properties.explicit;
@@ -102,7 +103,7 @@ export class Song extends GObject.Object {
             Vibe.getDefault().emit(
                 "song-added",
                 properties.plugin,
-                this
+                this as unknown as Song
             );
     }
 }
