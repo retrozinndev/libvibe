@@ -1,6 +1,6 @@
 import Adw from "gi://Adw?version=1";
 import Gtk from "gi://Gtk?version=4.0";
-import { IconButton, LabelButton, Section } from "..";
+import { DetailedButton, IconButton, LabelButton, Section } from "..";
 import { Album, Artist, Playlist, Song } from "../objects";
 import { Accessor } from "gnim";
 
@@ -16,7 +16,7 @@ export type PageProps<T extends PageType> = T extends Gtk.Widget ?
 : BaseProps & {
     content: NonNullable<T>;
     sections?: Array<Section>|Accessor<Array<Section>>;
-    buttons?: Array<IconButton & LabelButton>|Accessor<Array<IconButton&LabelButton>>;
+    buttons?: Array<IconButton|LabelButton|DetailedButton>|Accessor<Array<IconButton|LabelButton|DetailedButton>>;
 }
 
 export interface Page<

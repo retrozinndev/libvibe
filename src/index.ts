@@ -24,6 +24,8 @@ export type LabelButton = {
     onClicked?: () => void;
 };
 
+export type DetailedButton = IconButton|LabelButton;
+
 export type Section = {
     title: string;
     description?: string;
@@ -32,6 +34,7 @@ export type Section = {
     headerButtons?: Array<IconButton | LabelButton>;
     endButton?: IconButton | LabelButton;
 };
+
 
 type PageConstructor = new <T extends PageType>(props: PageProps<T>) => Page<T>;
 
