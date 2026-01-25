@@ -27,7 +27,7 @@ export interface Page<
     title: string;
     sections: Array<Section>;
     content: T;
-    buttons: Array<IconButton & LabelButton>;
+    buttons: Array<IconButton|LabelButton|DetailedButton>;
 
     get_content_widget(): Gtk.Box;
 }
