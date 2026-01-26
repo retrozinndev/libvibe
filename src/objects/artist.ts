@@ -12,7 +12,7 @@ export class Artist extends GObject.Object {
     /** the unique identifier for this artist in this plugin */
     readonly id: any;
 
-    readonly #name: string;
+    readonly #name: string = "Unknown Artist";
     readonly #displayName: string|null = null;
     readonly #description: string|null = null;
     readonly #url: string|null = null;
@@ -20,6 +20,8 @@ export class Artist extends GObject.Object {
     /** the artist's name.
     * if display name is provideable, use this property for the user name
     * and :display-name for the artist's display name(pretty name)
+    *
+    * @default "Unknown Artist"
     * */
     @getter(String)
     get name() { return this.#name; };
@@ -43,7 +45,7 @@ export class Artist extends GObject.Object {
     image: GdkPixbuf.Pixbuf|Gdk.Texture|null = null;
 
     constructor(properties: {
-        name: string;
+        name?: string;
         displayName?: string;
         image?: GdkPixbuf.Pixbuf|Gdk.Texture;
         plugin?: Plugin;
@@ -54,7 +56,9 @@ export class Artist extends GObject.Object {
         super();
 
         this.id = properties.id ?? Vibe.getDefault().generateID();
-        this.#name = properties.name;
+
+        if(properties.name !== undefined)
+            this.#name = properties.name;
 
         if(properties.displayName !== undefined)
             this.#displayName = properties.displayName;

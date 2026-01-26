@@ -9,7 +9,7 @@ import Gdk from "gi://Gdk?version=4.0";
 
 
 /** store song data.
-  * `T` - the source type */
+  * `T` - the source type. by default it's GstStream, GFile or a path to the audio file */
 @register({ GTypeName: "VibeSong" })
 export class Song<T extends Object = Gio.File|Gst.Stream> extends GObject.Object {
 
@@ -62,7 +62,8 @@ export class Song<T extends Object = Gio.File|Gst.Stream> extends GObject.Object
     constructor(properties: {
         title?: string;
         artist?: Array<Artist>;
-        source?: T;
+        /** any data in the `Object` type that contains a way to stream/play this song */
+        source?: T extends Gio.File|Gst.Stream ? T|string : T;
         id?: any;
         /** internally-used property to notify the api about a new song added for a plugin */
         plugin?: Plugin;
