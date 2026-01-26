@@ -24,7 +24,7 @@ export type LabelButton = {
     onClicked?: () => void;
 };
 
-export type DetailedButton = IconButton|LabelButton;
+export type DetailedButton = IconButton&LabelButton;
 
 export type Section = {
     title: string;
