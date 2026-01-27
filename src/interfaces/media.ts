@@ -50,6 +50,8 @@ export interface Media extends GObject.Object {
     shuffle: ShuffleMode;
     /** current song position in microseconds. if nothing is playing, it's set to 0. */
     position: number;
+    /** audio stream volume, min is 0 and max is 100 */
+    volume: number;
 
     /** play a specific song 
     * @param song the song to be played
@@ -85,6 +87,7 @@ export interface MediaSignalSignatures extends GObject.Object.SignalSignatures {
     "notify::queue": () => void;
     "notify::status": () => void;
     "notify::length": () => void;
+    "notify::volume": () => void;
     "notify::loop": () => void;
     "notify::shuffle": () => void;
     "notify::position": () => void;
