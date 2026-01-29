@@ -52,6 +52,8 @@ export interface Media extends GObject.Object {
     position: number;
     /** audio stream volume, min is 0 and max is 100 */
     volume: number;
+    /** whether to mute/unmute the media */
+    mute: boolean;
 
     /** play a specific song 
     * @param song the song to be played
@@ -91,4 +93,5 @@ export interface MediaSignalSignatures extends GObject.Object.SignalSignatures {
     "notify::loop": () => void;
     "notify::shuffle": () => void;
     "notify::position": () => void;
+    "notify::mute": () => void;
 }
