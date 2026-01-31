@@ -242,15 +242,7 @@ export abstract class Meta {
     }
 
     private static getTagNumber(taglist: Gst.TagList, tag: string): number|undefined {
-        const gvalue = taglist.get_value_index(tag, 0);
-
-        return GObject.type_check_value_holds(gvalue, GObject.TYPE_STRING) ?
-            Number.parseInt(taglist.get_string(tag)[1])
-        : GObject.type_check_value_holds(gvalue, GObject.TYPE_INT) ?
-            taglist.get_int(tag)[1]
-        : GObject.type_check_value_holds(gvalue, GObject.TYPE_INT64) ?
-            taglist.get_int64(tag)[1]
-        : undefined;
+        return Number.parseInt(taglist.get_string(tag)[1]) ?? undefined;
     }
 
     private static getTagDate(taglist: Gst.TagList, tag: string): Gst.DateTime|undefined {
@@ -273,72 +265,67 @@ export abstract class Meta {
         options.enableLogs ??= false;
 
         taglist.forEach(list => list.foreach((self, tag) => {
-            try {
-                switch(tag) {
-                    case Gst.TAG_TITLE:
-                        data.title = this.getTagString(self, tag);
-                    break;
+            switch(tag) {
+                case Gst.TAG_TITLE:
+                    data.title = this.getTagString(self, tag);
+                break;
 
-                    case Gst.TAG_ARTIST:
-                        data.artists = this.getTagString(self, tag)?.split(separator).filter(s => s.trim() !== "");
-                    break;
+                case Gst.TAG_ARTIST:
+                    data.artists = this.getTagString(self, tag)?.split(separator).filter(s => s.trim() !== "");
+                break;
 
-                    case Gst.TAG_ALBUM_ARTIST:
-                        data.albumArtists = this.getTagString(self, tag)?.split(separator).filter(s => s.trim() !== "");
-                    break;
+                case Gst.TAG_ALBUM_ARTIST:
+                    data.albumArtists = this.getTagString(self, tag)?.split(separator).filter(s => s.trim() !== "");
+                break;
 
-                    case Gst.TAG_ALBUM:
-                        data.albumName = this.getTagString(self, tag);
-                    break;
+                case Gst.TAG_ALBUM:
+                    data.albumName = this.getTagString(self, tag);
+                break;
 
-                    case Gst.TAG_IMAGE:
-                    case Gst.TAG_PREVIEW_IMAGE:
-                        const sample = self.get_sample(tag)[1];
-                        const info = sample.get_buffer()?.map(Gst.MapFlags.READ)[1];
+                case Gst.TAG_IMAGE:
+                case Gst.TAG_PREVIEW_IMAGE:
+                    const sample = self.get_sample(tag)[1];
+                    const info = sample.get_buffer()?.map(Gst.MapFlags.READ)[1];
 
-                        data.pictureData = info?.data;
-                    break;
+                    data.pictureData = info?.data;
+                break;
 
-                    case Gst.TAG_ALBUM_VOLUME_NUMBER:
-                        data.discNumber = this.getTagNumber(self, tag);
-                    break;
+                case Gst.TAG_ALBUM_VOLUME_NUMBER:
+                    data.discNumber = this.getTagNumber(self, tag);
+                break;
 
-                    case Gst.TAG_TRACK_NUMBER:
-                        data.trackNumber = this.getTagNumber(self, tag);
-                    break;
+                case Gst.TAG_TRACK_NUMBER:
+                    data.trackNumber = this.getTagNumber(self, tag);
+                break;
 
-                    case Gst.TAG_TRACK_COUNT:
-                        data.trackTotal = this.getTagNumber(self, tag);
-                    break;
+                case Gst.TAG_TRACK_COUNT:
+                    data.trackTotal = this.getTagNumber(self, tag);
+                break;
 
-                    case Gst.TAG_ISRC:
-                        data.isrc = this.getTagString(self, tag);
-                    break;
+                case Gst.TAG_ISRC:
+                    data.isrc = this.getTagString(self, tag);
+                break;
 
-                    case "common::lyrics-rating":
-                    case "common::rating":
-                        data.explicit = /explicit|advisory|[1]|true/i.test(this.getTagString(self, tag) ?? "");
-                    break;
+                case "common::lyrics-rating":
+                case "common::rating":
+                    data.explicit = /explicit|advisory|[1]|true/i.test(this.getTagString(self, tag) ?? "");
+                break;
 
-                    case Gst.TAG_COMPOSER:
-                        data.composers = this.getTagString(self, tag)?.split(separator).filter(s => s.trim() !== "");
-                    break;
+                case Gst.TAG_COMPOSER:
+                    data.composers = this.getTagString(self, tag)?.split(separator).filter(s => s.trim() !== "");
+                break;
 
-                    case Gst.TAG_PUBLISHER:
-                        data.publisher = this.getTagString(self, tag);
-                    break;
+                case Gst.TAG_PUBLISHER:
+                    data.publisher = this.getTagString(self, tag);
+                break;
 
-                    case Gst.TAG_DATE:
-                        data.date = this.getTagDate(self, tag);
-                    break;
+                case Gst.TAG_DATE:
+                    data.date = this.getTagDate(self, tag);
+                break;
 
-                    case Gst.TAG_LYRICS:
-                        data.lyrics = this.getTagString(self, tag);
-                    break;
-                }
-            } catch(e) {
-                if(options.enableLogs)
-                    console.error(e);
+                case Gst.TAG_LYRICS:
+                    data.lyrics = this.getTagString(self, tag);
+                break;
             }
         }));
 
