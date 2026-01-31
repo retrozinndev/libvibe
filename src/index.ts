@@ -10,8 +10,6 @@ import { createRoot, getScope } from "gnim";
 import Adw from "gi://Adw?version=1";
 
 
-type ToastPriority = "high"|"normal";
-
 export type IconButton = {
     id?: any;
     iconName: string;
@@ -34,9 +32,6 @@ export type Section = {
     headerButtons?: Array<IconButton | LabelButton>;
     endButton?: IconButton | LabelButton;
 };
-
-
-type PageConstructor = new <T extends PageType>(props: PageProps<T>) => Page<T>;
 
 export const isIconButton = (obj: object): obj is IconButton =>
     Boolean(Object.hasOwn(obj, "iconName") && Object.hasOwn(obj, "onClicked"));
@@ -71,13 +66,13 @@ export class Vibe extends GObject.Object {
         "auth-started": (plugin: Plugin) => void;
         /** authentication for a plugin has ended */
         "auth-ended": (plugin: Plugin) => void;
-        /** a new toast notification got sent to the UI */
-        "toast-notified": (text: string, priority: ToastPriority, button?: LabelButton) => void;
+        /** a new toast notification got sent */
+        "toast-notified": (text: string, priority: Vibe.ToastPriority, button?: LabelButton) => void;
     };
 
     #isDataSet: boolean = false;
     #pages!: Pages;
-    #pageConstructor!: PageConstructor;
+    #pageConstructor!: Vibe.PageConstructor;
     #media!: Media;
     #toastOverlay!: Adw.ToastOverlay;
     #lastId: number = -1;
@@ -132,8 +127,8 @@ export class Vibe extends GObject.Object {
     @getter(Array)
     get plugins() { return this.#plugins; }
 
-    @signal(String, gtype<ToastPriority>(String), gtype<LabelButton|undefined>(Object))
-    toastNotified(_: string, __: ToastPriority, ___?: LabelButton) {}
+    @signal(String, gtype<Vibe.ToastPriority>(String), gtype<LabelButton|undefined>(Object))
+    toastNotified(_: string, __: Vibe.ToastPriority, ___?: LabelButton) {}
 
     @signal()
     initialized() {}
@@ -248,7 +243,7 @@ Please create one providing all the necessary properties");
       * @param button action button to go with the notification. you can leave this empty if you want none
       *
       * @example notify the user that there's no internet connection */
-    public toastNotify(text: string, priority: ToastPriority = "normal", button?: LabelButton): void {
+    public toastNotify(text: string, priority: Vibe.ToastPriority = "normal", button?: LabelButton): void {
         const toast = new Adw.Toast({
             title: text,
             priority: priority === "high" ? 
@@ -323,4 +318,9 @@ Please create one providing all the necessary properties");
     notify(prop: (keyof typeof this)|string): void {
         super.notify(prop as string);
     }
+}
+
+namespace Vibe {
+    export type ToastPriority = "high"|"normal";   
+    export type PageConstructor = new <T extends PageType>(props: PageProps<T>) => Page<T>;
 }

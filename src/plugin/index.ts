@@ -3,52 +3,10 @@ import { Vibe, Section } from "..";
 import { Song, Artist, SongList } from "../objects";
 
 
-export type PluginStatus = {
-    "init": string;
-    "load": string;
-    "import": string;
-    "ok": string;
-    "none": string;
-};
-
-export type Update = {
-    /** the new updated version number.
-      * @example 1.2.1 (previous was 1.2.0) */
-    newVersion: string;
-    /** the link where the GET request should be made to get the updated plugin */
-    downloadUrl?: string;
-    /** the link for the user to download the new plugin version.
-      * (use this if you don't want to implement the plugin update directly) */
-    dowloadLink?: string;
-};
-
-export type Implementations = Partial<{
-    /** whether the plugin implements the search feature or not */
-    search: boolean;
-    /** wheter this plugin implements the sections feature or not */
-    recommendations: boolean;
-    /** wheter this plugin supports creating playlists or not */
-    playlist: boolean;
-    /** whether the plugin implements an update system */
-    updates: boolean;
-    /** whether the plugin implements a library system(saved playlists/songs/albums...) */
-    library: boolean;
-}>;
-
-export type PluginSignalSignatures = GObject.Object.SignalSignatures & {
-    /** emitted when the plugin has finished loading */
-    "loaded": () => void;
-    /** emitted when the plugin has finished importing(first-load/update only) */
-    "imported": () => void;
-    "notify::description": (description: string) => void;
-    "notify::status": (status: PluginStatus) => void;
-};
-
-
 /** create plugins and add functions to them */
 @register({ GTypeName: "VibePlugin" })
 export class Plugin extends GObject.Object {
-    declare $signals: PluginSignalSignatures;
+    declare $signals: Plugin.SignalSignatures;
 
     /** the plugin's unique identifier, defined by the application 
       * on plugin import 
@@ -60,7 +18,7 @@ export class Plugin extends GObject.Object {
     readonly #version: string = "unknown";
     readonly #url: string|null = null;
 
-    #implements: Implementations = {};
+    #implements: Plugin.Implementations = {};
     
     /** the plugin's unique name. e.g.: vibe-plugin-music
     * @readonly */
@@ -92,14 +50,14 @@ export class Plugin extends GObject.Object {
       * this plugin
       * @readonly
       */
-    @getter(gtype<Implementations>(Object))
+    @getter(gtype<Plugin.Implementations>(Object))
     get implements() { return this.#implements; }
 
     /** the plugin's status, you can set this to the available 
       * values through completion anytime. 
       * @default "none" */
-    @property(gtype<keyof PluginStatus>(String)) // fake-type (lol) because it's all a string in the end
-    status: keyof PluginStatus = "none";
+    @property(gtype<Plugin.Status>(String))
+    status: Plugin.Status = "none";
 
     constructor(properties: {
         name: string;
@@ -107,7 +65,7 @@ export class Plugin extends GObject.Object {
         description?: string;
         version?: string;
         url?: string;
-        implements?: Implementations;
+        implements?: Plugin.Implementations;
     }) {
         super();
 
@@ -156,7 +114,7 @@ export class Plugin extends GObject.Object {
     /** function that checks for updates for the plugin(if implemented).
       * this is called by the application when the plugin initializes/the user checks for updates.
       * @returns an Update object if an update was found, or null if none */
-    getUpdates(): Promise<Update|null>|null {
+    getUpdates(): Promise<Plugin.Update|null>|null {
         return null;
     }
 
@@ -191,7 +149,43 @@ export class Plugin extends GObject.Object {
     /** check if a feature is implemented for this plugin.
       * @returns true if feature is implemented by the plugin
       */
-    isImplemented<Feature extends keyof Implementations>(feature: Feature): boolean {
+    isImplemented<Feature extends keyof Plugin.Implementations>(feature: Feature): boolean {
         return Boolean(this.#implements[feature]);
+    }
+}
+
+export namespace Plugin {
+    export type Status = "init"|"load"|"import"|"fatal"|"ok"|"none";
+    export type Update = {
+        /** the new updated version number.
+          * @example 1.2.1 (previous was 1.2.0) */
+        newVersion: string;
+        /** the link where the GET request should be made to get the updated plugin */
+        downloadUrl?: string;
+        /** the link for the user to download the new plugin version.
+          * (use this if you don't want to implement the plugin update directly) */
+        dowloadLink?: string;
+    };
+
+    export type Implementations = Partial<{
+        /** whether the plugin implements the search feature or not */
+        search: boolean;
+        /** wheter this plugin implements the sections feature or not */
+        recommendations: boolean;
+        /** wheter this plugin supports creating playlists or not */
+        playlist: boolean;
+        /** whether the plugin implements an update system */
+        updates: boolean;
+        /** whether the plugin implements a library system(saved playlists/songs/albums...) */
+        library: boolean;
+    }>;
+    
+    export interface SignalSignatures extends GObject.Object.SignalSignatures {
+        /** emitted when the plugin has finished loading */
+        "loaded": () => void;
+        /** emitted when the plugin has finished importing(first-load/update only) */
+        "imported": () => void;
+        "notify::description": (description: string) => void;
+        "notify::status": (status: Plugin.Status) => void;
     }
 }
