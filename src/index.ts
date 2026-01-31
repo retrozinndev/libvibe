@@ -45,32 +45,12 @@ export const isDetailedButton = (obj: object): obj is DetailedButton =>
 /** Communicate with the music player and do more stuff */
 @register({ GTypeName: "VibeAPI" })
 export class Vibe extends GObject.Object {
+    declare $signals: Vibe.SignalSignatures;
+
     private static instance: Vibe;
 
-    declare $signals: GObject.Object.SignalSignatures & {
-        /** the app and api just finished initializing/starting */
-        "initialized": () => void;
-        /** a new song object was generated */
-        "song-added": (plugin: Plugin, song: Song) => void;
-        /** a new album was generated */
-        "album-added": (plugin: Plugin, album: Album) => void;
-        /** a new song list was generated. it's also triggered by albums and playlists */
-        "songlist-added": (plugin: Plugin, list: SongList) => void;
-        /** new artist object instance was generated */
-        "artist-added": (plugin: Plugin, artist: Artist) => void;
-        /** a new plugin got installed by the user */
-        "plugin-added": (plugin: Plugin) => void;
-        /** a playlist was created */
-        "playlist-added": (plugin: Plugin, playlist: Playlist) => void;
-        /** authentication for a plugin has started */
-        "auth-started": (plugin: Plugin) => void;
-        /** authentication for a plugin has ended */
-        "auth-ended": (plugin: Plugin) => void;
-        /** a new toast notification got sent */
-        "toast-notified": (text: string, priority: Vibe.ToastPriority, button?: LabelButton) => void;
-    };
-
     #isDataSet: boolean = false;
+    #window!: Adw.ApplicationWindow;
     #pages!: Pages;
     #pageConstructor!: Vibe.PageConstructor;
     #media!: Media;
@@ -99,6 +79,12 @@ export class Vibe extends GObject.Object {
         plugin: Plugin,
         artist: Artist
     }> = [];
+    
+    public static readonly runtimeDir = Gio.File.new_for_path(`${GLib.get_user_runtime_dir()}/vibe`);
+    public static readonly cacheDir = Gio.File.new_for_path(`${GLib.get_user_cache_dir()}/vibe`);
+    public static readonly dataDir = Gio.File.new_for_path(`${GLib.get_user_data_dir()}/vibe`);
+    public static readonly pluginsDir = Gio.File.new_for_path(`${this.dataDir.peek_path()!}/plugins`);
+    public static readonly pluginsCacheDir = Gio.File.new_for_path(`${this.cacheDir.peek_path()!}/plugins`);
 
 
     /** control on adding new pages and going back to the previous
@@ -193,12 +179,6 @@ export class Vibe extends GObject.Object {
     @signal(GObject.Object)
     authEnded(_: Plugin) {}
 
-    public static readonly runtimeDir = Gio.File.new_for_path(`${GLib.get_user_runtime_dir()}/vibe`);
-    public static readonly cacheDir = Gio.File.new_for_path(`${GLib.get_user_cache_dir()}/vibe`);
-    public static readonly dataDir = Gio.File.new_for_path(`${GLib.get_user_data_dir()}/vibe`);
-    public static readonly pluginsDir = Gio.File.new_for_path(`${this.dataDir.peek_path()!}/plugins`);
-    public static readonly pluginsCacheDir = Gio.File.new_for_path(`${this.cacheDir.peek_path()!}/plugins`);
-    
 
     constructor() {
         super();
@@ -267,6 +247,21 @@ Please create one providing all the necessary properties");
         this.emit("toast-notified", text, priority, button);
     }
 
+    /** adds an `AdwDialog` to the main application window and `present()` it
+      * 
+      * @param dialog the `AdwDialog` widget
+      *
+      * @returns `true` if the dialog could be added successfully, or else, `false` */
+    public addDialog(dialog: Adw.Dialog): boolean {
+        if(dialog instanceof Adw.Dialog) {
+            dialog.set_presentation_mode(Adw.DialogPresentationMode.AUTO);
+            dialog.present(this.#window); // so it uses the new popup style
+            return true;
+        }
+   
+        return false;
+    }
+
     /** set data for the VibeAPI to work correctly.
       * these data are instances of widgets and class implementations of interfaces for the API to work with. 
       * you don't need to set this, as it's set automatically by the application. */
@@ -274,7 +269,8 @@ Please create one providing all the necessary properties");
         media: Media, 
         pages: Pages, 
         pageConstructor: new <T extends PageType>(props: PageProps<T>) => Page<T>,
-        toastOverlay: Adw.ToastOverlay
+        toastOverlay: Adw.ToastOverlay,
+        mainWindow: Adw.ApplicationWindow
     ): void {
         if(this.#isDataSet) {
             console.error("Data was already set, this call was skipped");
@@ -285,6 +281,7 @@ Please create one providing all the necessary properties");
         this.#pages = pages;
         this.#pageConstructor = pageConstructor;
         this.#toastOverlay = toastOverlay;
+        this.#window = mainWindow;
 
         this.#isDataSet = true;
     }
@@ -323,4 +320,27 @@ Please create one providing all the necessary properties");
 namespace Vibe {
     export type ToastPriority = "high"|"normal";   
     export type PageConstructor = new <T extends PageType>(props: PageProps<T>) => Page<T>;
+
+    export interface SignalSignatures extends GObject.Object.SignalSignatures {
+        /** the app and api just finished initializing/starting */
+        "initialized": () => void;
+        /** a new song object was generated */
+        "song-added": (plugin: Plugin, song: Song) => void;
+        /** a new album was generated */
+        "album-added": (plugin: Plugin, album: Album) => void;
+        /** a new song list was generated. it's also triggered by albums and playlists */
+        "songlist-added": (plugin: Plugin, list: SongList) => void;
+        /** new artist object instance was generated */
+        "artist-added": (plugin: Plugin, artist: Artist) => void;
+        /** a new plugin got installed by the user */
+        "plugin-added": (plugin: Plugin) => void;
+        /** a playlist was created */
+        "playlist-added": (plugin: Plugin, playlist: Playlist) => void;
+        /** authentication for a plugin has started */
+        "auth-started": (plugin: Plugin) => void;
+        /** authentication for a plugin has ended */
+        "auth-ended": (plugin: Plugin) => void;
+        /** a new toast notification got sent */
+        "toast-notified": (text: string, priority: Vibe.ToastPriority, button?: LabelButton) => void;
+    }
 }
