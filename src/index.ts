@@ -5,7 +5,7 @@ import { SongList, Song, Artist, Album, Playlist } from "./objects";
 import { Media } from "./interfaces/media";
 import { Plugin } from "./plugin";
 import { Pages } from "./interfaces/pages";
-import { Page, PageType, PageProps } from "./interfaces";
+import { Page, PageType, PageProps, Dialog } from "./interfaces";
 import { createRoot, getScope } from "gnim";
 import Adw from "gi://Adw?version=1";
 
@@ -53,6 +53,7 @@ export class Vibe extends GObject.Object {
     #window!: Adw.ApplicationWindow;
     #pages!: Pages;
     #pageConstructor!: Vibe.PageConstructor;
+    #dialogConstructor!: Vibe.DialogConstructor;
     #media!: Media;
     #toastOverlay!: Adw.ToastOverlay;
     #lastId: number = -1;
@@ -247,19 +248,14 @@ Please create one providing all the necessary properties");
         this.emit("toast-notified", text, priority, button);
     }
 
-    /** adds an `AdwDialog` to the main application window and `present()` it
+    /** adds a dialog popup to the main application window and presents it
       * 
-      * @param dialog the `AdwDialog` widget
-      *
-      * @returns `true` if the dialog could be added successfully, or else, `false` */
-    public addDialog(dialog: Adw.Dialog): boolean {
-        if(dialog instanceof Adw.Dialog) {
-            dialog.set_presentation_mode(Adw.DialogPresentationMode.AUTO);
-            dialog.present(this.#window); // so it uses the new popup style
-            return true;
-        }
-   
-        return false;
+      * @param dialog its own properties */
+    public addDialog(dialog: Dialog): void {
+        const diag = new this.#dialogConstructor(dialog);
+
+        diag.set_presentation_mode(Adw.DialogPresentationMode.AUTO);
+        diag.present(this.#window); // so it uses the new popup style
     }
 
     /** set data for the VibeAPI to work correctly.
@@ -282,6 +278,13 @@ Please create one providing all the necessary properties");
         this.#toastOverlay = toastOverlay;
 
         this.#isDataSet = true;
+    }
+
+    public setDialogConstructor(construct: Vibe.DialogConstructor): void {
+        if(this.#dialogConstructor)
+            return;
+
+        this.#dialogConstructor = construct;
     }
 
     /** sets the main application window where to add dialogs to.
@@ -327,6 +330,7 @@ Please create one providing all the necessary properties");
 namespace Vibe {
     export type ToastPriority = "high"|"normal";   
     export type PageConstructor = new <T extends PageType>(props: PageProps<T>) => Page<T>;
+    export type DialogConstructor = new (props: Dialog) => Adw.Dialog;
 
     export interface SignalSignatures extends GObject.Object.SignalSignatures {
         /** the app and api just finished initializing/starting */
