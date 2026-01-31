@@ -248,6 +248,8 @@ export abstract class Meta {
             Number.parseInt(taglist.get_string(tag)[1])
         : GObject.type_check_value_holds(gvalue, GObject.TYPE_INT) ?
             taglist.get_int(tag)[1]
+        : GObject.type_check_value_holds(gvalue, GObject.TYPE_INT64) ?
+            taglist.get_int64(tag)[1]
         : undefined;
     }
 
@@ -310,7 +312,7 @@ export abstract class Meta {
                     break;
 
                     case Gst.TAG_ISRC:
-                        data.isrc = this.getTagNumber(self, tag);
+                        data.isrc = this.getTagString(self, tag);
                     break;
 
                     case "common::lyrics-rating":
@@ -331,7 +333,7 @@ export abstract class Meta {
                     break;
 
                     case Gst.TAG_LYRICS:
-                        data.lyrics = self.get_string(tag)[1];
+                        data.lyrics = this.getTagString(self, tag);
                     break;
                 }
             } catch(e) {
@@ -351,7 +353,7 @@ export namespace Meta {
         albumArtists: Array<string>;
         pictureData: Uint8Array|GLib.Bytes;
         discNumber: number;
-        isrc: number;
+        isrc: string;
         trackNumber: number;
         explicit: boolean;
         trackTotal: number;
