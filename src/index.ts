@@ -270,7 +270,6 @@ Please create one providing all the necessary properties");
         pages: Pages, 
         pageConstructor: new <T extends PageType>(props: PageProps<T>) => Page<T>,
         toastOverlay: Adw.ToastOverlay,
-        mainWindow: Adw.ApplicationWindow
     ): void {
         if(this.#isDataSet) {
             console.error("Data was already set, this call was skipped");
@@ -281,9 +280,17 @@ Please create one providing all the necessary properties");
         this.#pages = pages;
         this.#pageConstructor = pageConstructor;
         this.#toastOverlay = toastOverlay;
-        this.#window = mainWindow;
 
         this.#isDataSet = true;
+    }
+
+    /** sets the main application window where to add dialogs to.
+      * this is automatically set on application initialization, so don't worry. */
+    public setApplicationWindow(window: Adw.ApplicationWindow): void {
+        if(this.#window)
+            return;
+
+        this.#window = window;
     }
 
     vfunc_dispose(): void {
