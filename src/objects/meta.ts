@@ -274,6 +274,7 @@ export abstract class Meta {
                         data.pictureData = info?.data;
                     break;
 
+                    /**
                     case Gst.TAG_ALBUM_VOLUME_NUMBER:
                         data.discNumber = Number.parseInt(self.get_string(tag)[1]);
                     break;
@@ -289,6 +290,7 @@ export abstract class Meta {
                     case Gst.TAG_ISRC:
                         data.isrc = Number.parseInt(self.get_string(tag)[1]);
                     break;
+                    */
 
                     case "common::lyrics-rating":
                     case "common::rating":
