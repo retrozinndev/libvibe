@@ -9,6 +9,7 @@ import { Vibe } from "..";
 import { Album } from "./album";
 import GLib from "gi://GLib?version=2.0";
 import GlyGtk4 from "gi://GlyGtk4?version=2";
+import GObject from "gnim/gobject";
 
 
 // This is still heavily WIP
@@ -234,6 +235,28 @@ export abstract class Meta {
         }
     }
 
+    private static getTagString(taglist: Gst.TagList, tag: string): string|undefined {
+        return GObject.type_check_value_holds(taglist.get_value_index(tag, 0), GObject.TYPE_STRING) ?
+            taglist.get_string(tag)[1]
+        : undefined;
+    }
+
+    private static getTagNumber(taglist: Gst.TagList, tag: string): number|undefined {
+        const gvalue = taglist.get_value_index(tag, 0);
+
+        return GObject.type_check_value_holds(gvalue, GObject.TYPE_STRING) ?
+            Number.parseInt(taglist.get_string(tag)[1])
+        : GObject.type_check_value_holds(gvalue, GObject.TYPE_INT) ?
+            taglist.get_int(tag)[1]
+        : undefined;
+    }
+
+    private static getTagDate(taglist: Gst.TagList, tag: string): Gst.DateTime|undefined {
+        return GObject.type_check_value_holds(taglist.get_value_index(tag, 0), Gst.DateTime.$gtype) ?
+            taglist.get_date_time(tag)[1]
+        : undefined;
+    }
+
     /** convert a `GstTagList` to a `Meta.Data` object. 
       * 
       * @param taglist the `GstTagList` you want to convert
@@ -251,19 +274,19 @@ export abstract class Meta {
             try {
                 switch(tag) {
                     case Gst.TAG_TITLE:
-                        data.title = self.get_string(tag)[1];
+                        data.title = this.getTagString(self, tag);
                     break;
 
                     case Gst.TAG_ARTIST:
-                        data.artists = self.get_string(tag)[1]?.split(separator).filter(s => s.trim() !== "");
+                        data.artists = this.getTagString(self, tag)?.split(separator).filter(s => s.trim() !== "");
                     break;
 
                     case Gst.TAG_ALBUM_ARTIST:
-                        data.albumArtists = self.get_string(tag)[1]?.split(separator).filter(s => s.trim() !== "");
+                        data.albumArtists = this.getTagString(self, tag)?.split(separator).filter(s => s.trim() !== "");
                     break;
 
                     case Gst.TAG_ALBUM:
-                        data.albumName = self.get_string(tag)[1];
+                        data.albumName = this.getTagString(self, tag);
                     break;
 
                     case Gst.TAG_IMAGE:
@@ -274,41 +297,37 @@ export abstract class Meta {
                         data.pictureData = info?.data;
                     break;
 
-                    /**
                     case Gst.TAG_ALBUM_VOLUME_NUMBER:
-                        data.discNumber = Number.parseInt(self.get_string(tag)[1]);
+                        data.discNumber = this.getTagNumber(self, tag);
                     break;
 
                     case Gst.TAG_TRACK_NUMBER:
-                        data.trackNumber = Number.parseInt(self.get_string(tag)[1]);
+                        data.trackNumber = this.getTagNumber(self, tag);
                     break;
 
                     case Gst.TAG_TRACK_COUNT:
-                        data.trackTotal = Number.parseInt(self.get_string(tag)[1]);
+                        data.trackTotal = this.getTagNumber(self, tag);
                     break;
 
                     case Gst.TAG_ISRC:
-                        data.isrc = Number.parseInt(self.get_string(tag)[1]);
+                        data.isrc = this.getTagNumber(self, tag);
                     break;
-                    */
 
                     case "common::lyrics-rating":
                     case "common::rating":
-                        data.explicit = /explicit|advisory|[1]|true/i.test(self.get_string(tag)[1]);
+                        data.explicit = /explicit|advisory|[1]|true/i.test(this.getTagString(self, tag) ?? "");
                     break;
 
                     case Gst.TAG_COMPOSER:
-                        data.composers = self.get_string(tag)[1]?.split(separator).filter(s => s.trim() !== "");
+                        data.composers = this.getTagString(self, tag)?.split(separator).filter(s => s.trim() !== "");
                     break;
 
                     case Gst.TAG_PUBLISHER:
-                        data.publisher = self.get_string(tag)[1];
+                        data.publisher = this.getTagString(self, tag);
                     break;
 
                     case Gst.TAG_DATE:
-                        try {
-                            data.date = new Date(self.get_string(tag)[1]);
-                        } catch(_) {}
+                        data.date = this.getTagDate(self, tag);
                     break;
 
                     case Gst.TAG_LYRICS:
@@ -338,7 +357,7 @@ export namespace Meta {
         trackTotal: number;
         composers: Array<string>;
         publisher: string;
-        date: Date;
+        date: Gst.DateTime;
         artists: Array<string>;
         lyrics: string;
     }>;
