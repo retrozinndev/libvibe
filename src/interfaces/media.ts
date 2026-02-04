@@ -72,6 +72,17 @@ export interface Media extends GObject.Object {
     next(): void;
     /** go back to previous item in queue(if any) */
     previous(): void;
+
+    // for type specification only
+    connect<S extends keyof MediaSignalSignatures>(
+        signal: S,
+        callback: (self: Media, ...params: Parameters<MediaSignalSignatures[S]>) => ReturnType<MediaSignalSignatures[S]>
+    ): number;
+
+    emit<S extends keyof MediaSignalSignatures>(
+        signal: S,
+        ...args: Parameters<MediaSignalSignatures[S]>
+    ): void;
 }
 
 export interface MediaSignalSignatures extends GObject.Object.SignalSignatures {
