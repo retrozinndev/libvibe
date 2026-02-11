@@ -2,19 +2,9 @@ import Gtk from "gi://Gtk?version=4.0";
 import { Page } from "./page";
 
 
-
-export interface PagesSignalSignatures extends Gtk.Stack.SignalSignatures {
-    /** a new page was added to the app's page stack */
-    "added": (page: Page) => void;
-    /** a page got removed (back button or internal) */
-    "removed": (removedPage: Page) => void;
-    "notify::current-page": () => void;
-    "notify::history": () => void;
-}
-
 export interface Pages extends Gtk.Stack {
     // types
-    $signals: PagesSignalSignatures;
+    $signals: Pages.SignalSignatures;
 
     
     // properties
@@ -38,15 +28,26 @@ export interface Pages extends Gtk.Stack {
 
     // re-declarations to ensure type safety
     connect<
-        S extends keyof PagesSignalSignatures,
-        C extends PagesSignalSignatures[S]
+        S extends keyof Pages.SignalSignatures,
+        C extends Pages.SignalSignatures[S]
     >(
         signal: S,
         callback: (self: Pages, ...params: Parameters<C>) => ReturnType<C>
     ): number;
 
-    emit<S extends keyof PagesSignalSignatures>(
+    emit<S extends keyof Pages.SignalSignatures>(
         signal: S,
-        ...params: Parameters<PagesSignalSignatures[S]>
+        ...params: Parameters<Pages.SignalSignatures[S]>
     ): void;
+}
+
+export namespace Pages {
+    export interface SignalSignatures extends Gtk.Stack.SignalSignatures {
+        /** a new page was added to the app's page stack */
+        "added": (page: Page) => void;
+        /** a page got removed (back button or internal) */
+        "removed": (removedPage: Page) => void;
+        "notify::current-page": () => void;
+        "notify::history": () => void;
+    }
 }

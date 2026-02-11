@@ -5,7 +5,7 @@ import { SongList, Song, Artist, Album, Playlist } from "./objects";
 import { Media } from "./interfaces/media";
 import { Plugin } from "./plugin";
 import { Pages } from "./interfaces/pages";
-import { Page, PageType, PageProps, Dialog } from "./interfaces";
+import { Page, Dialog } from "./interfaces";
 import { createRoot, getScope } from "gnim";
 import Adw from "gi://Adw?version=1";
 
@@ -204,7 +204,7 @@ Please create one providing all the necessary properties");
 
     /** add a new page to the stack. plugins can use this to open details for artists, 
       * songs, playlists, albums and even custom pages */
-    public addPage<T extends PageType>(props: PageProps<T>): void {
+    public addPage<T extends Page.Type>(props: Page.ConstructorProps<T>): void {
         createRoot(() => {
             const page = new this.#pageConstructor(props),
                 scope = getScope();
@@ -264,7 +264,7 @@ Please create one providing all the necessary properties");
     public setData(
         media: Media, 
         pages: Pages, 
-        pageConstructor: new <T extends PageType>(props: PageProps<T>) => Page<T>,
+        pageConstructor: new <T extends Page.Type>(props: Page.ConstructorProps<T>) => Page<T>,
         toastOverlay: Adw.ToastOverlay,
     ): void {
         if(this.#isDataSet) {
@@ -329,7 +329,7 @@ Please create one providing all the necessary properties");
 
 namespace Vibe {
     export type ToastPriority = "high"|"normal";   
-    export type PageConstructor = new <T extends PageType>(props: PageProps<T>) => Page<T>;
+    export type PageConstructor = new <T extends Page.Type>(props: Page.ConstructorProps<T>) => Page<T>;
     export type DialogConstructor = new (props: Dialog) => Adw.Dialog;
 
     export interface SignalSignatures extends GObject.Object.SignalSignatures {
