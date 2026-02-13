@@ -1,11 +1,10 @@
-import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
 import { getter, gtype, register } from "gnim/gobject";
 import { Vibe } from "..";
 import { Plugin } from "../plugin";
 import { Song } from "./song";
 import { Artist } from "./artist";
 import { SongList } from "./songlist";
-import Gdk from "gi://Gdk?version=4.0";
+import { Image } from "../utils";
 
 
 /** store album information */
@@ -32,7 +31,7 @@ export class Album extends SongList {
     constructor(properties: {
         artist: Array<Artist>;
         songs?: Array<Song>;
-        image?: GdkPixbuf.Pixbuf|Gdk.Texture;
+        image?: Image;
         title?: string;
         id?: any;
         plugin?: Plugin;

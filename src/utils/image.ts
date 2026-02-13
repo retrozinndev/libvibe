@@ -26,7 +26,7 @@ import GlyGtk4 from "gi://GlyGtk4?version=2";
   * manually `ref()` and `unref()` the object, as it uses a 
   * different memory management system from the other objects */
 @register({ GTypeName: "VibeImage" })
-export class Image<T extends Image.SourceTypes> extends GObject.Object {
+export class Image<T extends Image.SourceTypes = any> extends GObject.Object {
     declare $signals: Image.SignalSignatures;
 
     public static readonly cacheDir: Gio.File = Gio.File.new_for_path(

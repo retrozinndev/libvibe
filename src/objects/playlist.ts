@@ -1,10 +1,9 @@
-import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
 import { register } from "gnim/gobject";
 import { Vibe } from "..";
 import { Song } from "./song";
 import { SongList } from "./songlist";
 import { Plugin } from "../plugin";
-import Gdk from "gi://Gdk?version=4.0";
+import { Image } from "../utils";
 
 
 /** user-managed song list (handled by the app) */
@@ -18,7 +17,7 @@ export class Playlist extends SongList {
         description?: string;
         id?: any;
         plugin?: Plugin;
-        image?: GdkPixbuf.Pixbuf|Gdk.Texture;
+        image?: Image;
         songs?: Array<Song>;
     }) {
         super({

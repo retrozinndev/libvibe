@@ -1,11 +1,10 @@
 import Gio from "gi://Gio?version=2.0";
 import GObject, { gtype, property, register, signal } from "gnim/gobject";
-import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
 import Gst from "gi://Gst?version=1.0";
 import { Artist, Album, Meta } from ".";
 import { Plugin } from "../plugin";
 import { Vibe } from "..";
-import Gdk from "gi://Gdk?version=4.0";
+import { Image } from "../utils";
 
 
 /** store song data.
@@ -51,8 +50,8 @@ export class Song<T extends Object = Gio.File|Gst.Stream> extends GObject.Object
     /** the song's individual image. usually, you don't need to define this,
     * as it's expected that only the album has an image; but you can also
     * use this if needed. can be null */
-    @property(gtype<GdkPixbuf.Pixbuf|Gdk.Texture|null>(GObject.Object))
-    image: GdkPixbuf.Pixbuf|Gdk.Texture|null = null;
+    @property(gtype<Image|null>(GObject.Object))
+    image: Image|null = null;
 
     /** the song's internal metadata object. should be set by the plugin.
       * properties like title, album and others are automatically set if you change this */
@@ -70,7 +69,7 @@ export class Song<T extends Object = Gio.File|Gst.Stream> extends GObject.Object
         explicit?: boolean;
         metadata?: Meta.Data;
         url?: string;
-        image?: GdkPixbuf.Pixbuf|Gdk.Texture;
+        image?: Image;
         album?: Album;
     }) {
         super();

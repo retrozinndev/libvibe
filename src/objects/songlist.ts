@@ -1,9 +1,8 @@
-import GdkPixbuf from "gi://GdkPixbuf?version=2.0";
 import GObject, { getter, gtype, property, register, signal } from "gnim/gobject";
 import { Song } from "./song";
 import { Vibe } from "..";
 import { Plugin } from "../plugin";
-import Gdk from "gi://Gdk?version=4.0";
+import { Image } from "../utils";
 
 
 /** base class for song lists(albums and playlists) */
@@ -35,8 +34,8 @@ export class SongList extends GObject.Object {
     @getter(gtype<string|null>(String))
     get description() { return this._description; }
 
-    @property(gtype<GdkPixbuf.Pixbuf|Gdk.Texture|null>(GObject.Object))
-    image: GdkPixbuf.Pixbuf|Gdk.Texture|null = null;
+    @property(gtype<Image|null>(GObject.Object))
+    image: Image|null = null;
 
     @signal(GObject.Object)
     added(_: Song) {}
@@ -52,7 +51,7 @@ export class SongList extends GObject.Object {
         title?: string;
         plugin?: Plugin;
         id?: any;
-        image?: GdkPixbuf.Pixbuf|Gdk.Texture;
+        image?: Image;
         description?: string;
     }) {
         super();
