@@ -1,4 +1,3 @@
-export * from "./meta";
 export * from "./songlist";
 export * from "./album";
 export * from "./song";

@@ -108,7 +108,11 @@ export class Image<T extends Image.SourceTypes = any> extends GObject.Object {
     public static generateCacheName(uniqueData?: string|Song): string {
         return uniqueData !== undefined ?
             uniqueData instanceof Song ?
-                String(uniqueData.id)
+                (uniqueData.source instanceof Gio.File ?
+                    uniqueData.source.has_uri_scheme("file") ?
+                        uniqueData.source.peek_path()!
+                    : uniqueData.source.get_uri()
+                : String(uniqueData.id))
             : GLib.compute_checksum_for_string(GLib.ChecksumType.SHA1, uniqueData, -1)!
         : Vibe.getDefault().generateID().toString();
     }

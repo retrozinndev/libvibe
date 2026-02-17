@@ -21,11 +21,6 @@ export class SongList extends GObject.Object {
     /** @protected the description for this song list */
     protected _description: string|null = null;
 
-    /** songs array, read-only property. you should use the provided
-      * methods to update the data inside this song list */
-    @getter(Array<Song>)
-    get songs() { return this._songs; }
-
     /** title for this song list, can be null */
     @getter(gtype<string|null>(String))
     get title() { return this._title; }
@@ -45,6 +40,7 @@ export class SongList extends GObject.Object {
 
     @signal(GObject.Object, gtype<Song|null>(GObject.Object))
     reordered(_: Song, __: Song|null) {}
+
 
     constructor(properties?: {
         songs?: Array<Song>;
@@ -85,14 +81,14 @@ export class SongList extends GObject.Object {
 
     /** pop the last song from this song list */
     pop(): void {
-        this._songs.pop();
-        this.notify("songs");
+        const popped = this._songs.pop();
+        popped && this.emit("removed", popped);
     }
 
     /** add a song to the song list */
     add(song: Song): void {
         this._songs.push(song);
-        this.notify("songs");
+        this.emit("added", song);
     }
 
     /** loop through the song list */
@@ -116,7 +112,6 @@ export class SongList extends GObject.Object {
             const [song] = this._songs.splice(a, 1);
             if(song) {
                 this.emit("removed", song);
-                this.notify("songs");
             }
             return;
         }
@@ -163,6 +158,19 @@ export class SongList extends GObject.Object {
             return item;
 
         return undefined;
+    }
+    
+    /** auto-sort songs based on their `:track-number` */
+    sort(): void;
+
+    /** sort songs by using a callback
+      * @param callback the for-each function
+      * 
+      * @returns nothing, songs are sorted in the original array instead of in a copy of it */
+    sort(callback?: (song: Song, nextSong: Song) => number): void {
+        this._songs = this._songs.sort(callback ?? ((s, ns) =>
+            ns.trackNumber - s.trackNumber
+        ));
     }
 
     /** update the position of a song with another 

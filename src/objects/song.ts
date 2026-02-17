@@ -1,10 +1,12 @@
 import Gio from "gi://Gio?version=2.0";
 import GObject, { gtype, property, register, signal } from "gnim/gobject";
 import Gst from "gi://Gst?version=1.0";
-import { Artist, Album, Meta } from ".";
+import { Artist, Album } from ".";
+import { Meta } from "../utils";
 import { Plugin } from "../plugin";
 import { Vibe } from "..";
 import { Image } from "../utils";
+import GLib from "gi://GLib?version=2.0";
 
 
 /** store song data.
@@ -53,24 +55,52 @@ export class Song<T extends Object = Gio.File|Gst.Stream> extends GObject.Object
     @property(gtype<Image|null>(GObject.Object))
     image: Image|null = null;
 
-    /** the song's internal metadata object. should be set by the plugin.
-      * properties like title, album and others are automatically set if you change this */
-    @property(gtype<Meta.Data|null>(Object))
-    metadata: Meta.Data|null = null;
+    /** the number of the disc that the song makes part of. @default 1 */
+    @property(Number)
+    discNumber: number = 1;
+
+    /** the song's ISRC(International Standard Recording Code). 
+      * it's a unique identification code for the song. it's used in streaming services to find a song by it's "barcode".
+      * can be null */
+    @property(gtype<string|null>(String))
+    isrc: string|null = null;
+
+    /** the track number according to the song's album. @default 1 */
+    @property(Number)
+    trackNumber: number = 1;
+
+    /** the song's publisher name. can be null */
+    @property(gtype<string|null>(String))
+    publisher: string|null = null;
+
+    /** the song's launch date as a `GstDateTime` object. can be null */
+    @property(gtype<Gst.DateTime|null>(Gst.DateTime))
+    date: Gst.DateTime|null = null;
+
+    /** the song's lyrics, in the LRC format. can be null */
+    @property(gtype<string|null>(String))
+    lyrics: string|null = null;
+
 
     constructor(properties: {
         title?: string;
         artist?: Array<Artist>;
-        /** any data in the `Object` type that contains a way to stream/play this song */
+        /** any data in the `Object` type that contains a way to stream/play this song. this is handled by 
+          * the plugin's Media implementation(or the default Gstreamer one) */
         source?: T extends Gio.File|Gst.Stream ? T|string : T;
         id?: any;
         /** internally-used property to notify the api about a new song added for a plugin */
         plugin?: Plugin;
         explicit?: boolean;
-        metadata?: Meta.Data;
         url?: string;
         image?: Image;
         album?: Album;
+        discNumber?: number;
+        isrc?: string;
+        trackNumber?: number;
+        publisher?: string;
+        date?: Gst.DateTime;
+        lyrics?: string;
     }) {
         super();
 
@@ -84,9 +114,6 @@ export class Song<T extends Object = Gio.File|Gst.Stream> extends GObject.Object
         if(properties.explicit !== undefined)
             this.explicit = properties.explicit;
         
-        if(properties.metadata !== undefined)
-            this.metadata = properties.metadata;
-
         if(properties.url !== undefined)
             this.url = properties.url;
 
@@ -98,6 +125,24 @@ export class Song<T extends Object = Gio.File|Gst.Stream> extends GObject.Object
 
         if(properties.artist !== undefined)
             this.artist = properties.artist;
+
+        if(properties.discNumber !== undefined)
+            this.discNumber = properties.discNumber;
+
+        if(properties.isrc !== undefined)
+            this.isrc = properties.isrc;
+
+        if(properties.trackNumber !== undefined)
+            this.trackNumber = properties.trackNumber;
+
+        if(properties.publisher !== undefined)
+            this.publisher = properties.publisher;
+
+        if(properties.date !== undefined)
+            this.date = properties.date;
+
+        if(properties.lyrics !== undefined)
+            this.lyrics = properties.lyrics;
 
         if(properties.plugin !== undefined)
             Vibe.getDefault().emit(
