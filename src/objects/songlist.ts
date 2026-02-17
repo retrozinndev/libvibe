@@ -9,8 +9,9 @@ import { Image } from "../utils";
 @register({ GTypeName: "VibeSongList" })
 export class SongList extends GObject.Object {
     readonly id: any;
-
     declare $signals: SongList.SignalSignatures;
+
+    #length: number = 0;
 
     /** @protected array containing all songs in this list */
     protected _songs: Array<Song> = [];
@@ -20,6 +21,9 @@ export class SongList extends GObject.Object {
 
     /** @protected the description for this song list */
     protected _description: string|null = null;
+
+    @getter(Number)
+    get length() { return this.#length; }
 
     /** title for this song list, can be null */
     @getter(gtype<string|null>(String))
@@ -33,10 +37,16 @@ export class SongList extends GObject.Object {
     image: Image|null = null;
 
     @signal(GObject.Object)
-    added(_: Song) {}
+    added(_: Song) {
+        this.#length = this._songs.length;
+        this.notify("length");
+    }
 
     @signal(GObject.Object)
-    removed(_: Song) {}
+    removed(_: Song) {
+        this.#length = this._songs.length;
+        this.notify("length");
+    }
 
     @signal(GObject.Object, gtype<Song|null>(GObject.Object))
     reordered(_: Song, __: Song|null) {}
