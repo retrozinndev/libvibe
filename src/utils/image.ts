@@ -24,10 +24,12 @@ import GlyGtk4 from "gi://GlyGtk4?version=2";
   * For usage with custom widgets:
   * if the use outside of a supported widget is needed, please,
   * manually `ref()` and `unref()` the object, as it uses a 
-  * different memory management system from the other objects */
+  * different management system from the other objects */
 @register({ GTypeName: "VibeImage" })
 export class Image<T extends Image.SourceTypes = any> extends GObject.Object {
     declare $signals: Image.SignalSignatures;
+
+    public readonly id: any;
 
     public static readonly cacheDir: Gio.File = Gio.File.new_for_path(
         `${Vibe.cacheDir.peek_path()!}/arts`
@@ -49,6 +51,9 @@ export class Image<T extends Image.SourceTypes = any> extends GObject.Object {
             this.unload().catch(console.error);
     }
 
+    @getter(gtype<T>(Object))
+    get source() { return this.#source; }
+
     @getter(gtype<Gio.File|null>(Gio.File))
     get cacheFile() { return this.#cacheFile; }
 
@@ -68,6 +73,8 @@ export class Image<T extends Image.SourceTypes = any> extends GObject.Object {
       * (you can also use a song instance for a non-session-persistent cache) */
     constructor(source?: T|GLib.Bytes|string, uniqueData?: string|Song) {
         super();
+
+        this.id = Vibe.getDefault().generateID();
 
         if(uniqueData !== undefined && this.restoreFromCache(uniqueData)) 
             return;
@@ -98,7 +105,7 @@ export class Image<T extends Image.SourceTypes = any> extends GObject.Object {
         this.notify("cache-file");
     }
 
-    protected static generateCacheName(uniqueData?: string|Song): string {
+    public static generateCacheName(uniqueData?: string|Song): string {
         return uniqueData !== undefined ?
             uniqueData instanceof Song ?
                 String(uniqueData.id)
