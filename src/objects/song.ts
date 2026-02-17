@@ -2,11 +2,9 @@ import Gio from "gi://Gio?version=2.0";
 import GObject, { gtype, property, register, signal } from "gnim/gobject";
 import Gst from "gi://Gst?version=1.0";
 import { Artist, Album } from ".";
-import { Meta } from "../utils";
 import { Plugin } from "../plugin";
 import { Vibe } from "..";
 import { Image } from "../utils";
-import GLib from "gi://GLib?version=2.0";
 
 
 /** store song data.
@@ -74,7 +72,7 @@ export class Song<T extends Object = Gio.File|Gst.Stream> extends GObject.Object
     publisher: string|null = null;
 
     /** the song's launch date as a `GstDateTime` object. can be null */
-    @property(gtype<Gst.DateTime|null>(Gst.DateTime))
+    @property(gtype<Gst.DateTime|null>(GObject.Object))
     date: Gst.DateTime|null = null;
 
     /** the song's lyrics, in the LRC format. can be null */
