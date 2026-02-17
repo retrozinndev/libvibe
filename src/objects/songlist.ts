@@ -110,9 +110,8 @@ export class SongList extends GObject.Object {
     remove(a: Song|number): void {
         if(typeof a === "number") {
             const [song] = this._songs.splice(a, 1);
-            if(song) {
-                this.emit("removed", song);
-            }
+            song && this.emit("removed", song);
+
             return;
         }
 
@@ -121,7 +120,6 @@ export class SongList extends GObject.Object {
 
             if(song.id === a.id) {
                 this.emit("removed", this._songs.splice(i, 1)[0]);
-                this.notify("songs");
                 break;
             }
         }
@@ -134,12 +132,7 @@ export class SongList extends GObject.Object {
       *
       * @returns true if the song was found, or else false */
     has(song: Song): boolean {
-        for(const s of this._songs) {
-            if(s.id === song.id) 
-                return true;
-        }
-
-        return false;
+        return Boolean(this._songs.find(s => s.id === song.id));
     }
 
     /** get a song from this list. if you use a song instance as
@@ -206,7 +199,6 @@ export class SongList extends GObject.Object {
         // append/prepend song if newPos is bigger/smaller than the array size
         if(unshift || newPos > this._songs.length-1) {
             this._songs[(unshift ? "unshift" : "push")](song);
-            this.notify("songs");
             this.emit("reordered", song, null);
 
             return;
@@ -215,7 +207,6 @@ export class SongList extends GObject.Object {
         const replaced = this._songs[newPos];
         this._songs[newPos] = song;
         this._songs[i] = replaced;
-        this.notify("songs");
         this.emit("reordered", song, replaced);
     }
 
