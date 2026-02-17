@@ -35,6 +35,10 @@ export class Image<T extends Image.SourceTypes = any> extends GObject.Object {
         `${Vibe.cacheDir.peek_path()!}/arts`
     );
 
+    static {
+        this.cacheDir.make_directory_with_parents(null);
+    }
+
     /** you should only change this value by using the defined 
       * setter for this field */
     #refs: number = 0;
@@ -102,6 +106,20 @@ export class Image<T extends Image.SourceTypes = any> extends GObject.Object {
 
         this.#cacheName = Image.generateCacheName(uniqueData);
         this.#cacheFile = Gio.File.new_for_path(`${Image.cacheDir.peek_path()!}/${this.#cacheName}`);
+        this.#cacheFile.replace_readwrite_async(
+            null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, GLib.PRIORITY_LOW, null, (_, res) => {
+                
+                let stream!: Gio.FileIOStream;
+                try {
+                    stream = this.#cacheFile?.replace_readwrite_finish(res)!;
+                } catch(e) {
+                    console.error("Image: Caching failed!", e);
+                    return;
+                }
+
+                stream.outputStream.write_bytes_async(this.#source as Uint8Array, GLib.PRIORITY_LOW, null);
+            }
+        );
         this.notify("cache-file");
     }
 
