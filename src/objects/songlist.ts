@@ -220,6 +220,12 @@ export class SongList extends GObject.Object {
         this.emit("reordered", song, replaced);
     }
 
+    /** creates a new array with the song objects contained in this list.
+      * @returns the song array */
+    toArray(): Array<Song> {
+        return [...this._songs];
+    }
+
     connect<
         S extends keyof SongList.SignalSignatures,
         C extends SongList.SignalSignatures[S]

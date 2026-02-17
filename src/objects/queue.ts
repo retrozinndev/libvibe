@@ -18,10 +18,10 @@ export class Queue extends SongList {
         super({
             title: "Queue",
             description: "Your song queue",
-            songs: Array.isArray(songs) ? songs : songs?.songs
+            songs: Array.isArray(songs) ? songs : songs?.toArray()
         });
 
-        if(this.songs.length > 0 && current !== undefined)
+        if(this.length > 0 && current !== undefined)
             this.currentSong = 0;
     }
 
