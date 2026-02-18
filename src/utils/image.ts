@@ -36,7 +36,8 @@ export class Image<T extends Image.SourceTypes = any> extends GObject.Object {
     );
 
     static {
-        this.cacheDir.make_directory_with_parents(null);
+        if(!this.cacheDir.query_exists(null))
+            this.cacheDir.make_directory_with_parents(null);
     }
 
     /** you should only change this value by using the defined 
