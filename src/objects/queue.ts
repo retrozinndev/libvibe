@@ -29,7 +29,6 @@ export class Queue extends SongList {
       * {@link add} method */
     clear(): void {
         this._songs = [];
-        this.notify("songs");
         this.emit("cleared");
     }
 
