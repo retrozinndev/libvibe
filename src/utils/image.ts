@@ -64,7 +64,7 @@ export class Image<T extends Image.SourceTypes = any> extends GObject.Object {
 
     @getter(Boolean)
     get hasCacheFile() {
-        return this.#cacheName !== null;
+        return this.#cacheFile !== null;
     }
 
     @getter(gtype<Gdk.Texture|null>(Gdk.Texture))
