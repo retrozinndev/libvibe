@@ -38,16 +38,24 @@ export namespace Page {
     export type Type = Artist|Song|Album|Playlist|Gtk.Widget;
 
     type BaseProps = {
-        title?: string|Accessor<string>;
+        title?: string;
         id?: any;
     };
     export type ConstructorProps<T extends Page.Type> = T extends Gtk.Widget ?
         BaseProps & { content: Gtk.Widget; }
     : BaseProps & {
         content: NonNullable<T>;
-        sections?: Array<Section>|Accessor<Array<Section>>;
-        buttons?: Array<IconButton|LabelButton|DetailedButton>|Accessor<Array<IconButton|LabelButton|DetailedButton>>;
+        sections?: Array<Section>;
+        buttons?: Array<IconButton|LabelButton|DetailedButton>;
     }
+
+    export type AccessorizeProps<T extends ConstructorProps<T2>, T2 extends Page.Type> = Omit<{
+        [K in keyof T]: T[K]|Accessor<T[K]>
+    }, "id"|"content"> & {
+        // here we put back non-bindable props
+        id?: any;
+        content: NonNullable<T2>
+    };
 
     export interface SignalSignatures extends Adw.Bin.SignalSignatures {
         /** a content refresh was requested */
