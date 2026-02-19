@@ -119,7 +119,14 @@ export abstract class Meta {
         }
     }
 
-    private static discover(file: Gio.File, timeout: number = Gst.SECOND * 2.5, printErrors: boolean = true): GstPbutils.DiscovererInfo {
+    /** gets media info(e.g.: tags) for `file` using `GstPbutilsDiscoverer`.
+      * this is mainly used for getting tags for media files
+      * @param file the media's `GFile`
+      * @param timeout discovering timeout for info
+      * @param printErrors whether you want to log any errors that occur
+      *
+      * @returns a GstPbutilsDiscovererInfo of `file`, containing info and tags for the file */
+    public static discover(file: Gio.File, timeout: number = Gst.SECOND * 2.5, printErrors: boolean = true): GstPbutils.DiscovererInfo {
         const discoverer = GstPbutils.Discoverer.new(timeout);
         const id = discoverer.connect("discovered", (_, __, err) => {
             if(!printErrors || !err)
@@ -140,7 +147,19 @@ export abstract class Meta {
         return info;
     }
 
-    private static discoverAsync(file: Gio.File, timeout: number = Gst.SECOND * 2.5, printErrors: boolean = true): Promise<GstPbutils.DiscovererInfo> {
+    /** asynchronously gets media info(e.g.: tags) for `file` using `GstPbutilsDiscoverer`.
+      * this is mainly used for getting tags for media files
+      * @param file the media's `GFile`
+      * @param timeout discovering timeout for info
+      * @param printErrors whether you want to log any errors that occur
+      *
+      * @returns a GstPbutilsDiscovererInfo of `file`, containing info and tags for the file */
+    public static async discoverAsync(
+        file: Gio.File,
+        timeout: number = Gst.SECOND * 2.5,
+        printErrors: boolean = true
+    ): Promise<GstPbutils.DiscovererInfo> {
+
         return new Promise((resolve, reject) => {
             const discoverer = GstPbutils.Discoverer.new(timeout);
             let info: GstPbutils.DiscovererInfo|null = null;
@@ -167,13 +186,67 @@ export abstract class Meta {
                 })
             ];
 
+            discoverer.start();
             discoverer.discover_uri_async(
                 !file.has_uri_scheme("file") ?
                     file.get_uri()
                 : `file://${file.peek_path()}`
             );
+        });
+    }
+
+    /** asynchronously gets media info(e.g.: tags) for each file using a single `GstPbutilsDiscoverer` instance.
+      * this is mainly used for getting tags for media files
+      * @param files array of `GFile`s containing all the files that you want to get info from
+      * @param timeout discovering timeout for each file
+      * @param printErrors whether you want to log any errors that occur
+      *
+      * @returns an `Array`, containing references to the respective `GFile` and its `DiscovererInfo`. `[GFile, GstPbutilsDiscovererInfo]`*/
+    public static async discoverManyAsync(
+        files: Array<Gio.File>,
+        timeout: number = Gst.SECOND * 2.5,
+        printErrors: boolean = true
+    ): Promise<Array<[Gio.File, GstPbutils.DiscovererInfo]>> {
+
+        if(files.length < 1)
+            return [];
+
+        return new Promise((resolve, reject) => {
+            const discoverer = GstPbutils.Discoverer.new(timeout);
+            const discovered: Array<[Gio.File, GstPbutils.DiscovererInfo]> = [];
+            let file: Gio.File = files[0], i: number = 0;
+
+            const ids: Array<number> = [
+                discoverer.connect("finished", () => {
+                    ids.forEach(id => discoverer.disconnect(id));
+                    discoverer.stop();
+                    if(discovered.length < 1) {
+                        reject(new Error("Couldn't get info from streams, no data could be discovered"));
+                        return;
+                    }
+
+                    resolve(discovered);
+                }),
+                discoverer.connect("discovered", (_, info, err) => {
+                    if(printErrors && err) 
+                        console.error(err);
+
+                    if(info)
+                        discovered.push([file, info]);
+
+                    file = files[i++];
+                })
+            ];
 
             discoverer.start();
+
+            for(const file of files) {
+                discoverer.discover_uri_async(
+                    !file.has_uri_scheme("file") ?
+                        file.get_uri()
+                    : `file://${file.peek_path()}`
+                );
+            }
         });
     }
 
