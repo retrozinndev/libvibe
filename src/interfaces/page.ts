@@ -49,7 +49,7 @@ export namespace Page {
         buttons?: Array<IconButton|LabelButton|DetailedButton>;
     }
 
-    export type AccessorizeProps<T extends ConstructorProps<T2>, T2 extends Page.Type> = Omit<{
+    export type AccessorizeProps<T extends ConstructorProps<T2>, T2 extends Page.Type = Gtk.Widget> = Omit<{
         [K in keyof T]: T[K]|Accessor<T[K]>
     }, "id"|"content"> & {
         // here we put back non-bindable props

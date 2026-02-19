@@ -6,7 +6,7 @@ import { Media } from "./interfaces/media";
 import { Plugin } from "./plugin";
 import { Pages } from "./interfaces/pages";
 import { Page, Dialog } from "./interfaces";
-import { createRoot, getScope } from "gnim";
+import { createRoot, getScope, jsx } from "gnim";
 import Adw from "gi://Adw?version=1";
 
 
@@ -204,9 +204,10 @@ Please create one providing all the necessary properties");
 
     /** add a new page to the stack. plugins can use this to open details for artists, 
       * songs, playlists, albums and even custom pages */
-    public addPage<T extends Page.Type>(props: Page.ConstructorProps<T>): void {
+    public addPage<T extends Page.Type>(props: Page.AccessorizeProps<Page.ConstructorProps<T>, T>): void {
         createRoot(() => {
-            const page = new this.#pageConstructor(props),
+            // @ts-ignore
+            const page = jsx(this.#pageConstructor, props),
                 scope = getScope();
 
             const id = page.connect("destroy", () => {
@@ -237,9 +238,14 @@ Please create one providing all the necessary properties");
                 name: button.id ?? "toast.clicked",
                 enabled: true
             });
-            this.#connections.set(action, 
-                action.connect("activate", () => button.onClicked?.())
-            );
+            const actionConn: number = action.connect("activate", () => {
+                action.disconnect(actionConn);
+                button.onClicked?.();
+            });
+            const clickConn: number = toast.connect("button-clicked", () => {
+                toast.disconnect(clickConn);
+                action.activate();
+            });
 
             toast.set_button_label(button.label);
         }
