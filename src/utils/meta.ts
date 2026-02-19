@@ -148,6 +148,7 @@ export abstract class Meta {
             const ids: Array<number> = [
                 discoverer.connect("finished", () => {
                     ids.forEach(id => discoverer.disconnect(id));
+                    discoverer.stop();
                     if(!info) {
                         reject(new Error("Couldn't get info from stream, DiscovererInfo is null"));
                         return;
@@ -161,7 +162,7 @@ export abstract class Meta {
                         return;
                     }
 
-                    if(!info)
+                    if(!info && discoverInfo)
                         info = discoverInfo;
                 })
             ];
