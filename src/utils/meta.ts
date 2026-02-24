@@ -11,8 +11,6 @@ import GObject from "gnim/gobject";
 import { Image } from "./image";
 
 
-// This is still heavily WIP
-
 /** retrieve metadata from media files, and apply them to a vibe object */
 export abstract class Meta {
 
@@ -465,11 +463,13 @@ export abstract class Meta {
                 break;
 
                 case Gst.TAG_ARTIST:
-                    data.artists = this.getTagString(self, tag)?.split(separator).filter(s => s.trim() !== "");
+                    data.artists = this.getTagString(self, tag)?.split(separator).filter(s => s.trim() !== "")
+                        .map(art => !/^ *$/.test(art) ? art.trim() : art);
                 break;
 
                 case Gst.TAG_ALBUM_ARTIST:
-                    data.albumArtists = this.getTagString(self, tag)?.split(separator).filter(s => s.trim() !== "");
+                    data.albumArtists = this.getTagString(self, tag)?.split(separator).filter(s => s.trim() !== "")
+                        .map(art => !/^ *$/.test(art) ? art.trim() : art);
                 break;
 
                 case Gst.TAG_ALBUM:
@@ -501,7 +501,8 @@ export abstract class Meta {
                 break;
 
                 case Gst.TAG_COMPOSER:
-                    data.composers = this.getTagString(self, tag)?.split(separator).filter(s => s.trim() !== "");
+                    data.composers = this.getTagString(self, tag)?.split(separator).filter(s => s.trim() !== "")
+                        .map(comp => !/^ *$/.test(comp) ? comp.trim() : comp);
                 break;
 
                 case Gst.TAG_PUBLISHER:
