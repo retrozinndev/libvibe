@@ -3,12 +3,12 @@ import { Song } from "./song";
 import { Vibe } from "..";
 import { Plugin } from "../plugin";
 import { Image } from "../utils";
+import { VibeObject } from "./object";
 
 
 /** base class for song lists(albums and playlists) */
 @register({ GTypeName: "VibeSongList" })
-export class SongList extends GObject.Object {
-    readonly id: any;
+export class SongList extends VibeObject {
     declare $signals: SongList.SignalSignatures;
 
     #length: number = 0;
@@ -60,9 +60,10 @@ export class SongList extends GObject.Object {
         image?: Image;
         description?: string;
     }) {
-        super();
-
-        this.id = properties?.id ?? Vibe.getDefault().generateID();
+        super({
+            id: properties?.id,
+            plugin: properties?.plugin
+        });
 
         if(properties === undefined)
             return;
@@ -70,13 +71,6 @@ export class SongList extends GObject.Object {
         if(properties.songs !== undefined)
             properties.songs.forEach(song =>
                 this.add(song)
-            );
-
-        if(properties.plugin !== undefined)
-            Vibe.getDefault().emit(
-                "songlist-added",
-                properties.plugin,
-                this
             );
 
         if(properties.title !== undefined)
@@ -87,6 +81,13 @@ export class SongList extends GObject.Object {
 
         if(properties.image !== undefined)
             this.image = properties.image;
+
+        if(properties.plugin !== undefined)
+            Vibe.getDefault().emit(
+                "songlist-added",
+                properties.plugin,
+                this
+            );
     }
 
     /** pop the last song from this song list */

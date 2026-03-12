@@ -1,7 +1,7 @@
 import Gio from "gi://Gio?version=2.0";
 import GObject, { gtype, property, register, signal } from "gnim/gobject";
 import Gst from "gi://Gst?version=1.0";
-import { Artist, Album } from ".";
+import { Artist, Album, VibeObject } from ".";
 import { Plugin } from "../plugin";
 import { Vibe } from "..";
 import { Image } from "../utils";
@@ -10,14 +10,8 @@ import { Image } from "../utils";
 /** store song data.
   * `T` - the source type. by default it's GstStream, GFile or a path to the audio file */
 @register({ GTypeName: "VibeSong" })
-export class Song<T extends Object = Gio.File|Gst.Stream> extends GObject.Object {
-
+export class Song<T extends Object = Gio.File|Gst.Stream> extends VibeObject {
     declare $signals: Song.SignalSignatures;
-
-    /** the unique identifier of this song, usually defined 
-    * internally at construction.
-    * @method Vibe.generateID() to generate an ID for this object */
-    readonly id: any;
 
     @signal()
     prepare() {}
@@ -100,9 +94,10 @@ export class Song<T extends Object = Gio.File|Gst.Stream> extends GObject.Object
         date?: Gst.DateTime;
         lyrics?: string;
     }) {
-        super();
-
-        this.id = properties.id ?? Vibe.getDefault().generateID();
+        super({
+            id: properties.id,
+            plugin: properties.plugin
+        });
 
         if(properties.source !== undefined)
             this.source = (typeof properties.source === "string" ?
@@ -146,7 +141,7 @@ export class Song<T extends Object = Gio.File|Gst.Stream> extends GObject.Object
             Vibe.getDefault().emit(
                 "song-added",
                 properties.plugin,
-                this as unknown as Song
+                this
             );
     }
 }

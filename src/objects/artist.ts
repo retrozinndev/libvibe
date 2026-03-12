@@ -2,14 +2,13 @@ import GObject, { getter, gtype, property, register } from "gnim/gobject";
 import { Vibe } from "..";
 import { Plugin } from "../plugin";
 import { Image } from "../utils";
+import { VibeObject } from "./object";
 
 
 /** store artist informations */
 @register({ GTypeName: "VibeArtist" })
-export class Artist extends GObject.Object {
+export class Artist extends VibeObject {
     declare $signals: Artist.SignalSignatures;
-    /** the unique identifier for this artist in this plugin */
-    readonly id: any;
 
     readonly #name: string = "Unknown Artist";
     readonly #displayName: string|null = null;
@@ -52,9 +51,10 @@ export class Artist extends GObject.Object {
         url?: string;
         description?: string;
     }) {
-        super();
-
-        this.id = properties.id ?? Vibe.getDefault().generateID();
+        super({
+             id: properties.id,
+             plugin: properties.plugin
+        });
 
         if(properties.name !== undefined)
             this.#name = properties.name;

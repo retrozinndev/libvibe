@@ -1,6 +1,7 @@
-import GObject, { getter, gtype, property, register } from "gnim/gobject";
+import GObject, { getter, gtype, property, register, signal } from "gnim/gobject";
 import { Vibe, Section } from "..";
 import { Song, Artist, SongList } from "../objects";
+import { Page } from "../interfaces";
 
 
 /** create plugins and add functions to them */
@@ -19,6 +20,13 @@ export class Plugin extends GObject.Object {
     readonly #url: string|null = null;
 
     #implements: Plugin.Implementations = {};
+
+    @signal()
+    protected loaded() {}
+
+    @signal(gtype<Page<any>>(GObject.Object))
+    protected pageRequest<T extends Page.Type>(page: Page<T>) {}
+
     
     /** the plugin's unique name. e.g.: vibe-plugin-music
     * @readonly */
@@ -36,20 +44,18 @@ export class Plugin extends GObject.Object {
     @property(String) 
     description: string = "A cool Plugin";
 
-    /** the plugin's version in a string format 
+    /** the plugin's version string (e.g.: `"0.9.1"`)
     * @default "unknown" */
     @getter(String)
     get version() { return this.#version; }
 
-    /** the plugin's website, can be null 
+    /** the plugin's website or development page. can be null 
     * @readonly */
     @getter(gtype<string|null>(String))
     get url() { return this.#url; }
 
-    /** an object containing which functions are implemented in 
-      * this plugin
-      * @readonly
-      */
+    /** an object that tells the application which features the plugin
+      * implements. @readonly */
     @getter(gtype<Plugin.Implementations>(Object))
     get implements() { return this.#implements; }
 
@@ -183,8 +189,13 @@ export namespace Plugin {
     export interface SignalSignatures extends GObject.Object.SignalSignatures {
         /** emitted when the plugin has finished loading */
         "loaded": () => void;
-        /** emitted when the plugin has finished importing(first-load/update only) */
-        "imported": () => void;
+        
+        /** emitted when a page is created from an object that originates from this plugin and is 
+          * requesting for content to be added to it(e.g.: sections)
+          *
+          * @param page the page that was created 
+          * @param plugin the plugin that requested this page(based on its content, e.g.: a song) */
+        "page-request": <T extends Page.Type>(page: Page<T>) => void;
         "notify::description": (description: string) => void;
         "notify::status": (status: Plugin.Status) => void;
     }

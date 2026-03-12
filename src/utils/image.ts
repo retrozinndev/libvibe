@@ -3,7 +3,7 @@ import Gio from "gi://Gio?version=2.0";
 import GLib from "gi://GLib?version=2.0";
 import Gly from "gi://Gly?version=2";
 import GObject, { getter, gtype, register } from "gnim/gobject";
-import { Song } from "../objects";
+import { Song, VibeObject } from "../objects";
 import { Vibe } from "..";
 import GlyGtk4 from "gi://GlyGtk4?version=2";
 
@@ -26,10 +26,8 @@ import GlyGtk4 from "gi://GlyGtk4?version=2";
   * manually `ref()` and `unref()` the object, as it uses a 
   * different management system from the other objects */
 @register({ GTypeName: "VibeImage" })
-export class Image<T extends Image.SourceTypes = any> extends GObject.Object {
+export class Image<T extends Image.SourceTypes = any> extends VibeObject {
     declare $signals: Image.SignalSignatures;
-
-    public readonly id: any;
 
     public static readonly cacheDir: Gio.File = Gio.File.new_for_path(
         `${Vibe.cacheDir.peek_path()!}/arts`
@@ -78,8 +76,6 @@ export class Image<T extends Image.SourceTypes = any> extends GObject.Object {
       * (you can also use a song instance for a non-session-persistent cache) */
     constructor(source?: T|GLib.Bytes|string, uniqueData?: string|Song) {
         super();
-
-        this.id = Vibe.getDefault().generateID();
 
         if(uniqueData !== undefined && this.restoreFromCache(uniqueData)) 
             return;

@@ -42,7 +42,12 @@ export const isLabelButton = (obj: object): obj is LabelButton =>
 export const isDetailedButton = (obj: object): obj is DetailedButton => 
     isIconButton(obj) && isLabelButton(obj);
 
-/** Communicate with the music player and do more stuff */
+/** Communicate with the music player and do more stuff, like:
+  * - connect to signals for detecting user actions or player events
+  * - retrieve the currently-playing song via the `media` instance available in the class
+  * - add dialogs or toast notifications for the user to interact with 
+  * - add a new page to the application stack by using an object template or your own widget
+  * - search through existing objects like songs, artists, albums and playlists */
 @register({ GTypeName: "VibeAPI" })
 export class Vibe extends GObject.Object {
     declare $signals: Vibe.SignalSignatures;
@@ -115,13 +120,20 @@ export class Vibe extends GObject.Object {
     get plugins() { return this.#plugins; }
 
     @signal(String, gtype<Vibe.ToastPriority>(String), gtype<LabelButton|undefined>(Object))
-    toastNotified(_: string, __: Vibe.ToastPriority, ___?: LabelButton) {}
+    protected toastNotified(_: string, __: Vibe.ToastPriority, ___?: LabelButton) {}
+
+    // @ts-ignore uhh
+    @signal(gtype<Song|Artist|Album|Playlist|SongList>(GObject.Object), Array)
+    protected menuRequest(_: Song|Artist|Album|Playlist|SongList) { return []; }
+
+    @signal(gtype<Page>(GObject.Object))
+    protected pageRequest(_: Page) {}
 
     @signal()
-    initialized() {}
+    protected initialized() {}
 
     @signal(GObject.Object, GObject.Object)
-    songAdded(plugin: Plugin, song: Song) {
+    protected songAdded(plugin: Plugin, song: Song) {
         this.#songs.push({
             plugin: plugin,
             song: song
@@ -131,7 +143,7 @@ export class Vibe extends GObject.Object {
     }
 
     @signal(GObject.Object, GObject.Object)
-    albumAdded(plugin: Plugin, album: Album) {
+    protected albumAdded(plugin: Plugin, album: Album) {
         this.#albums.push({
             plugin: plugin,
             album: album
@@ -141,7 +153,7 @@ export class Vibe extends GObject.Object {
     }
 
     @signal(GObject.Object, GObject.Object)
-    songlistAdded(plugin: Plugin, list: SongList) {
+    protected songlistAdded(plugin: Plugin, list: SongList) {
         this.#songlists.push({
             plugin: plugin,
             list: list
@@ -151,7 +163,7 @@ export class Vibe extends GObject.Object {
     }
     
     @signal(GObject.Object, GObject.Object)
-    artistAdded(plugin: Plugin, artist: Artist) {
+    protected artistAdded(plugin: Plugin, artist: Artist) {
         this.#artists.push({
             plugin: plugin,
             artist: artist
@@ -161,13 +173,13 @@ export class Vibe extends GObject.Object {
     }
 
     @signal(GObject.Object)
-    pluginAdded(plugin: Plugin) {
+    protected pluginAdded(plugin: Plugin) {
         this.#plugins.push(plugin);
         this.notify("plugins");
     }
 
     @signal(GObject.Object, GObject.Object)
-    playlistAdded(plugin: Plugin, list: Playlist) {
+    protected playlistAdded(plugin: Plugin, list: Playlist) {
         this.#playlists.push({
             plugin: plugin,
             playlist: list
@@ -175,10 +187,10 @@ export class Vibe extends GObject.Object {
     }
 
     @signal(GObject.Object)
-    authStarted(_: Plugin) {}
+    protected authStarted(_: Plugin) {}
 
     @signal(GObject.Object)
-    authEnded(_: Plugin) {}
+    protected authEnded(_: Plugin) {}
 
 
     constructor() {
@@ -339,10 +351,10 @@ namespace Vibe {
     export type DialogConstructor = new (props: Dialog) => Adw.Dialog;
 
     export interface SignalSignatures extends GObject.Object.SignalSignatures {
-        /** the app and api just finished initializing/starting */
+        /** the api just finished starting */
         "initialized": () => void;
         /** a new song object was generated */
-        "song-added": (plugin: Plugin, song: Song) => void;
+        "song-added": <T extends Object>(plugin: Plugin, song: Song<T>) => void;
         /** a new album was generated */
         "album-added": (plugin: Plugin, album: Album) => void;
         /** a new song list was generated. it's also triggered by albums and playlists */
@@ -359,5 +371,8 @@ namespace Vibe {
         "auth-ended": (plugin: Plugin) => void;
         /** a new toast notification got sent */
         "toast-notified": (text: string, priority: Vibe.ToastPriority, button?: LabelButton) => void;
+        /** a menu was requested by the user(e.g.: a secondary click in a song).
+          * @returns an array of buttons to be added to the menu */
+        "menu-request": (object: Song|Album|Artist|Playlist|SongList) => Array<LabelButton>;
     }
 }

@@ -9,7 +9,6 @@ import { Image } from "../utils";
 /** user-managed song list (handled by the app) */
 @register({ GTypeName: "VibePlaylist" })
 export class Playlist extends SongList {
-
     declare $signals: Playlist.SignalSignatures;
 
     constructor(properties: {
