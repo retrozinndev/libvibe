@@ -1,8 +1,9 @@
-import GObject, { getter, gtype } from "gnim/gobject"
+import GObject, { getter, gtype, register } from "gnim/gobject"
 import { Plugin } from "../plugin";
 import { Vibe } from "..";
 
 
+@register({ GTypeName: "VibeObject" })
 export class VibeObject extends GObject.Object {
     #plugin: Plugin|null = null;
     /** the unique identifier of this object.
