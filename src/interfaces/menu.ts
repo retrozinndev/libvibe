@@ -1,3 +1,4 @@
+import GObject from "gnim/gobject";
 import { LabelButton } from "..";
 
 
@@ -19,4 +20,16 @@ export interface Menu {
     /** transform the list of buttons to an array.
       * @returns `Array<LabelButton>` */
     toArray(): Array<LabelButton>;
+}
+
+export namespace Menu {
+    export interface SignalSignatures extends GObject.Object.SignalSignatures {
+        "added": (button: LabelButton, index: number) => void;
+        "removed": (button: LabelButton, index: number) => void;
+        "notify::length": (spec: GObject.ParamSpec<number>) => void;
+    }
+
+    export interface ConstructorProps extends GObject.Object.ConstructorProps {
+        buttons: Array<LabelButton>;
+    }
 }
