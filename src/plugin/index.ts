@@ -1,7 +1,7 @@
 import GObject, { getter, gtype, property, register, signal } from "gnim/gobject";
-import { Vibe, Section, LabelButton } from "..";
+import { Vibe, Section } from "..";
 import { Song, Artist, SongList, Album, Playlist } from "../objects";
-import { Page } from "../interfaces";
+import { Menu, Page } from "../interfaces";
 
 
 
@@ -28,13 +28,8 @@ export class Plugin extends GObject.Object {
     @signal(gtype<Page<any>>(GObject.Object))
     protected pageRequest<T extends Page.Type>(page: Page<T>) {}
 
-    @signal([gtype<Song|Artist|Album|Playlist|SongList>(GObject.Object)], Array<LabelButton>, {
-        accumulator: ((_hint: GObject.SignalInvocationHint, _: any, returnVal: GObject.Value, data?: void) => {
-            console.log("got value!", returnVal);
-
-        }) as never
-    })
-    protected menuRequest(object: Song|Artist|Album|Playlist|SongList) { return []; }
+    @signal(gtype<Song|Artist|Album|Playlist|SongList>(GObject.Object), Object)
+    protected menuRequest(object: Song|Artist|Album|Playlist|SongList, menu: Menu) {}
 
     
     /** the plugin's unique name. e.g.: vibe-plugin-music
@@ -209,8 +204,8 @@ export namespace Plugin {
           * this is emitted only for this plugin. for a plugin-wide signal,
           * refer to the main `Vibe` instance's `::menu-request`
           * @param object the object that is requesting the secondary menu(song, artist...)
-          * @returns an array of buttons to be added to the menu */
-        "menu-request": (object: Song|Album|Artist|Playlist|SongList) => Array<LabelButton>;
+          * @param menu the menu to add buttons to */
+        "menu-request": (object: Song|Album|Artist|Playlist|SongList, menu: Menu) => void;
         "notify::description": (description: string) => void;
         "notify::status": (status: Plugin.Status) => void;
     }

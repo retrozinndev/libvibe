@@ -5,7 +5,7 @@ import { SongList, Song, Artist, Album, Playlist } from "./objects";
 import { Media } from "./interfaces/media";
 import { Plugin } from "./plugin";
 import { Pages } from "./interfaces/pages";
-import { Page, Dialog } from "./interfaces";
+import { Page, Dialog, Menu } from "./interfaces";
 import { createRoot, getScope, jsx } from "gnim";
 import Adw from "gi://Adw?version=1";
 
@@ -122,10 +122,8 @@ export class Vibe extends GObject.Object {
     @signal(String, gtype<Vibe.ToastPriority>(String), gtype<LabelButton|undefined>(Object))
     protected toastNotified(_: string, __: Vibe.ToastPriority, ___?: LabelButton) {}
 
-    @signal([gtype<Song|Artist|Album|Playlist|SongList>(GObject.Object)], Array<LabelButton>, {
-        
-    })
-    protected menuRequest(_: Song|Artist|Album|Playlist|SongList) { return []; }
+    @signal(gtype<Song|Artist|Album|Playlist|SongList>(GObject.Object), Object)
+    protected menuRequest(_: Song|Artist|Album|Playlist|SongList, __: Menu) {}
 
     @signal(gtype<Page>(GObject.Object))
     protected pageRequest(_: Page) {}
@@ -378,7 +376,7 @@ namespace Vibe {
           * for a plugin-specific signal, refer to using `Plugin`'s `::menu-request`
           *
           * @param object the object that is requesting the secondary menu(song, artist...)
-          * @returns an array of buttons to be added to the menu */
-        "menu-request": (object: Song|Album|Artist|Playlist|SongList) => Array<LabelButton>;
+          * @param menu the menu to add buttons to */
+        "menu-request": (object: Song|Album|Artist|Playlist|SongList, menu: Menu) => void;
     }
 }
