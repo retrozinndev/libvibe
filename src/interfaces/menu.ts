@@ -6,12 +6,16 @@ export interface Menu {
     get length(): number;
 
     /** append a new button to the end of the menu
+      * 
+      * @param button to be added to the menu
       * @returns the id of the button */
-    append(): number;
+    append(button: LabelButton): number;
 
     /** prepends a new button to the start of the menu
+      * 
+      * @param button to be added to the menu
       * @returns the id of the button */
-    prepend(): number;
+    prepend(button: LabelButton): number;
 
     /** remove a specific button by its `id` from the menu
       * @returns `true` if the button was removed successfully, false if else */
