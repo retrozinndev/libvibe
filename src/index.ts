@@ -122,8 +122,9 @@ export class Vibe extends GObject.Object {
     @signal(String, gtype<Vibe.ToastPriority>(String), gtype<LabelButton|undefined>(Object))
     protected toastNotified(_: string, __: Vibe.ToastPriority, ___?: LabelButton) {}
 
-    // @ts-ignore uhh
-    @signal(gtype<Song|Artist|Album|Playlist|SongList>(GObject.Object), Array)
+    @signal([gtype<Song|Artist|Album|Playlist|SongList>(GObject.Object)], Array<LabelButton>, {
+        
+    })
     protected menuRequest(_: Song|Artist|Album|Playlist|SongList) { return []; }
 
     @signal(gtype<Page>(GObject.Object))
@@ -372,6 +373,11 @@ namespace Vibe {
         /** a new toast notification got sent */
         "toast-notified": (text: string, priority: Vibe.ToastPriority, button?: LabelButton) => void;
         /** a menu was requested by the user(e.g.: a secondary click in a song).
+          * this is a plugin-wide signal. it's emitted by all of the plugins;
+          * you can detect which plugin emitted the signal by accessing the `plugin` field of the `object`
+          * for a plugin-specific signal, refer to using `Plugin`'s `::menu-request`
+          *
+          * @param object the object that is requesting the secondary menu(song, artist...)
           * @returns an array of buttons to be added to the menu */
         "menu-request": (object: Song|Album|Artist|Playlist|SongList) => Array<LabelButton>;
     }

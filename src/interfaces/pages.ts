@@ -20,7 +20,7 @@ export interface Pages extends Gtk.Stack {
 
     // methods
     /** add a new page to the stack */
-    add(page: Page): void;
+    add<T extends Page.Type>(page: Page<T>): void;
 
     /** go back to the previous stack page */
     back(): void;
@@ -44,9 +44,9 @@ export interface Pages extends Gtk.Stack {
 export namespace Pages {
     export interface SignalSignatures extends Gtk.Stack.SignalSignatures {
         /** a new page was added to the app's page stack */
-        "added": (page: Page) => void;
+        "added": <T extends Page.Type>(page: Page<T>) => void;
         /** a page got removed (back button or internal) */
-        "removed": (removedPage: Page) => void;
+        "removed": <T extends Page.Type>(removedPage: Page<T>) => void;
         "notify::current-page": () => void;
         "notify::history": () => void;
     }
