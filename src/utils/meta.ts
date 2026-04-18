@@ -16,11 +16,11 @@ export abstract class Meta {
 
     /** get metadata tags(GstTags) from a media file 
       * @param file the GFile/path of the media where to get the data from
-      * @param separator optional metadata separator. by default it's a comma: ','
+      * @param separator optional metadata separator. (default: /[,&/]/g)
       * @param timeout optionally specify a timeout for GstPbutilsDiscoverer to work with(nanoseconds)
       *
       * @returns a {@link Meta.Data} object, containing the meta tags from the file(can be empty if there's none) */
-    public static getMetaTags(file: string|Gio.File, separator: string = ',', timeout: number = Gst.SECOND * 2.5, options: {
+    public static getMetaTags(file: string|Gio.File, separator: string|RegExp = /[,&/]/g, timeout: number = Gst.SECOND * 2.5, options: {
         enableLogs?: boolean;
     } = {}): Meta.Data {
         file = typeof file === "string" ?
@@ -60,7 +60,7 @@ export abstract class Meta {
         });
     }
 
-    public static async getMetaTagsAsync(file: string|Gio.File, separator: string = ',', timeout: number = Gst.SECOND * 2.5, options: {
+    public static async getMetaTagsAsync(file: string|Gio.File, separator: string|RegExp = /[,&/]/g, timeout: number = Gst.SECOND * 2.5, options: {
         enableLogs?: boolean;
     } = {}): Promise<Meta.Data> {
         file = typeof file === "string" ?
@@ -446,10 +446,10 @@ export abstract class Meta {
     /** convert a `GstTagList` to a `Meta.Data` object. 
       * 
       * @param taglist the `GstTagList` you want to convert
-      * @param separator an optional metadata separator. the default is a comma: ',' 
+      * @param separator an optional metadata separator. (default: /[,&/]/g)
       *
       * @returns a `Meta.Data` object with the result of the convertion */
-    public static taglistToData(taglist: Array<Gst.TagList>, separator: string = ',', options: {
+    public static taglistToData(taglist: Array<Gst.TagList>, separator: string|RegExp = /[,&/]/g, options: {
         enableLogs?: boolean;
     } = {}): Meta.Data {
         const data: Meta.Data = {};
