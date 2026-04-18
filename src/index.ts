@@ -8,6 +8,7 @@ import { Pages } from "./interfaces/pages";
 import { Page, Dialog, Menu } from "./interfaces";
 import { createRoot, getScope, jsx } from "gnim";
 import Adw from "gi://Adw?version=1";
+import Gtk from "gi://Gtk?version=4.0";
 
 
 export type IconButton = {
@@ -346,7 +347,7 @@ Please create one providing all the necessary properties");
 
 namespace Vibe {
     export type ToastPriority = "high"|"normal";   
-    export type PageConstructor = new <T extends Page.Type>(props: Page.ConstructorProps<T>) => Page<T>;
+    export type PageConstructor = new <T extends Page.Type = Gtk.Widget>(props: Page.ConstructorProps<T>) => Page<T>;
     export type DialogConstructor = new (props: Dialog) => Adw.Dialog;
 
     export interface SignalSignatures extends GObject.Object.SignalSignatures {
