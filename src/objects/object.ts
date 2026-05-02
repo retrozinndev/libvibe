@@ -5,6 +5,7 @@ import { Vibe } from "..";
 
 @register({ GTypeName: "VibeObject" })
 export class VibeObject extends GObject.Object {
+    declare $signals: VibeObject.SignalSignatures;
     #plugin: Plugin|null = null;
     /** the unique identifier of this object.
       * this is usually defined internally at construction-time. 
@@ -21,8 +22,12 @@ export class VibeObject extends GObject.Object {
 
         this.id = props?.id ?? Vibe.getDefault().generateID();
 
-        if(props?.plugin !== undefined)
-            this.#plugin = props.plugin;
+        if(props?.plugin !== undefined) {
+            Vibe.getDefault().emit("object-added", 
+                (this.#plugin = props.plugin),
+                this
+            );
+        }
     }
 }
 
@@ -30,5 +35,8 @@ export namespace VibeObject {
     export interface ConstructorProps extends GObject.Object.ConstructorProps {
         plugin: Plugin;
         id: any;
+    }
+    export interface SignalSignatures extends GObject.Object.SignalSignatures {
+        "notify::plugin": () => void;
     }
 }

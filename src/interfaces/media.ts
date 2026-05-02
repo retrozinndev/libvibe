@@ -5,6 +5,8 @@ import { Song, SongList } from "../objects";
 /** interface implemented by the vibe app to control media from each plugin. 
   * don't forget to implement the object's signals! */
 export interface Media extends GObject.Object {
+    $signals: Media.SignalSignatures;
+
     /** currently-playing song */
     get song(): Song|null;
     /** current queue */
@@ -41,17 +43,6 @@ export interface Media extends GObject.Object {
     next(): void;
     /** go back to previous item in queue(if any) */
     previous(): void;
-
-    // for type specification only
-    connect<S extends keyof Media.SignalSignatures>(
-        signal: S,
-        callback: (self: Media, ...params: Parameters<Media.SignalSignatures[S]>) => ReturnType<Media.SignalSignatures[S]>
-    ): number;
-
-    emit<S extends keyof Media.SignalSignatures>(
-        signal: S,
-        ...args: Parameters<Media.SignalSignatures[S]>
-    ): void;
 }
 
 export namespace Media {
@@ -96,6 +87,7 @@ export namespace Media {
         "gone-previous": (song: Song, queuePosition: number) => void;
         /** emitted when a song gets played(doesn't get emitted on ::next, ::previous nor ::resume) */
         "playing": (song: Song) => void;
+
         "notify::song": () => void;
         "notify::queue": () => void;
         "notify::status": () => void;

@@ -11,6 +11,7 @@ export interface Page<
     $signals: Page.SignalSignatures;
 
     readonly id: any;
+
     /** page title. @default "New page"(if no content is defined; else it's based on the content) */
     title: string;
     sections: Array<Section>;
@@ -18,20 +19,6 @@ export interface Page<
     buttons: Array<IconButton|LabelButton|DetailedButton>;
 
     get_content_widget(): Gtk.Box;
-
-    // types
-    connect<
-        S extends keyof Page.SignalSignatures,
-        C extends Page.SignalSignatures[S]
-    >(
-        signal: S,
-        callback: (self: Page<T>, ...params: Parameters<C>) => ReturnType<C>
-    ): number;
-
-    emit<S extends keyof Page.SignalSignatures>(
-        signal: S,
-        ...args: Parameters<Page.SignalSignatures[S]>
-    ): void;
 }
 
 export namespace Page {

@@ -6,7 +6,12 @@ import { Image } from "../utils";
 import { VibeObject } from "./object";
 
 
-/** base class for song lists(albums and playlists) */
+/** base class for song lists(albums and playlists).
+  * 
+  * to make `:title`, `:description` or `:songs` read-write, 
+  * just implement setters(e.g.: `set_title()` or `set title()`, 
+  * gnim will automatically use them to update the property 
+  * value. */
 @register({ GTypeName: "VibeSongList" })
 export class SongList extends VibeObject {
     declare $signals: SongList.SignalSignatures;
@@ -226,38 +231,10 @@ export class SongList extends VibeObject {
     toArray(): Array<Song> {
         return [...this._songs];
     }
-
-    connect<
-        S extends keyof SongList.SignalSignatures,
-        C extends SongList.SignalSignatures[S]
-    >(
-        signal: S, 
-        callback: (self: typeof this, ...params: Parameters<C>) => ReturnType<C>
-    ): number {
-        return super.connect(signal, callback);
-    }
-
-    emit<S extends keyof SongList.SignalSignatures>(
-        signal: S, 
-        ...args: Parameters<SongList.SignalSignatures[S]>
-    ): void {
-        super.emit(signal, ...args);
-    }
-
-    notify(prop: keyof typeof this): void;
-    notify(prop: string): void;
-
-    notify(prop: (keyof typeof this)|string): void {
-        super.notify(prop as string);
-    }
-
-    // to make _title, _description or _songs read-write, just implement
-    // methods like set_title, set_description or set_songs, gnim will
-    // automatically use them to update a property value
 }
 
 export namespace SongList {
-    export interface SignalSignatures extends GObject.Object.SignalSignatures {
+    export interface SignalSignatures extends VibeObject.SignalSignatures {
         "added": (song: Song) => void;
         "removed": (song: Song) => void;
         "reordered": (song: Song, replacedSong: Song|null) => void;

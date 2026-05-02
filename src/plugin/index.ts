@@ -139,23 +139,6 @@ export class Plugin extends GObject.Object {
         return null;
     }
 
-    public emit<Signal extends keyof typeof this.$signals>(
-        signal: Signal, 
-        ...args: Parameters<(typeof this.$signals)[Signal]>
-    ): void {
-        super.emit(signal, ...args);
-    }
-
-    public connect<
-        S extends keyof typeof this.$signals,
-        C extends (typeof this.$signals)[S]
-    >(
-        signal: S, 
-        callback: (self: typeof this, ...args: Parameters<C>) => ReturnType<C>
-    ): number {
-        return super.connect(signal, callback);
-    }
-
     /** check if a feature is implemented for this plugin.
       * @returns true if feature is implemented by the plugin
       */
@@ -206,7 +189,7 @@ export namespace Plugin {
           * @param object the object that is requesting the secondary menu(song, artist...)
           * @param menu the menu to add buttons to */
         "menu-request": (object: Song|Album|Artist|Playlist|SongList, menu: Menu) => void;
-        "notify::description": (description: string) => void;
-        "notify::status": (status: Plugin.Status) => void;
+        "notify::description": () => void;
+        "notify::status": () => void;
     }
 }

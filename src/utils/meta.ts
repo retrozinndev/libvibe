@@ -1,3 +1,5 @@
+import GObject from "gnim/gobject";
+import GLib from "gi://GLib?version=2.0";
 import Gio from "gi://Gio?version=2.0";
 import Gst from "gi://Gst?version=1.0";
 import GstPbutils from "gi://GstPbutils?version=1.0";
@@ -6,8 +8,6 @@ import { Plugin } from "../plugin";
 import { Artist } from "../objects/artist";
 import { Vibe } from "..";
 import { Album } from "../objects/album";
-import GLib from "gi://GLib?version=2.0";
-import GObject from "gnim/gobject";
 import { Image } from "./image";
 
 
@@ -20,9 +20,14 @@ export abstract class Meta {
       * @param timeout optionally specify a timeout for GstPbutilsDiscoverer to work with(nanoseconds)
       *
       * @returns a {@link Meta.Data} object, containing the meta tags from the file(can be empty if there's none) */
-    public static getMetaTags(file: string|Gio.File, separator: string|RegExp = /[,&/]/g, timeout: number = Gst.SECOND * 2.5, options: {
-        enableLogs?: boolean;
-    } = {}): Meta.Data {
+    public static getMetaTags(
+        file: string|Gio.File,
+        separator: string|RegExp = /[,&/]/g,
+        timeout: bigint = (Gst.SECOND as bigint) * BigInt(2.5),
+        options: {
+            enableLogs?: boolean;
+        } = {}
+    ): Meta.Data {
         file = typeof file === "string" ?
             Gio.File.new_for_path(file)
         : file;
@@ -60,9 +65,14 @@ export abstract class Meta {
         });
     }
 
-    public static async getMetaTagsAsync(file: string|Gio.File, separator: string|RegExp = /[,&/]/g, timeout: number = Gst.SECOND * 2.5, options: {
-        enableLogs?: boolean;
-    } = {}): Promise<Meta.Data> {
+    public static async getMetaTagsAsync(
+        file: string|Gio.File,
+        separator: string|RegExp = /[,&/]/g,
+        timeout: bigint = (Gst.SECOND as bigint) * BigInt(2.5),
+        options: {
+            enableLogs?: boolean;
+        } = {}
+    ): Promise<Meta.Data> {
         file = typeof file === "string" ?
             Gio.File.new_for_path(file)
         : file;
@@ -124,7 +134,11 @@ export abstract class Meta {
       * @param printErrors whether you want to log any errors that occur
       *
       * @returns a GstPbutilsDiscovererInfo of `file`, containing info and tags for the file */
-    public static discover(file: Gio.File, timeout: number = Gst.SECOND * 2.5, printErrors: boolean = true): GstPbutils.DiscovererInfo {
+    public static discover(
+        file: Gio.File,
+        timeout: bigint = (Gst.SECOND as bigint) * BigInt(25),
+        printErrors: boolean = true
+    ): GstPbutils.DiscovererInfo {
         const discoverer = GstPbutils.Discoverer.new(timeout);
         const id = discoverer.connect("discovered", (_, __, err) => {
             if(!printErrors || !err)
@@ -154,7 +168,7 @@ export abstract class Meta {
       * @returns a GstPbutilsDiscovererInfo of `file`, containing info and tags for the file */
     public static async discoverAsync(
         file: Gio.File,
-        timeout: number = Gst.SECOND * 2.5,
+        timeout: bigint = (Gst.SECOND as bigint) * BigInt(2.5),
         printErrors: boolean = true
     ): Promise<GstPbutils.DiscovererInfo> {
 
@@ -202,7 +216,7 @@ export abstract class Meta {
       * @returns an `Array`, containing references to the respective `GFile` and its `DiscovererInfo`. `[GFile, GstPbutilsDiscovererInfo]`*/
     public static async discoverManyAsync(
         files: Array<Gio.File>,
-        timeout: number = Gst.SECOND * 2.5,
+        timeout: bigint = (Gst.SECOND as bigint) * BigInt(2.5),
         printErrors: boolean = true
     ): Promise<Array<[Gio.File, GstPbutils.DiscovererInfo]>> {
 
@@ -390,12 +404,9 @@ export abstract class Meta {
       *
       * @returns the matching `Artist` object if found, or else, `undefined` */
     public static findMatchingArtist(name: string, plugin: Plugin): Artist|undefined {
-        const targetPluginId = plugin.id;
-        const match = Vibe.getDefault().artists.find(({ artist, plugin }) =>
-            plugin.id === targetPluginId && artist.name === name
+        return Vibe.getDefault().findObject(plugin, "artist", (artist) =>
+            artist.name === name
         );
-
-        return match?.artist;
     }
 
     /** tries to find a matching `Album` object with the provided name and artist(s)
@@ -405,26 +416,10 @@ export abstract class Meta {
       *
       * @returns the matching `Album` object if found, or else, `undefined` */
     public static findMatchingAlbum(title: string, artists: Array<Artist>, plugin: Plugin): Album|undefined {
-        const targetPluginId = plugin.id;
-        const artistIds = artists.map(art => art.id);
-        const match = Vibe.getDefault().albums.find(({ album, plugin }) => {
-            if(plugin.id !== targetPluginId)
-                return false;
-
-            if(title !== album.title)
-                return false;
-
-            let artistsMatch: boolean = artists.length < 1 && album.artist.length < 1;
-            let matchCount: number = 0;
-            for(const artist of album.artist) {
-                if(artistIds.find(id => id === artist.id))
-                    matchCount++;
-            }
-
-            return matchCount === artistIds.length || artistsMatch;
-        });
-
-        return match?.album;
+        return Vibe.getDefault().findObject(plugin, "album", (album) =>
+            album.title === title &&
+                album.artist.every((a, i) => a.id === artists[i]?.id)
+        );
     }
 
     private static getTagString(taglist: Gst.TagList, tag: string): string|undefined {

@@ -78,7 +78,7 @@ export class Artist extends VibeObject {
 }
 
 export namespace Artist {
-    export interface SignalSignatures extends GObject.Object.SignalSignatures {
+    export interface SignalSignatures extends VibeObject.SignalSignatures {
         "notify::name": () => void;
         "notify::display-name": () => void;
         "notify::image": () => void;

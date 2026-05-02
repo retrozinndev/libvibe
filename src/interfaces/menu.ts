@@ -30,7 +30,7 @@ export namespace Menu {
     export interface SignalSignatures extends GObject.Object.SignalSignatures {
         "added": (button: LabelButton, index: number) => void;
         "removed": (button: LabelButton, index: number) => void;
-        "notify::length": (spec: GObject.ParamSpec<number>) => void;
+        "notify::length": () => void;
     }
 
     export interface ConstructorProps extends GObject.Object.ConstructorProps {

@@ -1,7 +1,7 @@
 import GObject, { getter, gtype, register, signal } from "gnim/gobject";
 import Gio from "gi://Gio?version=2.0";
 import GLib from "gi://GLib?version=2.0";
-import { SongList, Song, Artist, Album, Playlist } from "./objects";
+import { SongList, Song, Artist, Album, Playlist, VibeObject } from "./objects";
 import { Media } from "./interfaces/media";
 import { Plugin } from "./plugin";
 import { Pages } from "./interfaces/pages";
@@ -63,29 +63,9 @@ export class Vibe extends GObject.Object {
     #media!: Media;
     #toastOverlay!: Adw.ToastOverlay;
     #lastId: number = -1;
-    #connections: Map<GObject.Object, Array<number>|number> = new Map();
 
     #plugins: Array<Plugin> = [];
-    #songs: Array<{
-        plugin: Plugin, 
-        song: Song
-    }> = [];
-    #playlists: Array<{
-        plugin: Plugin, 
-        playlist: Playlist
-    }> = [];
-    #albums: Array<{
-        plugin: Plugin,
-        album: Album
-    }> = [];
-    #songlists: Array<{
-        plugin: Plugin,
-        list: SongList
-    }> = [];
-    #artists: Array<{
-        plugin: Plugin,
-        artist: Artist
-    }> = [];
+    #objects: Array<Vibe.PluginData> = [];
     
     public static readonly runtimeDir = Gio.File.new_for_path(`${GLib.get_user_runtime_dir()}/vibe`);
     public static readonly cacheDir = Gio.File.new_for_path(`${GLib.get_user_cache_dir()}/vibe`);
@@ -103,19 +83,7 @@ export class Vibe extends GObject.Object {
     get media() { return this.#media; }
 
     @getter(Array)
-    get songs() { return this.#songs; }
-
-    @getter(Array)
-    get playlists() { return this.#playlists; }
-
-    @getter(Array)
-    get albums() { return this.#albums; }
-
-    @getter(Array)
-    get songlists() { return this.#songlists; }
-
-    @getter(Array)
-    get artists() { return this.#artists; }
+    get objects() { return this.#objects; }
 
     @getter(Array)
     get plugins() { return this.#plugins; }
@@ -134,56 +102,54 @@ export class Vibe extends GObject.Object {
 
     @signal(GObject.Object, GObject.Object)
     protected songAdded(plugin: Plugin, song: Song) {
-        this.#songs.push({
-            plugin: plugin,
-            song: song
-        });
-
-        this.notify("songs");
+        this.addObject(plugin, song);
     }
 
     @signal(GObject.Object, GObject.Object)
     protected albumAdded(plugin: Plugin, album: Album) {
-        this.#albums.push({
-            plugin: plugin,
-            album: album
-        });
-
-        this.notify("albums");
+        this.addObject(plugin, album);
     }
 
     @signal(GObject.Object, GObject.Object)
     protected songlistAdded(plugin: Plugin, list: SongList) {
-        this.#songlists.push({
-            plugin: plugin,
-            list: list
-        });
-
-        this.notify("songlists");
+        this.addObject(plugin, list);
     }
     
     @signal(GObject.Object, GObject.Object)
     protected artistAdded(plugin: Plugin, artist: Artist) {
-        this.#artists.push({
-            plugin: plugin,
-            artist: artist
-        });
-
-        this.notify("artists");
-    }
-
-    @signal(GObject.Object)
-    protected pluginAdded(plugin: Plugin) {
-        this.#plugins.push(plugin);
-        this.notify("plugins");
+        this.addObject(plugin, artist);
     }
 
     @signal(GObject.Object, GObject.Object)
     protected playlistAdded(plugin: Plugin, list: Playlist) {
-        this.#playlists.push({
-            plugin: plugin,
-            playlist: list
-        });
+        this.addObject(plugin, list);
+    }
+
+    @signal(GObject.Object, GObject.Object)
+    protected objectAdded(plugin: Plugin, object: VibeObject) {
+        let data = this.#objects.find(d => d.plugin === plugin);
+        if(!data) {
+            this.#objects.push({
+                plugin,
+                object: [object],
+                album: [],
+                artist: [],
+                playlist: [],
+                songlist: [],
+                song: []
+            });
+            this.notify("objects");
+            return;
+        }
+
+        data.object.push(object);
+        this.notify("objects");
+    }
+    
+    @signal(GObject.Object)
+    protected pluginAdded(plugin: Plugin) {
+        this.#plugins.push(plugin);
+        this.notify("plugins");
     }
 
     @signal(GObject.Object)
@@ -256,7 +222,7 @@ Please create one providing all the necessary properties");
             });
             const clickConn: number = toast.connect("button-clicked", () => {
                 toast.disconnect(clickConn);
-                action.activate();
+                action.activate(null);
             });
 
             toast.set_button_label(button.label);
@@ -314,34 +280,73 @@ Please create one providing all the necessary properties");
         this.#window = window;
     }
 
-    vfunc_dispose(): void {
-        this.#connections.forEach((ids, gobj) => Array.isArray(ids) ?
-            ids.forEach(id => gobj.disconnect(id))
-        : gobj.disconnect(ids));
+    /** track `object` to `plugin`. helps avoiding the creation of duplicated objects */
+    protected addObject(plugin: Plugin, object: VibeObject): void {
+        let data: Vibe.PluginData = this.#objects.find(data => data.plugin.id === plugin.id)!;
+        
+        if(data === undefined)
+            this.#objects.push(data = {
+                plugin,
+                song: [],
+                artist: [],
+                songlist: [],
+                playlist: [],
+                album: [],
+                object: []
+            });
+
+        if(object instanceof Song)
+            data.song.push(object);
+        else if(object instanceof Artist)
+            data.artist.push(object);
+        else if(object instanceof Playlist)
+            data.playlist.push(object);
+        else if(object instanceof Album)
+            data.album.push(object);
+        else if(object instanceof SongList)
+            data.songlist.push(object);
+        else
+            data.object.push(object);
+
+        this.notify("objects");
     }
 
-    connect<
-        S extends keyof typeof this.$signals,
-        C extends (typeof this.$signals)[S]
+    /** search for an object by `plugin` that matches `predicate` result
+      * @param plugin the original plugin that manages/created the object
+      * @param type the specific object type to search for
+      * @param predicate the condition checker to return the correct object */
+    public findObject<
+        K extends keyof Vibe.Objects = "object",
+        T extends Vibe.Objects[K] = Vibe.Objects[K]
     >(
-        signal: S,
-        callback: (self: typeof this, ...args: Parameters<C>) => ReturnType<C>
-    ): number {
-        return super.connect(signal, callback);
-    }
+        plugin: Plugin,
+        type: K,
+        predicate: (obj: T) => boolean|T
+    ): T|undefined {
+        let constructor: typeof VibeObject = VibeObject;
+        switch(type) {
+            case "album":
+                constructor = Album;
+            break;
+            case "song":
+                constructor = Song;
+            break;
+            case "artist":
+                constructor = Artist;
+            break;
+            case "playlist":
+                constructor = Playlist;
+            break;
+            case "songlist":
+                constructor = SongList;
+            break;
+        }
 
-    emit<Signal extends keyof typeof this.$signals>(
-        signal: Signal,
-        ...args: Parameters<(typeof this.$signals)[Signal]>
-    ): void {
-        super.emit(signal, ...args);
-    }
+        const list = this.#objects.find(d => d.plugin.id === plugin.id)?.[type] as Array<T>;
+        if(!list || list.length < 1)
+            return undefined;
 
-    notify(prop: string): void;
-    notify(prop: keyof typeof this): void;
-
-    notify(prop: (keyof typeof this)|string): void {
-        super.notify(prop as string);
+        return list.find((obj) => predicate(obj));
     }
 }
 
@@ -349,6 +354,21 @@ namespace Vibe {
     export type ToastPriority = "high"|"normal";   
     export type PageConstructor = new <T extends Page.Type = Gtk.Widget>(props: Page.ConstructorProps<T>) => Page<T>;
     export type DialogConstructor = new (props: Dialog) => Adw.Dialog;
+    export type PluginData = {
+        plugin: Plugin,
+        song: Array<Song>;
+        playlist: Array<Playlist>;
+        album: Array<Album>;
+        songlist: Array<SongList>;
+        artist: Array<Artist>;
+        object: Array<VibeObject>;
+    };
+    type ExtractObjectTypeFromName<
+        K extends keyof PluginData
+    > = PluginData[K] extends Array<infer T> ? T : VibeObject;
+    export type Objects = {
+        [K in Exclude<keyof PluginData, "plugin">]: ExtractObjectTypeFromName<K>
+    };
 
     export interface SignalSignatures extends GObject.Object.SignalSignatures {
         /** the api just finished starting */
@@ -361,10 +381,12 @@ namespace Vibe {
         "songlist-added": (plugin: Plugin, list: SongList) => void;
         /** new artist object instance was generated */
         "artist-added": (plugin: Plugin, artist: Artist) => void;
-        /** a new plugin got installed by the user */
-        "plugin-added": (plugin: Plugin) => void;
         /** a playlist was created */
         "playlist-added": (plugin: Plugin, playlist: Playlist) => void;
+        /** a `VibeObject` was created */
+        "object-added": (plugin: Plugin, object: VibeObject) => void;
+        /** a new plugin got installed by the user */
+        "plugin-added": (plugin: Plugin) => void;
         /** authentication for a plugin has started */
         "auth-started": (plugin: Plugin) => void;
         /** authentication for a plugin has ended */

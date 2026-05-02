@@ -31,13 +31,6 @@ export class Queue extends SongList {
         this._songs = [];
         this.emit("cleared");
     }
-
-    emit<S extends keyof Queue.SignalSignatures>(
-        signal: S, 
-        ...args: Parameters<Queue.SignalSignatures[S]>
-    ): void {
-        super.emit(signal as never, ...args as never);
-    }
 }
 
 export namespace Queue {

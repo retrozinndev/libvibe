@@ -2,7 +2,7 @@ import Gdk from "gi://Gdk?version=4.0";
 import Gio from "gi://Gio?version=2.0";
 import GLib from "gi://GLib?version=2.0";
 import Gly from "gi://Gly?version=2";
-import GObject, { getter, gtype, register } from "gnim/gobject";
+import { getter, gtype, register } from "gnim/gobject";
 import { Song, VibeObject } from "../objects";
 import { Vibe } from "..";
 import GlyGtk4 from "gi://GlyGtk4?version=2";
@@ -193,7 +193,7 @@ export class Image<T extends Image.SourceTypes = any> extends VibeObject {
 
 export namespace Image {
     export type SourceTypes = Gio.File|Uint8Array;
-    export interface SignalSignatures extends GObject.Object.SignalSignatures {
+    export interface SignalSignatures extends VibeObject.SignalSignatures {
         "unloaded": () => void;
         "loaded": () => void;
     }

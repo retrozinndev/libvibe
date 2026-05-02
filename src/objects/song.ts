@@ -147,7 +147,7 @@ export class Song<T extends Object = Gio.File|Gst.Stream> extends VibeObject {
 }
 
 export namespace Song {
-    export interface SignalSignatures extends GObject.Object.SignalSignatures {
+    export interface SignalSignatures extends VibeObject.SignalSignatures {
         /** emitted when the previous song is about to finish, so the next one can be prepared for a faster load time */
         "prepare": () => void;
         "notify::source": () => void;

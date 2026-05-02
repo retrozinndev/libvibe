@@ -3,7 +3,6 @@ import { Page } from "./page";
 
 
 export interface Pages extends Gtk.Stack {
-    // types
     $signals: Pages.SignalSignatures;
 
     
@@ -24,21 +23,6 @@ export interface Pages extends Gtk.Stack {
 
     /** go back to the previous stack page */
     back(): void;
-
-
-    // re-declarations to ensure type safety
-    connect<
-        S extends keyof Pages.SignalSignatures,
-        C extends Pages.SignalSignatures[S]
-    >(
-        signal: S,
-        callback: (self: Pages, ...params: Parameters<C>) => ReturnType<C>
-    ): number;
-
-    emit<S extends keyof Pages.SignalSignatures>(
-        signal: S,
-        ...params: Parameters<Pages.SignalSignatures[S]>
-    ): void;
 }
 
 export namespace Pages {
