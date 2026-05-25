@@ -23,7 +23,7 @@ export abstract class Meta {
     public static getMetaTags(
         file: string|Gio.File,
         separator: string|RegExp = /[,&/]/g,
-        timeout: bigint = Gst.SECOND as bigint * 3n,
+        timeout: number = 2.5 * (Gst.SECOND as number),
         options: {
             enableLogs?: boolean;
         } = {}
@@ -68,7 +68,7 @@ export abstract class Meta {
     public static async getMetaTagsAsync(
         file: string|Gio.File,
         separator: string|RegExp = /[,&/]/g,
-        timeout: bigint = Gst.SECOND as bigint * 3n,
+        timeout: number = 2.5 * (Gst.SECOND as number),
         options: {
             enableLogs?: boolean;
         } = {}
@@ -136,7 +136,7 @@ export abstract class Meta {
       * @returns a GstPbutilsDiscovererInfo of `file`, containing info and tags for the file */
     public static discover(
         file: Gio.File,
-        timeout: bigint = Gst.SECOND as bigint * 3n,
+        timeout: number = 2.5 * (Gst.SECOND as number),
         printErrors: boolean = true
     ): GstPbutils.DiscovererInfo {
         const discoverer = GstPbutils.Discoverer.new(timeout);
@@ -168,7 +168,7 @@ export abstract class Meta {
       * @returns a GstPbutilsDiscovererInfo of `file`, containing info and tags for the file */
     public static async discoverAsync(
         file: Gio.File,
-        timeout: bigint = Gst.SECOND as bigint * 3n,
+        timeout: number = 2.5 * (Gst.SECOND as number),
         printErrors: boolean = true
     ): Promise<GstPbutils.DiscovererInfo> {
 
@@ -216,7 +216,7 @@ export abstract class Meta {
       * @returns an `Array`, containing references to the respective `GFile` and its `DiscovererInfo`. `[GFile, GstPbutilsDiscovererInfo]`*/
     public static async discoverManyAsync(
         files: Array<Gio.File>,
-        timeout: bigint = Gst.SECOND as bigint * 3n,
+        timeout: number = 2.5 * (Gst.SECOND as number),
         printErrors: boolean = true
     ): Promise<Array<[Gio.File, GstPbutils.DiscovererInfo]>> {
 
