@@ -14,7 +14,7 @@ export class Song<T extends Object = Gio.File|Gst.Stream> extends VibeObject {
     declare $signals: Song.SignalSignatures;
 
     @signal()
-    prepare() {}
+    protected prepare() {}
 
     /** the song title. can be null */
     @property(gtype<string|null>(String)) 

@@ -42,19 +42,19 @@ export class SongList extends VibeObject {
     image: Image|null = null;
 
     @signal(GObject.Object)
-    added(_: Song) {
+    protected added(_: Song) {
         this.#length = this._songs.length;
         this.notify("length");
     }
 
     @signal(GObject.Object)
-    removed(_: Song) {
+    protected removed(_: Song) {
         this.#length = this._songs.length;
         this.notify("length");
     }
 
     @signal(GObject.Object, gtype<Song|null>(GObject.Object))
-    reordered(_: Song, __: Song|null) {}
+    protected reordered(_: Song, __: Song|null) {}
 
 
     constructor(properties?: {

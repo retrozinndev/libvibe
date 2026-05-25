@@ -274,7 +274,7 @@ export abstract class Meta {
       * @param data the `Meta.Data` object containing the metadata
       * @param plugin optional `Plugin` object that is calling this method
       * @param options optional modifiers that enables specific method features */
-    public static applyTags(song: Song, data: Meta.Data, plugin?: Plugin, options: {
+    public static applyTags(song: Song, data: Meta.Data, plugin: Plugin, options: {
         /** whether to apply any image/picture to the song using the metadata.
           * @default true */
         applyImage?: boolean;
@@ -317,13 +317,12 @@ export abstract class Meta {
         // here, `plugin` is used to find existing objects created by the plugin itself.
         if(data.artists !== undefined && data.artists.length > 0) {
             for(const name of data.artists) {
-                if(plugin) {
-                    const match = this.findMatchingArtist(name, plugin);
+                const match = this.findMatchingArtist(name, plugin);
 
-                    if(match) {
-                        song.artist.push(match);
-                        continue;
-                    }
+                if(match) {
+                    song.artist.push(match);
+                    song.notify("artist");
+                    continue;
                 }
 
                 song.artist.push(new Artist({
@@ -336,29 +335,22 @@ export abstract class Meta {
 
         // also has a smart fill: searches for an existing album with matching artists to fill!
         if(data.albumName !== undefined) {
-            if(plugin) {
-                const albumArtists = data.albumArtists && data.albumArtists.length > 0 ?
-                    data.albumArtists.map(name => this.findMatchingArtist(name, plugin) ?? 
-                        new Artist({ name, plugin }))
-                : song.artist;
-                const match = this.findMatchingAlbum(data.albumName, albumArtists, plugin);
+            const albumArtists = data.albumArtists && data.albumArtists.length > 0 ?
+                data.albumArtists.map(name => this.findMatchingArtist(name, plugin) ?? 
+                    new Artist({ name, plugin }))
+            : song.artist;
+            const match = this.findMatchingAlbum(data.albumName, albumArtists, plugin);
 
-                if(match)
-                    song.album = match;
-
-                // add song if not in the album already
-                if(!match?.has(song))
-                    match?.add(song);
-            } else {
-                song.album = new Album({
+            song.album = match ??
+                new Album({
                     title: data.albumName,
                     artist: song.artist,
                     plugin
                 });
 
-                if(!song.album.has(song))
-                    song.album.add(song);
-            }
+            // add song if not in the album already
+            if(!song.album.has(song))
+                song.album.add(song);
         }
 
         // check if there's no image to apply OR it's already done

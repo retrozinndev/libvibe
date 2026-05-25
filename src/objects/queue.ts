@@ -8,7 +8,7 @@ export class Queue extends SongList {
     declare $signals: Queue.SignalSignatures;
 
     @signal()
-    cleared() {}
+    protected cleared() {}
 
     /** the current song index */
     @property(Number)
