@@ -1,4 +1,5 @@
-import GObject, { getter, gtype, property, register, signal } from "gnim/gobject";
+import GObject from "gi://GObject?version=2.0";
+import { getter, gtype, property, register, signal } from "gnim/gobject";
 import { Vibe, Section } from "..";
 import { Song, Artist, SongList, Album, Playlist } from "../objects";
 import { Menu, Page } from "../interfaces";
@@ -8,7 +9,9 @@ import { Menu, Page } from "../interfaces";
 /** create plugins and add functions to them */
 @register({ GTypeName: "VibePlugin" })
 export class Plugin extends GObject.Object {
-    declare $signals: Plugin.SignalSignatures;
+    declare readonly $signals: Plugin.SignalSignatures;
+    declare readonly $readableProperties: Plugin.ReadableProperties;
+    declare readonly $readWriteProperties: Plugin.ReadWriteProperties;
 
     /** the plugin's unique identifier, defined by the application 
       * on plugin import 
@@ -19,8 +22,7 @@ export class Plugin extends GObject.Object {
     readonly #prettyName: string;
     readonly #version: string = "unknown";
     readonly #url: string|null = null;
-
-    #implements: Plugin.Implementations = {};
+    readonly #implements: Plugin.Implementations = {};
 
     @signal()
     protected loaded() {}
@@ -69,6 +71,7 @@ export class Plugin extends GObject.Object {
     @property(gtype<Plugin.Status>(String))
     status: Plugin.Status = "none";
 
+
     constructor(properties: {
         name: string;
         prettyName?: string;
@@ -93,7 +96,9 @@ export class Plugin extends GObject.Object {
             this.#version = properties.version;
 
         if(properties.implements !== undefined)
-            this.#implements = Object.freeze({ ...properties.implements });
+            Object.assign(this.#implements, properties.implements);
+
+        Object.freeze(this.#implements);
     }
 
     /** the search function implemented by the plugin.
@@ -174,22 +179,27 @@ export namespace Plugin {
     }>;
     
     export interface SignalSignatures extends GObject.Object.SignalSignatures {
+        "notify::name"(): void;
+        "notify::pretty-name"(): void;
+        "notify::description"(): void;
+        "notify::status"(): void;
+
         /** emitted when the plugin has finished loading */
-        "loaded": () => void;
-        
+        "loaded"(): void;
         /** emitted when a page is created from an object that originates from this plugin and is 
           * requesting for content to be added to it(e.g.: sections)
           *
           * @param page the page that was created 
           * @param plugin the plugin that requested this page(based on its content, e.g.: a song) */
-        "page-request": <T extends Page.Type>(page: Page<T>) => void;
+        "page-request"<T extends Page.Type>(page: Page<T>): void;
         /** a menu was requested by the user(e.g.: a secondary click in a song).
           * this is emitted only for this plugin. for a plugin-wide signal,
           * refer to the main `Vibe` instance's `::menu-request`
           * @param object the object that is requesting the secondary menu(song, artist...)
           * @param menu the menu to add buttons to */
-        "menu-request": (object: Song|Album|Artist|Playlist|SongList, menu: Menu) => void;
-        "notify::description": () => void;
-        "notify::status": () => void;
+        "menu-request"(object: Song|Album|Artist|Playlist|SongList, menu: Menu): void;
     }
+
+    export interface ReadableProperties extends GObject.Object.ReadableProperties {}
+    export interface ReadWriteProperties extends GObject.Object.ReadWriteProperties {}
 }

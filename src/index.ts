@@ -1,4 +1,4 @@
-import GObject, { getter, gtype, register, signal } from "gnim/gobject";
+import { getter, gtype, register, signal } from "gnim/gobject";
 import Gio from "gi://Gio?version=2.0";
 import GLib from "gi://GLib?version=2.0";
 import { SongList, Song, Artist, Album, Playlist, VibeObject } from "./objects";
@@ -9,6 +9,7 @@ import { Page, Dialog, Menu } from "./interfaces";
 import { createRoot, getScope, jsx } from "gnim";
 import Adw from "gi://Adw?version=1";
 import Gtk from "gi://Gtk?version=4.0";
+import GObject from "gi://GObject?version=2.0";
 
 
 export type IconButton = {
@@ -51,7 +52,10 @@ export const isDetailedButton = (obj: object): obj is DetailedButton =>
   * - search through existing objects like songs, artists, albums and playlists */
 @register({ GTypeName: "VibeAPI" })
 export class Vibe extends GObject.Object {
-    declare $signals: Vibe.SignalSignatures;
+    declare readonly $signals: Vibe.SignalSignatures;
+    declare readonly $constructOnlyProperties: Vibe.ConstructOnlyProperties;
+    declare readonly $writableProperties: Vibe.WritableProperties;
+    declare readonly $readableProperties: Vibe.ReadableProperties;
 
     private static instance: Vibe;
 
@@ -229,7 +233,7 @@ Please create one providing all the necessary properties");
         }
 
         this.#toastOverlay.add_toast(toast);
-        this.emit("toast-notified", text, priority, button);
+        (this as Vibe).emit("toast-notified", text, priority, button);
     }
 
     /** adds a dialog popup to the main application window and presents it
@@ -323,25 +327,6 @@ Please create one providing all the necessary properties");
         type: K,
         predicate: (obj: T) => boolean|T
     ): T|undefined {
-        let constructor: typeof VibeObject = VibeObject;
-        switch(type) {
-            case "album":
-                constructor = Album;
-            break;
-            case "song":
-                constructor = Song;
-            break;
-            case "artist":
-                constructor = Artist;
-            break;
-            case "playlist":
-                constructor = Playlist;
-            break;
-            case "songlist":
-                constructor = SongList;
-            break;
-        }
-
         const list = this.#objects.find(d => d.plugin.id === plugin.id)?.[type] as Array<T>;
         if(!list || list.length < 1)
             return undefined;
@@ -350,7 +335,7 @@ Please create one providing all the necessary properties");
     }
 }
 
-namespace Vibe {
+export namespace Vibe {
     export type ToastPriority = "high"|"normal";   
     export type PageConstructor = new <T extends Page.Type = Gtk.Widget>(props: Page.ConstructorProps<T>) => Page<T>;
     export type DialogConstructor = new (props: Dialog) => Adw.Dialog;
@@ -370,29 +355,47 @@ namespace Vibe {
         [K in Exclude<keyof PluginData, "plugin">]: ExtractObjectTypeFromName<K>
     };
 
+    export interface ReadableProperties extends GObject.Object.ReadableProperties {
+        "pages": Pages;
+        "media": Media;
+        "objects": Array<Vibe.PluginData>;
+        "plugins": Array<Plugin>;
+    }
+
+    export interface WritableProperties extends GObject.Object.WritableProperties {
+    }
+
+    export interface ConstructOnlyProperties extends GObject.Object.ConstructOnlyProperties {
+    }
+
     export interface SignalSignatures extends GObject.Object.SignalSignatures {
+        "notify::pages"(): void;
+        "notify::media"(): void;
+        "notify::objects"(): void;
+        "notify::plugins"(): void;
+
         /** the api just finished starting */
-        "initialized": () => void;
+        "initialized"(): void;
         /** a new song object was generated */
-        "song-added": <T extends Object>(plugin: Plugin, song: Song<T>) => void;
+        "song-added"<T extends Object>(plugin: Plugin, song: Song<T>): void;
         /** a new album was generated */
-        "album-added": (plugin: Plugin, album: Album) => void;
+        "album-added"(plugin: Plugin, album: Album): void;
         /** a new song list was generated. it's also triggered by albums and playlists */
-        "songlist-added": (plugin: Plugin, list: SongList) => void;
+        "songlist-added"(plugin: Plugin, list: SongList): void;
         /** new artist object instance was generated */
-        "artist-added": (plugin: Plugin, artist: Artist) => void;
+        "artist-added"(plugin: Plugin, artist: Artist): void;
         /** a playlist was created */
-        "playlist-added": (plugin: Plugin, playlist: Playlist) => void;
+        "playlist-added"(plugin: Plugin, playlist: Playlist): void;
         /** a `VibeObject` was created */
-        "object-added": (plugin: Plugin, object: VibeObject) => void;
+        "object-added"(plugin: Plugin, object: VibeObject): void;
         /** a new plugin got installed by the user */
-        "plugin-added": (plugin: Plugin) => void;
+        "plugin-added"(plugin: Plugin): void;
         /** authentication for a plugin has started */
-        "auth-started": (plugin: Plugin) => void;
+        "auth-started"(plugin: Plugin): void;
         /** authentication for a plugin has ended */
-        "auth-ended": (plugin: Plugin) => void;
+        "auth-ended"(plugin: Plugin): void;
         /** a new toast notification got sent */
-        "toast-notified": (text: string, priority: Vibe.ToastPriority, button?: LabelButton) => void;
+        "toast-notified"(text: string, priority: Vibe.ToastPriority, button?: LabelButton): void;
         /** a menu was requested by the user(e.g.: a secondary click in a song).
           * this is a plugin-wide signal. it's emitted by all of the plugins;
           * you can detect which plugin emitted the signal by accessing the `plugin` field of the `object`
@@ -400,6 +403,6 @@ namespace Vibe {
           *
           * @param object the object that is requesting the secondary menu(song, artist...)
           * @param menu the menu to add buttons to */
-        "menu-request": (object: Song|Album|Artist|Playlist|SongList, menu: Menu) => void;
+        "menu-request"(object: Song|Album|Artist|Playlist|SongList, menu: Menu): void;
     }
 }

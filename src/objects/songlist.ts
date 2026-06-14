@@ -14,7 +14,9 @@ import { VibeObject } from "./object";
   * value. */
 @register({ GTypeName: "VibeSongList" })
 export class SongList extends VibeObject {
-    declare $signals: SongList.SignalSignatures;
+    declare readonly $signals: SongList.SignalSignatures;
+    declare readonly $readableProperties: SongList.ReadableProperties;
+    declare readonly $readWriteProperties: SongList.ReadWriteProperties;
 
     #length: number = 0;
 
@@ -98,13 +100,13 @@ export class SongList extends VibeObject {
     /** pop the last song from this song list */
     pop(): void {
         const popped = this._songs.pop();
-        popped && this.emit("removed", popped);
+        popped && (this as SongList).emit("removed", popped);
     }
 
     /** add a song to the song list */
     add(song: Song): void {
         this._songs.push(song);
-        this.emit("added", song);
+        (this as SongList).emit("added", song);
     }
 
     /** loop through the song list */
@@ -126,7 +128,7 @@ export class SongList extends VibeObject {
     remove(a: Song|number): void {
         if(typeof a === "number") {
             const [song] = this._songs.splice(a, 1);
-            song && this.emit("removed", song);
+            song && (this as SongList).emit("removed", song);
 
             return;
         }
@@ -135,7 +137,7 @@ export class SongList extends VibeObject {
             const song = this._songs[i];
 
             if(song.id === a.id) {
-                this.emit("removed", this._songs.splice(i, 1)[0]);
+                (this as SongList).emit("removed", this._songs.splice(i, 1)[0]);
                 break;
             }
         }
@@ -215,7 +217,7 @@ export class SongList extends VibeObject {
         // append/prepend song if newPos is bigger/smaller than the array size
         if(unshift || newPos > this._songs.length-1) {
             this._songs[(unshift ? "unshift" : "push")](song);
-            this.emit("reordered", song, null);
+            (this as SongList).emit("reordered", song, null);
 
             return;
         }
@@ -223,7 +225,7 @@ export class SongList extends VibeObject {
         const replaced = this._songs[newPos];
         this._songs[newPos] = song;
         this._songs[i] = replaced;
-        this.emit("reordered", song, replaced);
+        (this as SongList).emit("reordered", song, replaced);
     }
 
     /** creates a new array with the song objects contained in this list.
@@ -235,8 +237,23 @@ export class SongList extends VibeObject {
 
 export namespace SongList {
     export interface SignalSignatures extends VibeObject.SignalSignatures {
-        "added": (song: Song) => void;
-        "removed": (song: Song) => void;
-        "reordered": (song: Song, replacedSong: Song|null) => void;
+        "notify::length"(): void;
+        "notify::image"(): void;
+        "notify::title"(): void;
+        "notify::description"(): void;
+
+        "added"(song: Song): void;
+        "removed"(song: Song): void;
+        "reordered"(song: Song, replacedSong: Song|null): void;
+    }
+
+    export interface ReadableProperties extends VibeObject.ReadableProperties {
+        length: number;
+        title: string|null;
+        description: string|null;
+    }
+
+    export interface ReadWriteProperties extends VibeObject.ReadWriteProperties {
+        image: Image|null;
     }
 }

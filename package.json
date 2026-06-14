@@ -3,9 +3,7 @@
   "name": "libvibe",
   "version": "0.0.1",
   "description": "A library to create extensions for the Vibe Music Player",
-  "scripts": {
-    "types": "sh ./scripts/types.sh"
-  },
+  "scripts": {},
   "keywords": ["library", "music-player", "music", "plugins", "extensions"],
   "author": {
       "name": "João Dias",

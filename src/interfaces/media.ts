@@ -1,16 +1,17 @@
-import GObject from "gnim/gobject";
-import { Song, SongList } from "../objects";
+import { Queue, Song, SongList, VibeObject } from "../objects";
 
 
 /** interface implemented by the vibe app to control media from each plugin. 
   * don't forget to implement the object's signals! */
-export interface Media extends GObject.Object {
-    $signals: Media.SignalSignatures;
+export interface Media extends VibeObject {
+    readonly $signals: Media.SignalSignatures;
+    readonly $readableProperties: Media.ReadableProperties;
+    readonly $readWriteProperties: Media.ReadWriteProperties;
 
     /** currently-playing song */
     get song(): Song|null;
     /** current queue */
-    get queue(): SongList|null;
+    get queue(): SongList;
     /** get the player status(playing, paused, stopped...) */
     get status(): Media.PlaybackStatus;
     /** current song's length in microseconds */
@@ -76,7 +77,32 @@ export namespace Media {
         LOADING = 3
     }
 
-    export interface SignalSignatures extends GObject.Object.SignalSignatures {
+    export interface ReadWriteProperties extends VibeObject.ReadWriteProperties {
+        "loop": Media.LoopMode;
+        "shuffle": Media.ShuffleMode;
+        "position": number;
+        "volume": number;
+        "mute": boolean;
+    }
+
+    export interface ReadableProperties extends VibeObject.ReadableProperties {
+        "song": Song|null;
+        "queue": Queue;
+        "status": Media.PlaybackStatus;
+        "length": number;
+    }
+
+    export interface SignalSignatures extends VibeObject.SignalSignatures {
+        "notify::song": () => void;
+        "notify::queue": () => void;
+        "notify::status": () => void;
+        "notify::length": () => void;
+        "notify::volume": () => void;
+        "notify::loop": () => void;
+        "notify::shuffle": () => void;
+        "notify::position": () => void;
+        "notify::mute": () => void;
+
         /** the song has been paused */
         "paused": (song: Song) => void;
         /** the song has been resumed */
@@ -87,15 +113,5 @@ export namespace Media {
         "gone-previous": (song: Song, queuePosition: number) => void;
         /** emitted when a song gets played(doesn't get emitted on ::next, ::previous nor ::resume) */
         "playing": (song: Song) => void;
-
-        "notify::song": () => void;
-        "notify::queue": () => void;
-        "notify::status": () => void;
-        "notify::length": () => void;
-        "notify::volume": () => void;
-        "notify::loop": () => void;
-        "notify::shuffle": () => void;
-        "notify::position": () => void;
-        "notify::mute": () => void;
     }
 }

@@ -10,7 +10,8 @@ import { Image } from "../utils";
 /** store album information */
 @register({ GTypeName: "VibeAlbum" })
 export class Album extends SongList {
-    declare $signals: Album.SignalSignatures;
+    declare readonly $signals: Album.SignalSignatures;
+    declare readonly $readableProperties: Album.ReadableProperties;
 
     readonly #artist: Array<Artist> = [];
     readonly #url: string|null = null;
@@ -68,11 +69,14 @@ export class Album extends SongList {
 
 export namespace Album {
     export interface SignalSignatures extends SongList.SignalSignatures {
-        "notify::artist": () => void;
-        "notify::image": () => void;
-        "notify::title": () => void;
-        "notify::url": () => void;
-        "notify::single": () => void;
-        "notify::description": () => void;
+        "notify::artist"(): void;
+        "notify::url"(): void;
+        "notify::single"(): void;
+    }
+
+    export interface ReadableProperties extends SongList.ReadableProperties {
+        "artist": Array<Artist>;
+        "url": string|null;
+        "single": boolean;
     }
 }

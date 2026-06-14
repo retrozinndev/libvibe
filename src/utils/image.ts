@@ -27,7 +27,8 @@ import GlyGtk4 from "gi://GlyGtk4?version=2";
   * different management system from the other objects */
 @register({ GTypeName: "VibeImage" })
 export class Image<T extends Image.SourceTypes = any> extends VibeObject {
-    declare $signals: Image.SignalSignatures;
+    declare readonly $signals: Image.SignalSignatures;
+    declare readonly $readableProperties: Image.ReadableProperties;
 
     public static readonly cacheDir: Gio.File = Gio.File.new_for_path(
         `${Vibe.cacheDir.peek_path()!}/arts`
@@ -92,21 +93,21 @@ export class Image<T extends Image.SourceTypes = any> extends VibeObject {
 
         if(source instanceof Gio.File) {
             this.#source = source as T;
-            this.notify("has-cache-file");
+            (this as Image).notify("has-cache-file");
             return;
         }
 
         this.#source = (source instanceof GLib.Bytes ?
             source.toArray()
         : source) as T;
-        this.notify("has-cache-file");
+        (this as Image).notify("has-cache-file");
 
         this.#cacheName = Image.generateCacheName(uniqueData);
         this.#cacheFile = Gio.File.new_for_path(`${Image.cacheDir.peek_path()!}/${this.#cacheName}`);
         this.#cacheFile.replace_contents_bytes_async(
             this.#source as Uint8Array, null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, null, null
         );
-        this.notify("cache-file");
+        (this as Image).notify("cache-file");
     }
 
     public static generateCacheName(uniqueData?: string|Song): string {
@@ -164,7 +165,7 @@ export class Image<T extends Image.SourceTypes = any> extends VibeObject {
                     }
 
                     this.#texture = texture;
-                    this.notify("texture");
+                    (this as Image).notify("texture");
                     resolve();
                 });
             });
@@ -178,7 +179,7 @@ export class Image<T extends Image.SourceTypes = any> extends VibeObject {
 
         this.#texture?.run_dispose();
         this.#texture = null;
-        this.notify("texture");
+        (this as Image).notify("texture");
     }
 
     ref(): Image<T> {
@@ -194,7 +195,18 @@ export class Image<T extends Image.SourceTypes = any> extends VibeObject {
 export namespace Image {
     export type SourceTypes = Gio.File|Uint8Array;
     export interface SignalSignatures extends VibeObject.SignalSignatures {
-        "unloaded": () => void;
-        "loaded": () => void;
+        "notify::source"(): void;
+        "notify::cache-file"(): void;
+        "notify::has-cache-file"(): void;
+        "notify::texture"(): void;
+
+        "unloaded"(): void;
+        "loaded"(): void;
+    }
+    export interface ReadableProperties<T extends Image.SourceTypes = Gio.File> extends VibeObject.ReadableProperties {
+        "source": T;
+        "cache-file": Gio.File|null;
+        "has-cache-file": boolean;
+        "texture": Gdk.Texture|null;
     }
 }

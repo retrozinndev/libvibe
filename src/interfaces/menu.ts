@@ -1,4 +1,4 @@
-import GObject from "gnim/gobject";
+import GObject from "gi://GObject?version=2.0";
 import { LabelButton } from "..";
 
 
@@ -28,12 +28,17 @@ export interface Menu {
 
 export namespace Menu {
     export interface SignalSignatures extends GObject.Object.SignalSignatures {
+        "notify::length": () => void;
+
         "added": (button: LabelButton, index: number) => void;
         "removed": (button: LabelButton, index: number) => void;
-        "notify::length": () => void;
     }
 
-    export interface ConstructorProps extends GObject.Object.ConstructorProps {
-        buttons: Array<LabelButton>;
+    export interface ReadableProperties extends GObject.Object.ReadableProperties {
+        "length": number;
+    }
+
+    export interface ConstructOnlyProperties extends GObject.Object.ConstructOnlyProperties {
+        "buttons": Array<LabelButton>;
     }
 }
