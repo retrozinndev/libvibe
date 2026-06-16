@@ -1,10 +1,10 @@
 import Gio from "gi://Gio?version=2.0";
-import GObject, { gtype, property, register, signal } from "gnim/gobject";
+import { gtype, property, register } from "gnim/gobject";
 import Gst from "gi://Gst?version=1.0";
 import { Artist, Album, VibeObject } from ".";
-import { Plugin } from "../plugin";
 import { Vibe } from "..";
 import { Image } from "../utils";
+import GObject from "gi://GObject?version=2.0";
 
 
 /** store song data.
@@ -12,9 +12,9 @@ import { Image } from "../utils";
 @register({ GTypeName: "VibeSong" })
 export class Song<T extends Object = Gio.File|Gst.Stream> extends VibeObject {
     declare $signals: Song.SignalSignatures;
-
-    @signal()
-    protected prepare() {}
+    declare $readableProperties: Song.ReadableProperties;
+    declare $readWriteProperties: Song.ReadWriteProperties;
+    declare $constructOnlyProperties: Song.ConstructOnlyProperties;
 
     /** the song title. can be null */
     @property(gtype<string|null>(String)) 
@@ -32,7 +32,7 @@ export class Song<T extends Object = Gio.File|Gst.Stream> extends VibeObject {
     @property(gtype<string|null>(String))
     url: string|null = null;
 
-    /** the song's source, can be a `GFile`(local), `GstStream`(tcp/udp streaming), null or any chosen type in construction */
+    /** the song's source. contains info on how to play the song(e.g.: a GFile for a local song). */
     @property(gtype<T|null>(GObject.TYPE_JSOBJECT))
     source: T|null = null;
 
@@ -74,26 +74,7 @@ export class Song<T extends Object = Gio.File|Gst.Stream> extends VibeObject {
     lyrics: string|null = null;
 
 
-    constructor(properties: {
-        title?: string;
-        artist?: Array<Artist>;
-        /** any data in the `Object` type that contains a way to stream/play this song. this is handled by 
-          * the plugin's Media implementation(or the default Gstreamer one) */
-        source?: T extends Gio.File|Gst.Stream ? T|string : T;
-        id?: any;
-        /** internally-used property to notify the api about a new song added for a plugin */
-        plugin?: Plugin;
-        explicit?: boolean;
-        url?: string;
-        image?: Image;
-        album?: Album;
-        discNumber?: number;
-        isrc?: string;
-        trackNumber?: number;
-        publisher?: string;
-        date?: Gst.DateTime;
-        lyrics?: string;
-    }) {
+    constructor(properties: Partial<GObject.ConstructorProps<Song>>) {
         super({
             id: properties.id,
             plugin: properties.plugin
@@ -148,15 +129,31 @@ export class Song<T extends Object = Gio.File|Gst.Stream> extends VibeObject {
 
 export namespace Song {
     export interface SignalSignatures extends VibeObject.SignalSignatures {
-        /** emitted when the previous song is about to finish, so the next one can be prepared for a faster load time */
-        "prepare": () => void;
-        "notify::source": () => void;
-        "notify::name": () => void;
-        "notify::artist": () => void;
-        "notify::explicit": () => void;
-        "notify::url": () => void;
-        "notify::metadata": () => void;
-        "notify::image": () => void;
-        "notify::album": () => void;
+        "notify::source"(): void;
+        "notify::name"(): void;
+        "notify::artist"(): void;
+        "notify::explicit"(): void;
+        "notify::url"(): void;
+        "notify::metadata"(): void;
+        "notify::image"(): void;
+        "notify::album"(): void;
     }
+
+    export interface ReadableProperties extends VibeObject.ReadableProperties {}
+    export interface ReadWriteProperties extends VibeObject.ReadWriteProperties {
+        "title": string|null;
+        "artist": Array<Artist>;
+        "album": Album|null;
+        "url": string|null;
+        "source": object;
+        "explicit": boolean;
+        "image": Image|null;
+        "disc-number": number;
+        "isrc": string|null;
+        "track-number": number;
+        "publisher": string|null;
+        "date": Gst.DateTime|null;
+        "lyrics": string|null;
+    }
+    export interface ConstructOnlyProperties extends VibeObject.ConstructOnlyProperties {}
 }

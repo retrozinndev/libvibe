@@ -1,9 +1,7 @@
-import { register } from "gnim/gobject";
+import { register, setter } from "gnim/gobject";
 import { Vibe } from "..";
-import { Song } from "./song";
 import { SongList } from "./songlist";
-import { Plugin } from "../plugin";
-import { Image } from "../utils";
+import GObject from "gi://GObject?version=2.0";
 
 
 /** user-managed song list (handled by the app) */
@@ -11,14 +9,13 @@ import { Image } from "../utils";
 export class Playlist extends SongList {
     declare $signals: Playlist.SignalSignatures;
 
-    constructor(properties: {
-        title: string;
-        description?: string;
-        id?: any;
-        plugin?: Plugin;
-        image?: Image;
-        songs?: Array<Song>;
-    }) {
+    @setter(String)
+    set title(str: string) {
+        this._title = str;
+        this.notify("title");
+    }
+
+    constructor(properties: Partial<GObject.ConstructorProps<Playlist>>) {
         super({
             title: properties.title,
             description: properties.description,
@@ -27,7 +24,7 @@ export class Playlist extends SongList {
             id: properties.id
         });
 
-        if(properties.plugin !== undefined)
+        if(properties.plugin)
             Vibe.getDefault().emit(
                 "playlist-added",
                 properties.plugin,

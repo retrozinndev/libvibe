@@ -39,11 +39,11 @@ export class VibeObject extends GObject.Object {
 
 export namespace VibeObject {
     export interface ConstructOnlyProperties extends GObject.Object.ConstructOnlyProperties {
-        id: any;
-        plugin: Plugin;
+        "id": any;
+        "plugin": Plugin;
     }
     export interface SignalSignatures extends GObject.Object.SignalSignatures {
-        "notify::plugin": () => void;
+        "notify::plugin"(): void;
     }
 
     export interface ReadableProperties extends GObject.Object.ReadableProperties {

@@ -1,16 +1,15 @@
 import { getter, gtype, register } from "gnim/gobject";
 import { Vibe } from "..";
-import { Plugin } from "../plugin";
-import { Song } from "./song";
 import { Artist } from "./artist";
 import { SongList } from "./songlist";
-import { Image } from "../utils";
+import GObject from "gi://GObject?version=2.0";
 
 
 /** store album information */
 @register({ GTypeName: "VibeAlbum" })
 export class Album extends SongList {
     declare readonly $signals: Album.SignalSignatures;
+    declare readonly $constructOnlyProperties: Album.ConstructOnlyProperties;
     declare readonly $readableProperties: Album.ReadableProperties;
 
     readonly #artist: Array<Artist> = [];
@@ -29,17 +28,7 @@ export class Album extends SongList {
     @getter(Boolean)
     get single() { return this.#single; }
 
-    constructor(properties: {
-        artist: Array<Artist>;
-        songs?: Array<Song>;
-        image?: Image;
-        title?: string;
-        id?: any;
-        plugin?: Plugin;
-        description?: string;
-        url?: string;
-        single?: boolean;
-    }) {
+    constructor(properties: Partial<GObject.ConstructorProps<Album>>) {
         super({
             title: properties.title,
             image: properties.image,
@@ -78,5 +67,11 @@ export namespace Album {
         "artist": Array<Artist>;
         "url": string|null;
         "single": boolean;
+    }
+
+    export interface ConstructOnlyProperties extends SongList.ConstructOnlyProperties {
+        artist: Array<Artist>;
+        url: string|null;
+        single: boolean;
     }
 }

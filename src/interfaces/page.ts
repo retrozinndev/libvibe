@@ -8,7 +8,9 @@ import { Accessor } from "gnim";
 export interface Page<
     T extends Page.Type = Gtk.Widget
 > extends Adw.Bin {
-    $signals: Page.SignalSignatures;
+    readonly $signals: Page.SignalSignatures;
+    readonly $readableProperties: Page.ReadableProperties;
+    readonly $readWriteProperties: Page.ReadWriteProperties;
 
     readonly id: any;
 
@@ -46,6 +48,19 @@ export namespace Page {
 
     export interface SignalSignatures extends Adw.Bin.SignalSignatures {
         /** a content refresh was requested */
-        "refresh": () => void;
+        "refresh"(): void;
+    }
+
+    export interface ConstructOnlyProperties extends Adw.Bin.ConstructOnlyProperties {
+        id: any;
+    }
+
+    export interface ReadableProperties extends Adw.Bin.ReadableProperties {}
+
+    export interface ReadWriteProperties extends Adw.Bin.ReadWriteProperties {
+        title: string;
+        sections: Array<Section>;
+        content: Page.Type;
+        buttons: Array<IconButton|LabelButton|DetailedButton>;
     }
 }

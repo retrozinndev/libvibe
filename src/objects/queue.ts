@@ -12,30 +12,32 @@ export class Queue extends SongList {
 
     /** the current song index */
     @property(Number)
-    currentSong: number = 0;
+    currentSong: number = -1;
 
     constructor(songs?: SongList|Array<Song>, current?: number) {
         super({
             title: "Queue",
-            description: "Your song queue",
+            description: "Your track queue",
             songs: Array.isArray(songs) ? songs : songs?.toArray()
         });
 
-        if(this.length > 0 && current !== undefined)
-            this.currentSong = 0;
+        if(this.length > 0)
+            this.currentSong = current != null && current <= this.length ?
+                current
+            : 0;
     }
 
     /** clears the song queue, emits ::cleared. you can add more songs using the 
       * {@link add} method */
     clear(): void {
         this._songs = [];
-        this.emit("cleared");
+        (this as Queue).emit("cleared");
     }
 }
 
 export namespace Queue {
     export interface SignalSignatures extends SongList.SignalSignatures {
-        "cleared": () => void;
-        "notify::current-song": () => void;
+        "notify::current-song"(): void;
+        "cleared"(): void;
     }
 }

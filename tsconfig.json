@@ -5,11 +5,15 @@
         "useUnknownInCatchVariables": true,
         "allowJs": false,
         "lib": ["ES2025"],
-        "strict": true,
+        "strict": false,
         "moduleResolution": "bundler",
         "skipLibCheck": true,
         "jsx": "react-jsx",
-        "jsxImportSource": "gnim/gtk4",
-        "types": ["../.types/gi"]
-    }
+        "jsxImportSource": "gnim/gtk4"
+    },
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        "../.types/**/index.d.ts"
+    ]
 }

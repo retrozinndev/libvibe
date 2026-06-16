@@ -43,7 +43,7 @@ export abstract class Meta {
         options.enableLogs ??= false;
 
         const info = this.discover(file, timeout, options.enableLogs);
-        const streamTags = info.get_tags(), 
+        const streamTags = info.get_stream_info()?.get_tags(), 
             audioStreamTags = info.get_audio_streams().map(audStream => audStream.get_tags());
 
         this.handleDiscovererResults(info);
@@ -88,7 +88,7 @@ export abstract class Meta {
         options.enableLogs ??= false;
 
         const info = await this.discoverAsync(file, timeout, options.enableLogs);
-        const streamTags = info.get_tags(), 
+        const streamTags = info.get_stream_info()?.get_tags(), 
             audioStreamTags = info.get_audio_streams().map(audStream => audStream.get_tags());
 
         this.handleDiscovererResults(info);

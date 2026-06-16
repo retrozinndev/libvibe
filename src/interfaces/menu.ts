@@ -3,6 +3,10 @@ import { LabelButton } from "..";
 
 
 export interface Menu {
+    readonly $signals: Menu.SignalSignatures;
+    readonly $readableProperties: Menu.ReadableProperties;
+    readonly $constructOnlyProperties: Menu.ConstructOnlyProperties;
+
     get length(): number;
 
     /** append a new button to the end of the menu

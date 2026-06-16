@@ -1,9 +1,9 @@
-import GObject, { getter, gtype, property, register, signal } from "gnim/gobject";
+import { getter, gtype, property, register, signal } from "gnim/gobject";
 import { Song } from "./song";
 import { Vibe } from "..";
-import { Plugin } from "../plugin";
 import { Image } from "../utils";
 import { VibeObject } from "./object";
+import GObject from "gi://GObject?version=2.0";
 
 
 /** base class for song lists(albums and playlists).
@@ -15,6 +15,7 @@ import { VibeObject } from "./object";
 @register({ GTypeName: "VibeSongList" })
 export class SongList extends VibeObject {
     declare readonly $signals: SongList.SignalSignatures;
+    declare readonly $constructOnlyProperties: SongList.ConstructOnlyProperties;
     declare readonly $readableProperties: SongList.ReadableProperties;
     declare readonly $readWriteProperties: SongList.ReadWriteProperties;
 
@@ -59,37 +60,27 @@ export class SongList extends VibeObject {
     protected reordered(_: Song, __: Song|null) {}
 
 
-    constructor(properties?: {
-        songs?: Array<Song>;
-        title?: string;
-        plugin?: Plugin;
-        id?: any;
-        image?: Image;
-        description?: string;
-    }) {
+    constructor(properties: Partial<GObject.ConstructorProps<SongList>> = {}) {
         super({
             id: properties?.id,
             plugin: properties?.plugin
         });
 
-        if(properties === undefined)
-            return;
-
-        if(properties.songs !== undefined)
+        if(properties.songs)
             properties.songs.forEach(song =>
                 this.add(song)
             );
 
-        if(properties.title !== undefined)
+        if(properties.title != null)
             this._title = properties.title;
 
-        if(properties.description !== undefined)
+        if(properties.description != null)
             this._description = properties.description;
 
-        if(properties.image !== undefined)
+        if(properties.image != null)
             this.image = properties.image;
 
-        if(properties.plugin !== undefined)
+        if(properties.plugin != null)
             Vibe.getDefault().emit(
                 "songlist-added",
                 properties.plugin,
@@ -245,6 +236,12 @@ export namespace SongList {
         "added"(song: Song): void;
         "removed"(song: Song): void;
         "reordered"(song: Song, replacedSong: Song|null): void;
+    }
+
+    export interface ConstructOnlyProperties extends VibeObject.ConstructOnlyProperties {
+        title: string|null;
+        description: string|null;
+        songs: Array<Song>;
     }
 
     export interface ReadableProperties extends VibeObject.ReadableProperties {

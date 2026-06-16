@@ -12,6 +12,7 @@ export class Plugin extends GObject.Object {
     declare readonly $signals: Plugin.SignalSignatures;
     declare readonly $readableProperties: Plugin.ReadableProperties;
     declare readonly $readWriteProperties: Plugin.ReadWriteProperties;
+    declare readonly $constructOnlyProperties: Plugin.ConstructOnlyProperties;
 
     /** the plugin's unique identifier, defined by the application 
       * on plugin import 
@@ -72,30 +73,26 @@ export class Plugin extends GObject.Object {
     status: Plugin.Status = "none";
 
 
-    constructor(properties: {
-        name: string;
-        prettyName?: string;
-        description?: string;
-        version?: string;
-        url?: string;
-        implements?: Plugin.Implementations;
-    }) {
+    constructor(properties: Partial<GObject.ConstructorProps<Plugin>>) {
         super();
 
         this.id = Vibe.getDefault().generateID();
+        if(properties.name == null)
+            throw new Error("Plugin: no name provided for plugin! Please, set the \"name\" property!");
+
         this.#name = properties.name;
         this.#prettyName = properties.prettyName ?? properties.name;
 
-        if(properties.url !== undefined)
+        if(properties.url != null)
             this.#url = properties.url;
 
-        if(properties.description !== undefined)
+        if(properties.description != null)
             this.description = properties.description;
 
-        if(properties.version !== undefined)
+        if(properties.version != null)
             this.#version = properties.version;
 
-        if(properties.implements !== undefined)
+        if(properties.implements != null)
             Object.assign(this.#implements, properties.implements);
 
         Object.freeze(this.#implements);
@@ -200,6 +197,22 @@ export namespace Plugin {
         "menu-request"(object: Song|Album|Artist|Playlist|SongList, menu: Menu): void;
     }
 
-    export interface ReadableProperties extends GObject.Object.ReadableProperties {}
-    export interface ReadWriteProperties extends GObject.Object.ReadWriteProperties {}
+    export interface ConstructOnlyProperties extends GObject.Object.ConstructOnlyProperties {
+        "name": string;
+        "pretty-name": string;
+        "version": string;
+        "url": string|null;
+        "implements": Plugin.Implementations;
+    }
+    export interface ReadableProperties extends GObject.Object.ReadableProperties {
+        "name": string;
+        "pretty-name": string;
+        "version": string;
+        "url": string|null;
+        "implements": Plugin.Implementations;
+    }
+    export interface ReadWriteProperties extends GObject.Object.ReadWriteProperties {
+        "description": string;
+        "status": Plugin.Status;
+    }
 }

@@ -3,7 +3,9 @@ import { Page } from "./page";
 
 
 export interface Pages extends Gtk.Stack {
-    $signals: Pages.SignalSignatures;
+    readonly $signals: Pages.SignalSignatures;
+    readonly $readableProperties: Pages.ReadableProperties;
+    readonly $readWriteProperties: Pages.ReadWriteProperties;
 
     
     // properties
@@ -33,5 +35,13 @@ export namespace Pages {
         "removed": <T extends Page.Type>(removedPage: Page<T>) => void;
         "notify::current-page": () => void;
         "notify::history": () => void;
+    }
+
+    export interface ReadableProperties extends Gtk.Stack.ReadableProperties {
+        "current-page": Page;
+        "history": Array<Page>;
+        "can-go-back": boolean;
+    }
+    export interface ReadWriteProperties extends Gtk.Stack.ReadWriteProperties {
     }
 }

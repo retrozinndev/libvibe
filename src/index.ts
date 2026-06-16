@@ -92,6 +92,9 @@ export class Vibe extends GObject.Object {
     @getter(Array)
     get plugins() { return this.#plugins; }
 
+    @signal()
+    protected initialized() {}
+
     @signal(String, gtype<Vibe.ToastPriority>(String), gtype<LabelButton|undefined>(Object))
     protected toastNotified(_: string, __: Vibe.ToastPriority, ___?: LabelButton) {}
 
@@ -100,9 +103,6 @@ export class Vibe extends GObject.Object {
 
     @signal(gtype<Page>(GObject.Object))
     protected pageRequest(_: Page) {}
-
-    @signal()
-    protected initialized() {}
 
     @signal(GObject.Object, GObject.Object)
     protected songAdded(plugin: Plugin, song: Song) {

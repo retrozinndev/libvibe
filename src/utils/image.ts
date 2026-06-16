@@ -29,6 +29,8 @@ import GlyGtk4 from "gi://GlyGtk4?version=2";
 export class Image<T extends Image.SourceTypes = any> extends VibeObject {
     declare readonly $signals: Image.SignalSignatures;
     declare readonly $readableProperties: Image.ReadableProperties;
+    declare readonly $readWriteProperties: Image.ReadWriteProperties;
+    declare readonly $constructOnlyProperties: Image.ConstructOnlyProperties;
 
     public static readonly cacheDir: Gio.File = Gio.File.new_for_path(
         `${Vibe.cacheDir.peek_path()!}/arts`
@@ -209,4 +211,7 @@ export namespace Image {
         "has-cache-file": boolean;
         "texture": Gdk.Texture|null;
     }
+
+    export interface ReadWriteProperties extends VibeObject.ReadWriteProperties {}
+    export interface ConstructOnlyProperties extends VibeObject.ConstructOnlyProperties {}
 }
