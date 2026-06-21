@@ -1,8 +1,9 @@
 import Adw from "gi://Adw?version=1";
 import Gtk from "gi://Gtk?version=4.0";
 import { DetailedButton, IconButton, LabelButton, Section } from "..";
-import { Album, Artist, Playlist, Song } from "../objects";
+import { Album, Artist, Playlist, Song, SongList } from "../objects";
 import { Accessor } from "gnim";
+import GObject from "gi://GObject?version=2.0";
 
 
 export interface Page<
@@ -24,7 +25,7 @@ export interface Page<
 }
 
 export namespace Page {
-    export type Type = Artist|Song|Album|Playlist|Gtk.Widget;
+    export type Type = Artist|Song|Album|Playlist|SongList|Gtk.Widget;
 
     type BaseProps = {
         title?: string;

@@ -297,9 +297,6 @@ export abstract class Meta {
         if(data.isrc !== undefined)
             song.isrc = data.isrc;
 
-        if(data.lyrics !== undefined)
-            song.lyrics = data.lyrics;
-
         if(data.publisher !== undefined)
             song.publisher = data.publisher;
 
@@ -355,10 +352,8 @@ export abstract class Meta {
 
         // check if there's no image to apply OR it's already done
         if(!options.applyImage || data.pictureData === undefined || 
-           ((song.album?.image || song.image) && 
-            (options.applyImageToArtist && 
-             (song.artist.every(art => art.image !== null ||
-              song.album?.artist.every(art => art.image !== null)))))
+           ((song.album?.image || song.image) && (options.applyImageToArtist && 
+            (song.artist.every(art => art.image !== null || song.album?.artist.every(art => art.image !== null)))))
         ) {
             return;
         }
@@ -420,10 +415,6 @@ export abstract class Meta {
         : undefined;
     }
 
-    private static getTagNumber(taglist: Gst.TagList, tag: string): number|undefined {
-        return Number.parseInt(taglist.get_string(tag)[1]) ?? undefined;
-    }
-
     private static getTagDate(taglist: Gst.TagList, tag: string): Gst.DateTime|undefined {
         return GObject.type_check_value_holds(taglist.get_value_index(tag, 0), Gst.DateTime.$gtype) ?
             taglist.get_date_time(tag)[1]
@@ -471,17 +462,18 @@ export abstract class Meta {
                 break;
 
                 case Gst.TAG_ALBUM_VOLUME_NUMBER:
-                    data.discNumber = this.getTagNumber(self, tag);
+                    data.discNumber = self.get_uint(tag)[1];
                 break;
 
                 case Gst.TAG_TRACK_NUMBER:
-                    data.trackNumber = this.getTagNumber(self, tag);
+                    data.trackNumber = self.get_uint(tag)[1];
                 break;
 
                 case Gst.TAG_ISRC:
                     data.isrc = this.getTagString(self, tag);
                 break;
 
+                case Gst.TAG_USER_RATING:
                 case "common::lyrics-rating":
                 case "common::rating":
                     data.explicit = /explicit|advisory|[1]|true/i.test(this.getTagString(self, tag) ?? "");

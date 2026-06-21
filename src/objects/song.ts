@@ -69,11 +69,6 @@ export class Song<T extends Object = Gio.File|Gst.Stream> extends VibeObject {
     @property(gtype<Gst.DateTime|null>(GObject.Object))
     date: Gst.DateTime|null = null;
 
-    /** the song's lyrics, in the LRC format. can be null */
-    @property(gtype<string|null>(String))
-    lyrics: string|null = null;
-
-
     constructor(properties: Partial<GObject.ConstructorProps<Song>>) {
         super({
             id: properties.id,
@@ -115,9 +110,6 @@ export class Song<T extends Object = Gio.File|Gst.Stream> extends VibeObject {
         if(properties.date !== undefined)
             this.date = properties.date;
 
-        if(properties.lyrics !== undefined)
-            this.lyrics = properties.lyrics;
-
         if(properties.plugin !== undefined)
             Vibe.getDefault().emit(
                 "song-added",
@@ -153,7 +145,6 @@ export namespace Song {
         "track-number": number;
         "publisher": string|null;
         "date": Gst.DateTime|null;
-        "lyrics": string|null;
     }
     export interface ConstructOnlyProperties extends VibeObject.ConstructOnlyProperties {}
 }
