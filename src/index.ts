@@ -60,12 +60,13 @@ export class Vibe extends GObject.Object {
     private static instance: Vibe;
 
     #isDataSet: boolean = false;
-    #window!: Adw.ApplicationWindow;
-    #pages!: Pages;
-    #pageConstructor!: Vibe.PageConstructor;
-    #dialogConstructor!: Vibe.DialogConstructor;
-    #media!: Media;
-    #toastOverlay!: Adw.ToastOverlay;
+    #window: Adw.ApplicationWindow;
+    #pages: Pages;
+    #pageConstructor: Vibe.PageConstructor;
+    #dialogConstructor: Vibe.DialogConstructor;
+    #media: Media;
+    #defaultMedia: Media;
+    #toastOverlay: Adw.ToastOverlay;
     #lastId: number = -1;
 
     #plugins: Array<Plugin> = [];
@@ -84,7 +85,11 @@ export class Vibe extends GObject.Object {
     get pages() { return this.#pages; }
 
     @getter(gtype<Media>(GObject.Object))
-    get media() { return this.#media; }
+    get media() { return this.#media ?? this.#defaultMedia; }
+    set __media(impl: Media|null) {
+        this.#media = impl ?? this.#defaultMedia;
+        this.notify("media");
+    }
 
     @getter(Array)
     get objects() { return this.#objects; }
@@ -260,7 +265,7 @@ Please create one providing all the necessary properties");
             return;
         }
 
-        this.#media = media;
+        this.#defaultMedia = media;
         this.#pages = pages;
         this.#pageConstructor = pageConstructor;
         this.#toastOverlay = toastOverlay;

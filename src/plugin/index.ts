@@ -2,7 +2,7 @@ import GObject from "gi://GObject?version=2.0";
 import { getter, gtype, property, register, signal } from "gnim/gobject";
 import { Vibe, Section } from "..";
 import { Song, Artist, SongList, Album, Playlist } from "../objects";
-import { Menu, Page } from "../interfaces";
+import { Media, Menu, Page } from "../interfaces";
 
 
 
@@ -24,6 +24,13 @@ export class Plugin extends GObject.Object {
     readonly #version: string = "unknown";
     readonly #url: string|null = null;
     readonly #implements: Plugin.Implementations = {};
+    #media: Media|null = null;
+
+    protected get _media() { return this.#media; }
+    protected set _media(impl: Media|null) {
+        this.#media = impl;
+        this.notify("media");
+    }
 
     @signal()
     protected loaded() {}
@@ -34,6 +41,9 @@ export class Plugin extends GObject.Object {
     @signal(gtype<Song|Artist|Album|Playlist|SongList>(GObject.Object), Object)
     protected menuRequest(object: Song|Artist|Album|Playlist|SongList, menu: Menu) {}
 
+    /** the plugin's media player implementation. `null` if it uses the default. */
+    @getter(gtype<Media|null>(GObject.Object))
+    get media() { return this._media; }
     
     /** the plugin's unique name. e.g.: vibe-plugin-music
     * @readonly */
