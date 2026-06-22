@@ -350,16 +350,12 @@ export abstract class Meta {
                 song.album.add(song);
         }
 
-        // check if there's no image to apply OR it's already done
-        if(!options.applyImage || data.pictureData === undefined || 
-           ((song.album?.image || song.image) && (options.applyImageToArtist && 
-            (song.artist.every(art => art.image !== null || song.album?.artist.every(art => art.image !== null)))))
-        ) {
+        // check if it's disabled / there's no image to apply
+        if(!options.applyImage || data.pictureData === undefined)
             return;
-        }
 
         // these nullish-coalescing operators are here to avoid creation of duplicate Image objects.
-        // duplicates can happen if another song from the same album is having its tags applied after the another from the same album/artist
+        // duplicates can happen if another song from the same album has its tags applied after the another from the same album/artist
         const image = song.album?.image ?? song.image ?? new Image(
             data.pictureData, Image.generateCacheName(song)
         );
