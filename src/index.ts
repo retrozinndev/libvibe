@@ -70,7 +70,7 @@ export class Vibe extends GObject.Object {
     #lastId: number = -1;
 
     #plugins: Array<Plugin> = [];
-    #objects: Array<Vibe.PluginData> = [];
+    #objects: Record<any, Vibe.PluginData> = {};
     
     public static readonly runtimeDir = Gio.File.new_for_path(`${GLib.get_user_runtime_dir()}/vibe`);
     public static readonly cacheDir = Gio.File.new_for_path(`${GLib.get_user_cache_dir()}/vibe`);
@@ -136,23 +136,7 @@ export class Vibe extends GObject.Object {
 
     @signal(GObject.Object, GObject.Object)
     protected objectAdded(plugin: Plugin, object: VibeObject) {
-        let data = this.#objects.find(d => d.plugin === plugin);
-        if(!data) {
-            this.#objects.push({
-                plugin,
-                object: [object],
-                album: [],
-                artist: [],
-                playlist: [],
-                songlist: [],
-                song: []
-            });
-            this.notify("objects");
-            return;
-        }
-
-        data.object.push(object);
-        this.notify("objects");
+        this.addObject(plugin, object, true);
     }
     
     @signal(GObject.Object)
@@ -289,12 +273,13 @@ Please create one providing all the necessary properties");
         this.#window = window;
     }
 
-    /** track `object` to `plugin`. helps avoiding the creation of duplicated objects */
-    protected addObject(plugin: Plugin, object: VibeObject): void {
-        let data: Vibe.PluginData = this.#objects.find(data => data.plugin.id === plugin.id)!;
+    /** track `object` to `plugin`. helps avoiding the creation of duplicated objects.
+      * @param ignoreType whether to add the object to the common objects array independently of its type */
+    protected addObject(plugin: Plugin, object: VibeObject, ignoreType: boolean = false): void {
+        let data: Vibe.PluginData = this.#objects[plugin.id];
         
         if(data === undefined)
-            this.#objects.push(data = {
+            this.#objects[plugin.id] = {
                 plugin,
                 song: [],
                 artist: [],
@@ -302,7 +287,14 @@ Please create one providing all the necessary properties");
                 playlist: [],
                 album: [],
                 object: []
-            });
+            };
+
+        if(ignoreType) {
+            data.object.push(object);
+            this.notify("objects");
+
+            return;
+        }
 
         if(object instanceof Song)
             data.song.push(object);
@@ -332,7 +324,7 @@ Please create one providing all the necessary properties");
         type: K,
         predicate: (obj: T) => boolean|T
     ): T|undefined {
-        const list = this.#objects.find(d => d.plugin.id === plugin.id)?.[type] as Array<T>;
+        const list = this.#objects[plugin.id]?.[type] as Array<T>;
         if(!list || list.length < 1)
             return undefined;
 
