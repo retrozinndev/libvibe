@@ -276,10 +276,8 @@ Please create one providing all the necessary properties");
     /** track `object` to `plugin`. helps avoiding the creation of duplicated objects.
       * @param ignoreType whether to add the object to the common objects array independently of its type */
     protected addObject(plugin: Plugin, object: VibeObject, ignoreType: boolean = false): void {
-        let data: Vibe.PluginData = this.#objects[plugin.id];
-        
-        if(data === undefined)
-            this.#objects[plugin.id] = {
+        let data: Vibe.PluginData = this.#objects[plugin.id]
+            ?? (this.#objects[plugin.id] = {
                 plugin,
                 song: [],
                 artist: [],
@@ -287,7 +285,7 @@ Please create one providing all the necessary properties");
                 playlist: [],
                 album: [],
                 object: []
-            };
+            });
 
         if(ignoreType) {
             data.object.push(object);
